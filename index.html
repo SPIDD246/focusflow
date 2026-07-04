@@ -74,6 +74,34 @@
           <button data-min="15" class="chip">15m</button>
         </div>
       </section>
+
+      <section class="card">
+        <h2 class="card-title">Reminders & Data</h2>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Study reminders</div>
+            <div class="setting-hint" id="remHint">Off — get a ping before class</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="remToggle" />
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="setting-row" id="leadRow" style="display:none">
+          <div class="setting-label">Notify me</div>
+          <select id="remLead" class="mini-select">
+            <option value="5">5 min before</option>
+            <option value="10" selected>10 min before</option>
+            <option value="15">15 min before</option>
+            <option value="30">30 min before</option>
+          </select>
+        </div>
+        <div class="data-btns">
+          <button class="btn ghost" id="exportBtn">⭳ Export</button>
+          <button class="btn ghost" id="importBtn">⭱ Import</button>
+          <input type="file" id="importFile" accept="application/json" hidden />
+        </div>
+      </section>
     </aside>
 
     <!-- CENTER: weekly schedule -->

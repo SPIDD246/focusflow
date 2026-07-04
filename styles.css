@@ -301,6 +301,39 @@ h1, h2, .stat-num, .timer-display { font-family: "Sora", "Inter", sans-serif; }
 
 .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 4px; }
 
+/* Settings / reminders / data */
+.setting-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; padding: 10px 0;
+  border-bottom: 1px solid var(--card-brd);
+}
+.setting-label { font-size: 14px; font-weight: 600; }
+.setting-hint { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.mini-select {
+  font-family: inherit; font-size: 13px; color: var(--text);
+  background: rgba(255,255,255,0.05); border: 1px solid var(--card-brd);
+  border-radius: 9px; padding: 8px 10px; outline: none; cursor: pointer;
+}
+.mini-select option { background: var(--bg-2); }
+.mini-select:focus { border-color: var(--accent); }
+
+/* Toggle switch */
+.switch { position: relative; display: inline-block; width: 46px; height: 26px; flex: none; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider {
+  position: absolute; inset: 0; cursor: pointer;
+  background: rgba(255,255,255,0.12); border-radius: 999px; transition: .25s;
+}
+.slider::before {
+  content: ""; position: absolute; height: 18px; width: 18px;
+  left: 4px; top: 4px; background: #fff; border-radius: 50%; transition: .25s;
+}
+.switch input:checked + .slider { background: linear-gradient(135deg, var(--accent), var(--accent-2)); }
+.switch input:checked + .slider::before { transform: translateX(20px); }
+
+.data-btns { display: flex; gap: 8px; margin-top: 14px; }
+.data-btns .btn { flex: 1; padding: 9px; font-size: 13px; }
+
 /* Toast */
 .toast {
   position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%);

@@ -10,9 +10,12 @@ let state = load();
 function load() {
   try {
     const raw = JSON.parse(localStorage.getItem(STORE_KEY));
-    if (raw && raw.sessions) return raw;
+    if (raw && raw.sessions) {
+      if (!raw.reminders) raw.reminders = { enabled: false, lead: 10 };
+      return raw;
+    }
   } catch (_) {}
-  return { sessions: [], focusMinutes: 0, focusLog: [] }; // focusLog: array of ISO dates
+  return { sessions: [], focusMinutes: 0, focusLog: [], reminders: { enabled: false, lead: 10 } };
 }
 function save() {
   localStorage.setItem(STORE_KEY, JSON.stringify(state));
@@ -229,6 +232,117 @@ document.querySelectorAll(".timer-presets .chip").forEach((chip) => {
   });
 });
 
+// ---------- Reminders ----------
+const remToggle = document.getElementById("remToggle");
+const remLead = document.getElementById("remLead");
+const remHint = document.getElementById("remHint");
+const leadRow = document.getElementById("leadRow");
+const notified = new Set(); // session-day keys already fired this page session
+
+function syncReminderUI() {
+  const on = state.reminders.enabled;
+  remToggle.checked = on;
+  remLead.value = String(state.reminders.lead);
+  leadRow.style.display = on ? "flex" : "none";
+  remHint.textContent = on
+    ? `On — pings ${state.reminders.lead} min before each class`
+    : "Off — get a ping before class";
+}
+
+remToggle.addEventListener("change", async () => {
+  if (remToggle.checked) {
+    if (!("Notification" in window)) {
+      toast("This browser doesn't support notifications");
+      remToggle.checked = false;
+      return;
+    }
+    let perm = Notification.permission;
+    if (perm !== "granted") perm = await Notification.requestPermission();
+    if (perm !== "granted") {
+      toast("Allow notifications to enable reminders");
+      remToggle.checked = false;
+      return;
+    }
+    state.reminders.enabled = true;
+    toast("Reminders on 🔔 (keep this tab open)");
+  } else {
+    state.reminders.enabled = false;
+    toast("Reminders off");
+  }
+  save();
+  syncReminderUI();
+});
+
+remLead.addEventListener("change", () => {
+  state.reminders.lead = parseInt(remLead.value, 10);
+  save();
+  syncReminderUI();
+});
+
+function checkReminders() {
+  if (!state.reminders.enabled || Notification.permission !== "granted") return;
+  const now = new Date();
+  const nowMin = now.getHours() * 60 + now.getMinutes();
+  const today = DAYS[todayIdx()];
+  const key = isoDay(now);
+  state.sessions.forEach((s) => {
+    if (s.day !== today) return;
+    const [h, m] = s.start.split(":").map(Number);
+    const fireAt = h * 60 + m - state.reminders.lead;
+    if (nowMin === fireAt) {
+      const k = `${s.id}-${key}`;
+      if (notified.has(k)) return;
+      notified.add(k);
+      try {
+        new Notification("📚 " + s.subject, {
+          body: `Starts at ${s.start} · ${fmtDur(s.duration)} — in ${state.reminders.lead} min`,
+          silent: false,
+        });
+      } catch (_) {}
+      toast(`🔔 ${s.subject} starts in ${state.reminders.lead} min`);
+    }
+  });
+}
+setInterval(checkReminders, 20000);
+
+// ---------- Export / Import ----------
+document.getElementById("exportBtn").addEventListener("click", () => {
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "focusflow-schedule.json";
+  a.click();
+  URL.revokeObjectURL(url);
+  toast("Schedule exported ⭳");
+});
+
+const importFile = document.getElementById("importFile");
+document.getElementById("importBtn").addEventListener("click", () => importFile.click());
+importFile.addEventListener("change", () => {
+  const file = importFile.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      if (!Array.isArray(data.sessions)) throw new Error("bad file");
+      state.sessions = data.sessions;
+      state.focusMinutes = data.focusMinutes || 0;
+      state.focusLog = Array.isArray(data.focusLog) ? data.focusLog : [];
+      state.reminders = data.reminders || { enabled: false, lead: 10 };
+      save();
+      render();
+      syncReminderUI();
+      toast(`Imported ${state.sessions.length} sessions ✓`);
+    } catch (_) {
+      toast("Couldn't read that file — invalid format");
+    }
+    importFile.value = "";
+  };
+  reader.readAsText(file);
+});
+
 // ---------- Clock ----------
 function tickClock() {
   const now = new Date();
@@ -278,4 +392,5 @@ if (state.sessions.length === 0 && !localStorage.getItem(STORE_KEY)) {
 document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !modal.hidden) closeModal(); });
 
 paintTimer();
+syncReminderUI();
 render();
