@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FocusFlow — Learning & Schedule Manager</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="aurora"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">✦</div>
+      <div>
+        <h1>FocusFlow</h1>
+        <p class="tagline">Plan your week. Track your focus.</p>
+      </div>
+    </div>
+    <div class="clock" id="clock">—</div>
+  </header>
+
+  <main class="layout">
+    <!-- LEFT: stats + timer -->
+    <aside class="col side">
+      <section class="card glow">
+        <h2 class="card-title">This Week</h2>
+        <div class="stat-grid">
+          <div class="stat">
+            <span class="stat-num" id="statSessions">0</span>
+            <span class="stat-label">Sessions</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num" id="statHours">0h</span>
+            <span class="stat-label">Planned</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num" id="statFocus">0h</span>
+            <span class="stat-label">Focused</span>
+          </div>
+          <div class="stat">
+            <span class="stat-num" id="statStreak">0</span>
+            <span class="stat-label">Day streak</span>
+          </div>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-head">
+            <span>Weekly goal</span>
+            <span id="goalText">0 / 10h</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" id="goalFill"></div></div>
+        </div>
+      </section>
+
+      <section class="card timer-card">
+        <h2 class="card-title">Focus Timer</h2>
+        <div class="timer-ring">
+          <svg viewBox="0 0 120 120">
+            <circle class="ring-bg" cx="60" cy="60" r="52" />
+            <circle class="ring-fg" id="ringFg" cx="60" cy="60" r="52" />
+          </svg>
+          <div class="timer-display" id="timerDisplay">25:00</div>
+        </div>
+        <div class="timer-controls">
+          <button class="btn ghost" id="timerReset">Reset</button>
+          <button class="btn primary" id="timerToggle">Start</button>
+        </div>
+        <div class="timer-presets">
+          <button data-min="25" class="chip active">25m</button>
+          <button data-min="45" class="chip">45m</button>
+          <button data-min="15" class="chip">15m</button>
+        </div>
+      </section>
+    </aside>
+
+    <!-- CENTER: weekly schedule -->
+    <section class="col main">
+      <div class="section-head">
+        <h2>Weekly Schedule</h2>
+        <button class="btn primary" id="openAdd">+ Add session</button>
+      </div>
+      <div class="week" id="week"></div>
+    </section>
+  </main>
+
+  <!-- Add/Edit modal -->
+  <div class="modal-backdrop" id="modal" hidden>
+    <div class="modal card">
+      <h2 class="card-title" id="modalTitle">New session</h2>
+      <form id="sessionForm" class="form">
+        <label>Subject
+          <input name="subject" type="text" placeholder="e.g. Calculus" required maxlength="40" />
+        </label>
+        <div class="row">
+          <label>Day
+            <select name="day">
+              <option>Mon</option><option>Tue</option><option>Wed</option>
+              <option>Thu</option><option>Fri</option><option>Sat</option><option>Sun</option>
+            </select>
+          </label>
+          <label>Start
+            <input name="start" type="time" value="18:00" required />
+          </label>
+        </div>
+        <div class="row">
+          <label>Duration (min)
+            <input name="duration" type="number" min="5" max="480" step="5" value="60" required />
+          </label>
+          <label>Color
+            <div class="swatches" id="swatches"></div>
+          </label>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn ghost" id="cancelBtn">Cancel</button>
+          <button type="submit" class="btn primary" id="saveBtn">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" hidden></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
