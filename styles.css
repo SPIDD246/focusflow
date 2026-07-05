@@ -267,7 +267,13 @@ body::before {
 .badge-num { font-size: 13px; font-weight: 700; margin-top: 6px; }
 .badge-sub { font-size: 11px; color: var(--muted); margin-top: 2px; font-weight: 600; }
 
-/* ---- Focus sounds ---- */
+/* ---- Focus music (YouTube) ---- */
+.yt-wrap {
+  position: relative; width: 100%; aspect-ratio: 16 / 9; margin-bottom: 14px;
+  border-radius: 14px; overflow: hidden; border: 1px solid var(--card-brd); background: #000;
+  box-shadow: var(--shadow-sm);
+}
+.yt-wrap iframe, .yt-wrap #ytPlayer { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 .sound-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
 .sound-btn {
   border: 1px solid var(--card-brd); background: var(--surface); color: var(--text);

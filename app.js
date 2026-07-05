@@ -227,13 +227,13 @@ function paintTimer() {
 }
 function startTimer() {
   running = true; toggleBtn.textContent = "Pause";
-  if (soundWithTimer && soundWithTimer.checked && activeSound === "off") setSound("lofi");
+  if (soundWithTimer && soundWithTimer.checked && currentYT === "off") playYT(LOFI_DEFAULT);
   tick = setInterval(() => { remaining--; paintTimer(); if (remaining <= 0) finishTimer(); }, 1000);
 }
 function pauseTimer() { running = false; toggleBtn.textContent = "Start"; clearInterval(tick); }
 function finishTimer() {
   clearInterval(tick); running = false; toggleBtn.textContent = "Start";
-  if (soundWithTimer && soundWithTimer.checked) setSound("off");
+  if (soundWithTimer && soundWithTimer.checked) stopYT();
   const mins = Math.round(totalSec / 60);
   const day = isoDay(new Date());
   state.focusMinutes += mins;
@@ -384,73 +384,34 @@ importFile.addEventListener("change", () => {
   reader.readAsText(file);
 });
 
-// ---------- Focus sounds (Web Audio, generated live — no files, works offline) ----------
-let AC = null, master = null, activeSound = "off", stopFns = [], vol = 0.55;
-function audio() {
-  if (!AC) {
-    AC = new (window.AudioContext || window.webkitAudioContext)();
-    master = AC.createGain(); master.gain.value = vol; master.connect(AC.destination);
-  }
-  if (AC.state === "suspended") AC.resume();
-  return AC;
+// ---------- Focus music: Lofi Girl (YouTube IFrame API) ----------
+const LOFI_DEFAULT = "jfKfPfyJRdk"; // Lofi Girl — lofi hip hop radio 📚
+let ytPlayer = null, ytReady = false, currentYT = "off", pendingYT = null, ytVol = 55;
+
+window.onYouTubeIframeAPIReady = function () {
+  ytPlayer = new YT.Player("ytPlayer", {
+    width: "100%", height: "100%",
+    playerVars: { playsinline: 1, modestbranding: 1, rel: 0 },
+    events: {
+      onReady: () => { ytReady = true; ytPlayer.setVolume(ytVol); if (pendingYT) { playYT(pendingYT); pendingYT = null; } },
+    },
+  });
+};
+(function loadYT() { const s = document.createElement("script"); s.src = "https://www.youtube.com/iframe_api"; document.head.appendChild(s); })();
+
+function markSoundBtn(id) { document.querySelectorAll(".sound-btn").forEach((b) => b.classList.toggle("active", b.dataset.yt === id)); }
+function playYT(id) {
+  currentYT = id; markSoundBtn(id);
+  if (!ytReady) { pendingYT = id; return; }
+  ytPlayer.loadVideoById(id); ytPlayer.setVolume(ytVol); ytPlayer.playVideo();
 }
-function stopSound() { stopFns.forEach((f) => { try { f(); } catch (_) {} }); stopFns = []; }
-function noiseBuffer(type) {
-  const len = 2 * AC.sampleRate, buf = AC.createBuffer(1, len, AC.sampleRate), d = buf.getChannelData(0);
-  let last = 0;
-  for (let i = 0; i < len; i++) {
-    const w = Math.random() * 2 - 1;
-    if (type === "brown") { last = (last + 0.02 * w) / 1.02; d[i] = last * 3.5; } else d[i] = w;
-  }
-  return buf;
-}
-function noiseSource(type, filters, gain, swell) {
-  const ctx = audio(), src = ctx.createBufferSource();
-  src.buffer = noiseBuffer(type); src.loop = true;
-  let node = src;
-  filters.forEach((f) => { const b = ctx.createBiquadFilter(); b.type = f.type; b.frequency.value = f.freq; node.connect(b); node = b; });
-  const g = ctx.createGain(); g.gain.value = gain; node.connect(g); g.connect(master); src.start();
-  stopFns.push(() => { try { src.stop(); } catch (_) {} });
-  if (swell) { // slow wave-like amplitude LFO
-    const lfo = ctx.createOscillator(), lg = ctx.createGain();
-    lfo.frequency.value = swell.rate; lg.gain.value = swell.depth;
-    lfo.connect(lg); lg.connect(g.gain); lfo.start();
-    stopFns.push(() => { try { lfo.stop(); } catch (_) {} });
-  }
-}
-function playRain() { noiseSource("white", [{ type: "highpass", freq: 420 }, { type: "lowpass", freq: 3400 }], 0.5, { rate: 0.15, depth: 0.12 }); }
-function playOcean() { noiseSource("brown", [{ type: "lowpass", freq: 700 }], 0.85, { rate: 0.08, depth: 0.35 }); }
-function playLofi() {
-  noiseSource("brown", [{ type: "lowpass", freq: 500 }], 0.14); // warm pad underneath
-  const ctx = audio(), scale = [0, 3, 5, 7, 10], root = 220;
-  const step = () => {
-    const n = scale[(Math.random() * scale.length) | 0] + (Math.random() < 0.4 ? 12 : 0);
-    note(root * Math.pow(2, n / 12));
-    if (Math.random() < 0.5) note(root * Math.pow(2, (n + 7) / 12), 0.14);
-  };
-  const t = setInterval(step, 1600); step();
-  stopFns.push(() => clearInterval(t));
-}
-function note(freq, peak = 0.22) {
-  const ctx = audio(), o = ctx.createOscillator(), g = ctx.createGain(), lp = ctx.createBiquadFilter();
-  o.type = "triangle"; o.frequency.value = freq; lp.type = "lowpass"; lp.frequency.value = 1600;
-  o.connect(lp); lp.connect(g); g.connect(master);
-  const t = ctx.currentTime;
-  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(peak, t + 0.06); g.gain.exponentialRampToValueAtTime(0.001, t + 1.9);
-  o.start(t); o.stop(t + 2);
-}
-function setSound(s) {
-  stopSound(); activeSound = s;
-  document.querySelectorAll(".sound-btn").forEach((b) => b.classList.toggle("active", b.dataset.sound === s));
-  if (s === "off") return;
-  audio();
-  ({ rain: playRain, ocean: playOcean, lofi: playLofi }[s] || (() => {}))();
-}
+function stopYT() { currentYT = "off"; markSoundBtn("off"); if (ytReady) ytPlayer.pauseVideo(); }
 document.querySelectorAll(".sound-btn").forEach((btn) => btn.addEventListener("click", () => {
-  const s = btn.dataset.sound; setSound(s);
-  toast(s === "off" ? "Sound off" : "Playing " + btn.textContent.trim());
+  const id = btn.dataset.yt;
+  if (id === "off") { stopYT(); toast("Music stopped"); }
+  else { playYT(id); toast("▶ " + btn.textContent.trim()); }
 }));
-document.getElementById("vol").addEventListener("input", (e) => { vol = e.target.value / 100; if (master) master.gain.value = vol; });
+document.getElementById("vol").addEventListener("input", (e) => { ytVol = +e.target.value; if (ytReady) ytPlayer.setVolume(ytVol); });
 const soundWithTimer = document.getElementById("soundWithTimer");
 
 // ---------- Add to phone calendar (.ics — native reminders even when app closed) ----------

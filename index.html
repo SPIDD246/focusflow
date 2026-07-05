@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=7" />
+  <link rel="stylesheet" href="styles.css?v=8" />
 </head>
 <body>
   <div class="aurora"></div>
@@ -81,12 +81,13 @@
       </section>
 
       <section class="card">
-        <h2 class="card-title">Focus Sounds</h2>
+        <h2 class="card-title">Focus Music · Lofi Girl</h2>
+        <div class="yt-wrap"><div id="ytPlayer"></div></div>
         <div class="sound-grid">
-          <button class="sound-btn" data-sound="rain">🌧️ Rain</button>
-          <button class="sound-btn" data-sound="ocean">🌊 Ocean</button>
-          <button class="sound-btn" data-sound="lofi">🎹 Lo-fi</button>
-          <button class="sound-btn active" data-sound="off">⏸ Off</button>
+          <button class="sound-btn active" data-yt="jfKfPfyJRdk">📚 Study</button>
+          <button class="sound-btn" data-yt="rUxyKA_-grg">💤 Sleep</button>
+          <button class="sound-btn" data-yt="4xDzrJKXOOY">🌌 Synthwave</button>
+          <button class="sound-btn" data-yt="off">⏸ Stop</button>
         </div>
         <label class="setting-row" style="border:none;padding-bottom:0">
           <span class="setting-label">🔊 Volume</span>
@@ -95,7 +96,7 @@
         <div class="setting-row" style="padding-top:6px">
           <div>
             <div class="setting-label">Play with timer</div>
-            <div class="setting-hint">Auto-start sound when focusing</div>
+            <div class="setting-hint">Auto-start Lofi Girl when focusing</div>
           </div>
           <label class="switch"><input type="checkbox" id="soundWithTimer" /><span class="slider"></span></label>
         </div>
@@ -195,6 +196,6 @@
 
   <div class="toast" id="toast" hidden></div>
 
-  <script src="app.js?v=7"></script>
+  <script src="app.js?v=8"></script>
 </body>
 </html>
