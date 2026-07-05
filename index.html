@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=5" />
+  <link rel="stylesheet" href="styles.css?v=6" />
 </head>
 <body>
   <div class="aurora"></div>
@@ -77,6 +77,27 @@
           <button data-min="25" class="chip active">25m</button>
           <button data-min="45" class="chip">45m</button>
           <button data-min="15" class="chip">15m</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2 class="card-title">Focus Sounds</h2>
+        <div class="sound-grid">
+          <button class="sound-btn" data-sound="rain">🌧️ Rain</button>
+          <button class="sound-btn" data-sound="ocean">🌊 Ocean</button>
+          <button class="sound-btn" data-sound="lofi">🎹 Lo-fi</button>
+          <button class="sound-btn active" data-sound="off">⏸ Off</button>
+        </div>
+        <label class="setting-row" style="border:none;padding-bottom:0">
+          <span class="setting-label">🔊 Volume</span>
+          <input type="range" id="vol" class="range" min="0" max="100" value="55" />
+        </label>
+        <div class="setting-row" style="padding-top:6px">
+          <div>
+            <div class="setting-label">Play with timer</div>
+            <div class="setting-hint">Auto-start sound when focusing</div>
+          </div>
+          <label class="switch"><input type="checkbox" id="soundWithTimer" /><span class="slider"></span></label>
         </div>
       </section>
 
@@ -170,6 +191,6 @@
 
   <div class="toast" id="toast" hidden></div>
 
-  <script src="app.js?v=5"></script>
+  <script src="app.js?v=6"></script>
 </body>
 </html>

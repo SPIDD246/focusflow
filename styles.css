@@ -267,6 +267,22 @@ body::before {
 .badge-num { font-size: 13px; font-weight: 700; margin-top: 6px; }
 .badge-sub { font-size: 11px; color: var(--muted); margin-top: 2px; font-weight: 600; }
 
+/* ---- Focus sounds ---- */
+.sound-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.sound-btn {
+  border: 1px solid var(--card-brd); background: var(--surface); color: var(--text);
+  padding: 13px 10px; border-radius: 13px; cursor: pointer; font-family: inherit;
+  font-weight: 700; font-size: 13px; transition: all .2s var(--ease);
+}
+.sound-btn:hover { border-color: var(--card-brd-hi); transform: translateY(-2px); }
+.sound-btn.active { color: #fff; border-color: transparent; background: linear-gradient(135deg, var(--accent), var(--accent-2)); box-shadow: var(--shadow-sm); }
+.range {
+  -webkit-appearance: none; appearance: none; width: 150px; max-width: 55%;
+  height: 6px; border-radius: 999px; background: var(--track); outline: none; cursor: pointer;
+}
+.range::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--accent); cursor: pointer; box-shadow: var(--shadow-sm); border: 2px solid #fff; }
+.range::-moz-range-thumb { width: 16px; height: 16px; border: 2px solid #fff; border-radius: 50%; background: var(--accent); cursor: pointer; }
+
 /* ---- Settings ---- */
 .setting-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--card-brd); }
 .setting-label { font-size: 14px; font-weight: 700; }
