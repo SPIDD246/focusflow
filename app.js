@@ -1,6 +1,6 @@
 // ---------- FocusFlow: learning & schedule manager ----------
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-const COLORS = ["#ef7d5d", "#f4b263", "#7cba9a", "#6aa7c4", "#b490d4", "#e8659a"];
+const COLORS = ["#6fae7c", "#3f9d7f", "#e6b25f", "#6aa7c4", "#b490d4", "#ef7d5d"];
 const WEEKLY_GOAL_H = 10;
 const STORE_KEY = "focusflow.v1";
 
