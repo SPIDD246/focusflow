@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>FocusFlow — Learning & Schedule Manager</title>
   <meta name="description" content="Plan your week and track your study focus, beautifully." />
-  <meta name="theme-color" content="#eef4e8" />
+  <meta name="theme-color" content="#eef4e8" id="themeColorMeta" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="FocusFlow" />
@@ -14,11 +14,12 @@
   <link rel="apple-touch-icon" href="icon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=4" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=5" />
 </head>
 <body>
   <div class="aurora"></div>
+  <canvas class="confetti" id="confetti"></canvas>
 
   <header class="topbar">
     <div class="brand">
@@ -29,39 +30,25 @@
       </div>
     </div>
     <div class="top-actions">
-      <button class="btn install" id="installBtn" hidden>⭳ Install app</button>
+      <button class="icon-btn" id="themeToggle" title="Toggle light / dark">🌙</button>
+      <button class="btn install" id="installBtn" hidden>⭳ Install</button>
       <div class="clock" id="clock">—</div>
     </div>
   </header>
 
   <main class="layout">
-    <!-- LEFT: stats + timer -->
+    <!-- LEFT -->
     <aside class="col side">
       <section class="card glow">
         <h2 class="card-title">This Week</h2>
         <div class="stat-grid">
-          <div class="stat">
-            <span class="stat-num" id="statSessions">0</span>
-            <span class="stat-label">Sessions</span>
-          </div>
-          <div class="stat">
-            <span class="stat-num" id="statHours">0h</span>
-            <span class="stat-label">Planned</span>
-          </div>
-          <div class="stat">
-            <span class="stat-num" id="statFocus">0h</span>
-            <span class="stat-label">Focused</span>
-          </div>
-          <div class="stat">
-            <span class="stat-num" id="statStreak">0</span>
-            <span class="stat-label">Day streak</span>
-          </div>
+          <div class="stat"><span class="stat-num" id="statSessions">0</span><span class="stat-label">Sessions</span></div>
+          <div class="stat"><span class="stat-num" id="statDone">0</span><span class="stat-label">Done</span></div>
+          <div class="stat"><span class="stat-num" id="statFocus">0h</span><span class="stat-label">Focused</span></div>
+          <div class="stat"><span class="stat-num" id="statStreak">0</span><span class="stat-label">Day streak</span></div>
         </div>
         <div class="progress-wrap">
-          <div class="progress-head">
-            <span>Weekly goal</span>
-            <span id="goalText">0 / 10h</span>
-          </div>
+          <div class="progress-head"><span>Weekly goal</span><span id="goalText">0 / 10h</span></div>
           <div class="progress-track"><div class="progress-fill" id="goalFill"></div></div>
         </div>
       </section>
@@ -100,10 +87,7 @@
             <div class="setting-label">Study reminders</div>
             <div class="setting-hint" id="remHint">Off — get a ping before class</div>
           </div>
-          <label class="switch">
-            <input type="checkbox" id="remToggle" />
-            <span class="slider"></span>
-          </label>
+          <label class="switch"><input type="checkbox" id="remToggle" /><span class="slider"></span></label>
         </div>
         <div class="setting-row" id="leadRow" style="display:none">
           <div class="setting-label">Notify me</div>
@@ -114,6 +98,13 @@
             <option value="30">30 min before</option>
           </select>
         </div>
+        <div class="setting-row" id="summaryRow" style="display:none">
+          <div>
+            <div class="setting-label">Daily summary</div>
+            <div class="setting-hint">A recap at 8:00 PM</div>
+          </div>
+          <label class="switch"><input type="checkbox" id="summaryToggle" /><span class="slider"></span></label>
+        </div>
         <div class="data-btns">
           <button class="btn ghost" id="exportBtn">⭳ Export</button>
           <button class="btn ghost" id="importBtn">⭱ Import</button>
@@ -122,17 +113,33 @@
       </section>
     </aside>
 
-    <!-- CENTER: weekly schedule -->
+    <!-- CENTER -->
     <section class="col main">
       <div class="section-head">
         <h2>Weekly Schedule</h2>
         <button class="btn primary" id="openAdd">+ Add session</button>
       </div>
       <div class="week" id="week"></div>
+
+      <div class="insights">
+        <section class="card">
+          <h2 class="card-title">Focus this week</h2>
+          <div class="bar-chart" id="barChart"></div>
+        </section>
+        <section class="card">
+          <h2 class="card-title">Time by subject</h2>
+          <div class="subject-list" id="subjectList"></div>
+        </section>
+      </div>
+
+      <section class="card">
+        <h2 class="card-title">Achievements</h2>
+        <div class="badges" id="badges"></div>
+      </section>
     </section>
   </main>
 
-  <!-- Add/Edit modal -->
+  <!-- Modal -->
   <div class="modal-backdrop" id="modal" hidden>
     <div class="modal card">
       <h2 class="card-title" id="modalTitle">New session</h2>
@@ -147,17 +154,11 @@
               <option>Thu</option><option>Fri</option><option>Sat</option><option>Sun</option>
             </select>
           </label>
-          <label>Start
-            <input name="start" type="time" value="18:00" required />
-          </label>
+          <label>Start<input name="start" type="time" value="18:00" required /></label>
         </div>
         <div class="row">
-          <label>Duration (min)
-            <input name="duration" type="number" min="5" max="480" step="5" value="60" required />
-          </label>
-          <label>Color
-            <div class="swatches" id="swatches"></div>
-          </label>
+          <label>Duration (min)<input name="duration" type="number" min="5" max="480" step="5" value="60" required /></label>
+          <label>Color<div class="swatches" id="swatches"></div></label>
         </div>
         <div class="modal-actions">
           <button type="button" class="btn ghost" id="cancelBtn">Cancel</button>
@@ -169,6 +170,6 @@
 
   <div class="toast" id="toast" hidden></div>
 
-  <script src="app.js?v=4"></script>
+  <script src="app.js?v=5"></script>
 </body>
 </html>
