@@ -386,34 +386,43 @@ importFile.addEventListener("change", () => {
 
 // ---------- Focus music: Lofi Girl (YouTube IFrame API) ----------
 const LOFI_DEFAULT = "jfKfPfyJRdk"; // Lofi Girl — lofi hip hop radio 📚
-let ytPlayer = null, ytReady = false, ytBroken = false, currentYT = "off", pendingYT = null, ytVol = 55;
-const ytWatchUrl = (id) => "https://www.youtube.com/watch?v=" + (id && id !== "off" ? id : LOFI_DEFAULT);
+let ytPlayer = null, ytReady = false, currentYT = "off", pendingYT = null, ytVol = 55, ytRetries = 0;
 
-window.onYouTubeIframeAPIReady = function () {
+function buildYtPlayer() {
+  ytReady = false;
+  const wrap = document.querySelector(".yt-wrap");
+  wrap.innerHTML = '<div id="ytPlayer"></div>';
   ytPlayer = new YT.Player("ytPlayer", {
     width: "100%", height: "100%", videoId: LOFI_DEFAULT,
     playerVars: { playsinline: 1, modestbranding: 1, rel: 0, enablejsapi: 1, origin: location.origin },
     events: {
       onReady: () => { ytReady = true; ytPlayer.setVolume(ytVol); if (pendingYT) { playYT(pendingYT); pendingYT = null; } },
-      onError: (e) => onYtError(e.data),
+      onError: () => onYtError(),
     },
   });
-};
+}
+window.onYouTubeIframeAPIReady = buildYtPlayer;
 (function loadYT() { const s = document.createElement("script"); s.src = "https://www.youtube.com/iframe_api"; document.head.appendChild(s); })();
 
+// On error: silently rebuild & retry inline (never navigate away). Show a gentle note if it truly can't load.
 function onYtError() {
-  ytBroken = true;
+  if (ytRetries < 2) {
+    ytRetries++;
+    if (currentYT !== "off") pendingYT = currentYT;
+    try { ytPlayer && ytPlayer.destroy(); } catch (_) {}
+    buildYtPlayer();
+    return;
+  }
   const wrap = document.querySelector(".yt-wrap");
-  if (wrap) wrap.innerHTML = `<a class="yt-fallback" href="${ytWatchUrl(currentYT)}" target="_blank" rel="noopener">▶ Open Lofi Girl on YouTube<br><small>Embedding blocked here — tap to listen on YouTube</small></a>`;
+  if (wrap) wrap.innerHTML = '<div class="yt-fallback">🎵 Can\'t load music here<br><small>Open the online link with internet, then tap a track</small></div>';
 }
 function markSoundBtn(id) { document.querySelectorAll(".sound-btn").forEach((b) => b.classList.toggle("active", b.dataset.yt === id)); }
 function playYT(id) {
   currentYT = id; markSoundBtn(id);
-  if (ytBroken) { window.open(ytWatchUrl(id), "_blank", "noopener"); return; }
   if (!ytReady) { pendingYT = id; return; }
   ytPlayer.loadVideoById(id); ytPlayer.setVolume(ytVol); ytPlayer.playVideo();
 }
-function stopYT() { currentYT = "off"; markSoundBtn("off"); if (ytReady && !ytBroken) ytPlayer.pauseVideo(); }
+function stopYT() { currentYT = "off"; markSoundBtn("off"); if (ytReady) ytPlayer.pauseVideo(); }
 document.querySelectorAll(".sound-btn").forEach((btn) => btn.addEventListener("click", () => {
   const id = btn.dataset.yt;
   if (id === "off") { stopYT(); toast("Music stopped"); }
