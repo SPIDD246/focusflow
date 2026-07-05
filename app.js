@@ -386,26 +386,34 @@ importFile.addEventListener("change", () => {
 
 // ---------- Focus music: Lofi Girl (YouTube IFrame API) ----------
 const LOFI_DEFAULT = "jfKfPfyJRdk"; // Lofi Girl — lofi hip hop radio 📚
-let ytPlayer = null, ytReady = false, currentYT = "off", pendingYT = null, ytVol = 55;
+let ytPlayer = null, ytReady = false, ytBroken = false, currentYT = "off", pendingYT = null, ytVol = 55;
+const ytWatchUrl = (id) => "https://www.youtube.com/watch?v=" + (id && id !== "off" ? id : LOFI_DEFAULT);
 
 window.onYouTubeIframeAPIReady = function () {
   ytPlayer = new YT.Player("ytPlayer", {
-    width: "100%", height: "100%",
-    playerVars: { playsinline: 1, modestbranding: 1, rel: 0 },
+    width: "100%", height: "100%", videoId: LOFI_DEFAULT,
+    playerVars: { playsinline: 1, modestbranding: 1, rel: 0, enablejsapi: 1, origin: location.origin },
     events: {
       onReady: () => { ytReady = true; ytPlayer.setVolume(ytVol); if (pendingYT) { playYT(pendingYT); pendingYT = null; } },
+      onError: (e) => onYtError(e.data),
     },
   });
 };
 (function loadYT() { const s = document.createElement("script"); s.src = "https://www.youtube.com/iframe_api"; document.head.appendChild(s); })();
 
+function onYtError() {
+  ytBroken = true;
+  const wrap = document.querySelector(".yt-wrap");
+  if (wrap) wrap.innerHTML = `<a class="yt-fallback" href="${ytWatchUrl(currentYT)}" target="_blank" rel="noopener">▶ Open Lofi Girl on YouTube<br><small>Embedding blocked here — tap to listen on YouTube</small></a>`;
+}
 function markSoundBtn(id) { document.querySelectorAll(".sound-btn").forEach((b) => b.classList.toggle("active", b.dataset.yt === id)); }
 function playYT(id) {
   currentYT = id; markSoundBtn(id);
+  if (ytBroken) { window.open(ytWatchUrl(id), "_blank", "noopener"); return; }
   if (!ytReady) { pendingYT = id; return; }
   ytPlayer.loadVideoById(id); ytPlayer.setVolume(ytVol); ytPlayer.playVideo();
 }
-function stopYT() { currentYT = "off"; markSoundBtn("off"); if (ytReady) ytPlayer.pauseVideo(); }
+function stopYT() { currentYT = "off"; markSoundBtn("off"); if (ytReady && !ytBroken) ytPlayer.pauseVideo(); }
 document.querySelectorAll(".sound-btn").forEach((btn) => btn.addEventListener("click", () => {
   const id = btn.dataset.yt;
   if (id === "off") { stopYT(); toast("Music stopped"); }
@@ -470,12 +478,38 @@ document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !modal.h
 if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
 let deferredPrompt = null;
 const installBtn = document.getElementById("installBtn");
-window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); deferredPrompt = e; installBtn.hidden = false; });
+const isStandalone = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone;
+if (!isStandalone()) installBtn.hidden = false; // always offer install (with instructions fallback)
+
+function openInfo(title, html) {
+  const back = document.createElement("div");
+  back.className = "modal-backdrop";
+  back.innerHTML = `<div class="modal card"><h2 class="card-title">${title}</h2><div class="info-body">${html}</div><div class="modal-actions"><button class="btn primary">Got it</button></div></div>`;
+  document.body.appendChild(back);
+  const close = () => back.remove();
+  back.addEventListener("click", (e) => { if (e.target === back) close(); });
+  back.querySelector("button").addEventListener("click", close);
+}
+function showInstallHelp() {
+  const ua = navigator.userAgent;
+  const ios = /iphone|ipad|ipod/i.test(ua) || (/mac/i.test(ua) && "ontouchend" in document);
+  const android = /android/i.test(ua);
+  let html;
+  if (ios) html = "On iPhone / iPad (use <b>Safari</b>):<br>1. Tap the <b>Share</b> button ⬆️<br>2. Scroll to <b>Add to Home Screen</b><br>3. Tap <b>Add</b> — done! 🎉";
+  else if (android) html = "On Android (use <b>Chrome</b>):<br>Tap the menu <b>⋮</b> → <b>Add to Home screen</b> → <b>Install</b>.";
+  else html = "On desktop <b>Chrome / Edge</b>:<br>Click the <b>install icon ⊕</b> in the address bar,<br>or menu <b>⋮ → Install FocusFlow</b>.";
+  openInfo("📲 Install FocusFlow", html);
+}
+window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); deferredPrompt = e; if (!isStandalone()) installBtn.hidden = false; });
 installBtn.addEventListener("click", async () => {
-  if (!deferredPrompt) return;
-  deferredPrompt.prompt(); const { outcome } = await deferredPrompt.userChoice;
-  if (outcome === "accepted") toast("Installing FocusFlow… 🎉");
-  deferredPrompt = null; installBtn.hidden = true;
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === "accepted") toast("Installing FocusFlow… 🎉");
+    deferredPrompt = null;
+  } else {
+    showInstallHelp();
+  }
 });
 window.addEventListener("appinstalled", () => { installBtn.hidden = true; toast("FocusFlow installed ✓"); });
 
