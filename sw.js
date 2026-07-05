@@ -1,5 +1,5 @@
 // FocusFlow service worker — offline cache
-const CACHE = "focusflow-v1";
+const CACHE = "focusflow-v2";
 const ASSETS = [
   "./",
   "./index.html",
