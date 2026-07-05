@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=6" />
+  <link rel="stylesheet" href="styles.css?v=7" />
 </head>
 <body>
   <div class="aurora"></div>
@@ -131,6 +131,10 @@
           <button class="btn ghost" id="importBtn">⭱ Import</button>
           <input type="file" id="importFile" accept="application/json" hidden />
         </div>
+        <button class="btn primary" id="calBtn" style="width:100%;margin-top:10px">📅 Add to phone calendar</button>
+        <div class="setting-hint" style="margin-top:9px;text-align:center;line-height:1.5">
+          Saves a file — open it in Google / Apple Calendar to get native reminders,<br>even when the app is closed.
+        </div>
       </section>
     </aside>
 
@@ -191,6 +195,6 @@
 
   <div class="toast" id="toast" hidden></div>
 
-  <script src="app.js?v=6"></script>
+  <script src="app.js?v=7"></script>
 </body>
 </html>

@@ -453,6 +453,34 @@ document.querySelectorAll(".sound-btn").forEach((btn) => btn.addEventListener("c
 document.getElementById("vol").addEventListener("input", (e) => { vol = e.target.value / 100; if (master) master.gain.value = vol; });
 const soundWithTimer = document.getElementById("soundWithTimer");
 
+// ---------- Add to phone calendar (.ics — native reminders even when app closed) ----------
+function icsEsc(t) { return t.replace(/([,;\\])/g, "\\$1").replace(/\n/g, "\\n"); }
+function buildICS() {
+  const BYDAY = { Mon: "MO", Tue: "TU", Wed: "WE", Thu: "TH", Fri: "FR", Sat: "SA", Sun: "SU" };
+  const dates = weekDates();
+  const lead = state.reminders.lead || 10;
+  const L = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//FocusFlow//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH", "X-WR-CALNAME:FocusFlow Study"];
+  state.sessions.forEach((s) => {
+    const di = DAYS.indexOf(s.day);
+    const dt = dates[di].replace(/-/g, "") + "T" + s.start.replace(":", "") + "00";
+    L.push("BEGIN:VEVENT", "UID:" + s.id + "@focusflow", "DTSTART:" + dt, "DURATION:PT" + s.duration + "M",
+      "RRULE:FREQ=WEEKLY;BYDAY=" + BYDAY[s.day], "SUMMARY:" + icsEsc(s.subject) + " (study)",
+      "DESCRIPTION:" + icsEsc("FocusFlow study session"),
+      "BEGIN:VALARM", "ACTION:DISPLAY", "DESCRIPTION:" + icsEsc(s.subject + " starts soon"),
+      "TRIGGER:-PT" + lead + "M", "END:VALARM", "END:VEVENT");
+  });
+  L.push("END:VCALENDAR");
+  return L.join("\r\n");
+}
+document.getElementById("calBtn").addEventListener("click", () => {
+  if (!state.sessions.length) { toast("Add some sessions first"); return; }
+  const blob = new Blob([buildICS()], { type: "text/calendar;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a"); a.href = url; a.download = "focusflow.ics"; a.click();
+  URL.revokeObjectURL(url);
+  toast("📅 Calendar file saved — open it in your calendar app");
+});
+
 // ---------- Clock ----------
 function tickClock() { document.getElementById("clock").textContent = new Date().toLocaleString(undefined, { weekday: "long", hour: "2-digit", minute: "2-digit" }); }
 setInterval(tickClock, 1000); tickClock();
