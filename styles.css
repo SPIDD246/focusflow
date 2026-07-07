@@ -40,9 +40,27 @@
   --radius:    20px;
   --radius-sm: 14px;
   --ease: cubic-bezier(0.22, 0.8, 0.28, 1);
+  /* spring-like easing (overshoot) for hover/press feedback */
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --spring-soft: cubic-bezier(0.4, 1.35, 0.5, 1);
 
   /* HUD bracket color */
   --hud: rgba(0, 229, 180, 0.45);
+
+  /* --- Fluid typography scale (clamp: min@mobile → max@desktop) --- */
+  --fs-2xs: clamp(9px,  0.55vw + 7.5px, 10.5px);  /* micro labels */
+  --fs-xs:  clamp(10.5px, 0.6vw + 9px,  12.5px);  /* small labels / meta */
+  --fs-sm:  clamp(12px, 0.5vw + 10.8px, 14px);    /* body-secondary / chips */
+  --fs-md:  clamp(13.5px, 0.5vw + 12.2px, 15.5px);/* body */
+  --fs-lg:  clamp(16px, 1vw + 13px, 20px);        /* section subtitles */
+  --fs-xl:  clamp(19px, 1.6vw + 14px, 26px);      /* section headings */
+  --fs-2xl: clamp(30px, 4vw + 18px, 46px);        /* hero / timer numbers */
+
+  /* --- Fluid spacing scale --- */
+  --sp-1: clamp(6px,  0.4vw + 4px,  10px);
+  --sp-2: clamp(10px, 0.7vw + 6px,  16px);
+  --sp-3: clamp(14px, 1vw + 9px,    22px);
+  --sp-4: clamp(20px, 1.6vw + 12px, 32px);
 }
 
 /* ---- Light override (toggle keeps all vars, just flips values) ---- */
@@ -197,10 +215,10 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
    5. LAYOUT
    ================================================================ */
 .layout {
-  display: grid; grid-template-columns: 300px 1fr 300px; gap: 22px;
+  display: grid; grid-template-columns: 300px 1fr 300px; gap: var(--sp-3);
   max-width: 1600px; margin: 0 auto; padding: 8px clamp(18px, 4vw, 52px) 70px;
 }
-.col { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+.col { display: flex; flex-direction: column; gap: var(--sp-3); min-width: 0; }
 
 /* ================================================================
    6. CARDS — glassmorphism + HUD corner brackets
@@ -512,8 +530,8 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
 .session.done { opacity: 0.55; }
 .session.done .s-subj { text-decoration: line-through; opacity: .7; }
 .session .s-bar { position: absolute; left: 0; top: 10px; bottom: 10px; width: 4px; border-radius: 4px; box-shadow: 0 0 8px currentColor; }
-.session .s-subj { font-weight: 700; font-size: 13.5px; padding-left: 9px; }
-.session .s-time { color: var(--muted); font-size: 11px; padding-left: 9px; margin-top: 3px; font-weight: 600; font-family: "Orbitron", sans-serif; letter-spacing: .5px; }
+.session .s-subj { font-weight: 700; font-size: var(--fs-md); padding-left: 9px; }
+.session .s-time { color: var(--muted); font-size: var(--fs-xs); padding-left: 9px; margin-top: 3px; font-weight: 600; font-family: "Orbitron", sans-serif; letter-spacing: .5px; }
 .session .s-check {
   position: absolute; right: 9px; top: 50%; transform: translateY(-50%);
   width: 22px; height: 22px; border-radius: 50%; cursor: pointer;
@@ -571,7 +589,7 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
 .sound-btn {
   border: 1px solid var(--card-brd); background: var(--surface); color: var(--text);
   padding: 12px 10px; border-radius: 12px; cursor: pointer; font-family: "Nunito", sans-serif;
-  font-weight: 700; font-size: 12.5px; transition: all .2s var(--ease);
+  font-weight: 700; font-size: var(--fs-sm); transition: border-color .2s, background .2s, color .2s, transform .32s var(--spring), box-shadow .25s;
 }
 .sound-btn:hover { border-color: var(--card-brd-hi); transform: translateY(-2px); box-shadow: var(--neon-glow); }
 .sound-btn.active { color: #030f0c; border-color: transparent; background: linear-gradient(135deg, var(--accent), var(--accent-2)); box-shadow: var(--neon-glow); }
@@ -638,7 +656,7 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
 .form input:focus, .form select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,229,180,0.18); }
 .form option { background: var(--bg-2); }
 .swatches { display: flex; gap: 9px; }
-.swatch { width: 27px; height: 27px; border-radius: 9px; cursor: pointer; border: 2px solid transparent; transition: transform .15s var(--ease); }
+.swatch { width: 27px; height: 27px; border-radius: 9px; cursor: pointer; border: 2px solid transparent; transition: transform .3s var(--spring); }
 .swatch:hover { transform: scale(1.16); }
 .swatch.sel { border-color: var(--bg-2); box-shadow: 0 0 0 2px var(--accent), 0 0 10px var(--accent); }
 .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 6px; }
@@ -801,7 +819,7 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
 .quest-ico { flex: none; width: 28px; text-align: center; font-size: 20px; }
 .quest.claimed .quest-ico { filter: grayscale(.5); }
 .quest-mid { flex: 1; min-width: 0; }
-.quest-label { font-size: 12.5px; font-weight: 700; color: var(--text); }
+.quest-label { font-size: var(--fs-sm); font-weight: 700; color: var(--text); }
 .quest-track { height: 6px; border-radius: 999px; background: var(--track); overflow: hidden; margin: 5px 0 3px; }
 .quest-track span { display: block; height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--accent), var(--accent-2)); box-shadow: 0 0 8px var(--accent); transition: width .5s var(--ease); }
 .quest.ready .quest-track span { background: linear-gradient(90deg, var(--amber), var(--accent)); box-shadow: var(--amber-glow); }
@@ -836,7 +854,7 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
   filter: grayscale(.8) drop-shadow(0 0 6px rgba(0,229,180,0.4));
   animation: none;
 }
-.boss-name { flex: 1; min-width: 0; font-family: "Orbitron", sans-serif; font-weight: 800; font-size: 14px; color: var(--text); line-height: 1.2; letter-spacing: .5px; }
+.boss-name { flex: 1; min-width: 0; font-family: "Orbitron", sans-serif; font-weight: 800; font-size: var(--fs-md); color: var(--text); line-height: 1.2; letter-spacing: .5px; }
 .boss-hp-txt {
   flex: none; font-family: "Orbitron", sans-serif; font-size: 10px; font-weight: 800; letter-spacing: 1px;
   color: var(--pink); background: rgba(255,77,144,0.12); padding: 3px 9px; border-radius: 999px;
@@ -1078,3 +1096,9 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
   85% { opacity: 1; }
   100% { opacity: 0; transform: scale(1.02) translateY(-8px); }
 }
+; }
+}
+; }
+}
+
+

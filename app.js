@@ -86,7 +86,7 @@ function sessionEl(s, isDone) {
     e.stopPropagation();
     const dm = doneMap();
     if (dm[s.id]) { delete dm[s.id]; }
-    else { dm[s.id] = true; burst(e.clientX, e.clientY); toast(`✓ ${s.subject} done — nice work!`); }
+    else { dm[s.id] = true; burst(e.clientX, e.clientY); toast(`✓ ${s.subject} done · nice work!`); }
     render();
   });
   el.addEventListener("click", () => openModal(s));
@@ -171,7 +171,7 @@ function ensureRpg() {
   }
 }
 // Award XP + stat points for `mins` of completed focus.
-// Returns { gain, levels } — `gain` is the XP after perk multipliers, `levels` is levels gained.
+// Returns { gain, levels } · `gain` is the XP after perk multipliers, `levels` is levels gained.
 // The stat you chose to "train" this session gets the full points; Focus tracks all
 // focus time, Discipline rewards not pausing, Strength grows with your streak.
 // Unlocked skill-tree perks (see PERKS) boost the XP/stat gain.
@@ -210,10 +210,10 @@ function celebrateLevels(gained) {
   const lv = levelInfo(state.rpg.xp).level, tier = tierFor(lv);
   setTimeout(() => {
     burst(window.innerWidth / 2, window.innerHeight / 3);
-    toast(`⬆️ LEVEL UP! You reached Level ${lv} — ${tier.title}`);
+    toast(`⬆️ LEVEL UP! You reached Level ${lv} · ${tier.title}`);
     flashLevelUp(lv, tier);
   }, 700);
-  notify("⬆️ Level Up!", `You just hit Level ${lv} — ${tier.title}!`);
+  notify("⬆️ Level Up!", `You just hit Level ${lv} · ${tier.title}!`);
 }
 // Full-screen radial flash + big "LEVEL UP" readout, themed to the tier you just reached.
 function flashLevelUp(level, tier) {
@@ -289,7 +289,7 @@ function renderAvatar(level) {
   const files = exts.map((e) => `avatars/avatar.${e}`).concat(exts.map((e) => `avatars/${t.key}.${e}`));
   let i = 0;
   (function tryNext() {
-    if (i >= files.length) return; // no image found — keep the SVG
+    if (i >= files.length) return; // no image found · keep the SVG
     const img = new Image();
     img.onload = () => { av.innerHTML = ""; img.className = "hero-img"; img.alt = t.title; av.appendChild(img); };
     img.onerror = () => { i++; tryNext(); };
@@ -323,7 +323,7 @@ function renderHero() {
   renderRadar();
 }
 // 4-axis radar (INT top, DIS right, FOC bottom, STR left) showing each stat's level.
-// The shape is relative — the strongest stat reaches the edge so you see your build at a glance.
+// The shape is relative · the strongest stat reaches the edge so you see your build at a glance.
 const RADAR_COLOR = { int: "#5fb0d6", dis: "#ecb44e", foc: "#6fce88", str: "#f2795f" };
 function renderRadar() {
   const box = document.getElementById("statRadar");
@@ -395,7 +395,7 @@ function renderPerks() {
       state.rpg.perksSeen.push(p.key);
       justUnlocked.push(p.key);
       setTimeout(() => toast(`✨ Skill unlocked: ${p.name}!`), 450);
-      notify("✨ New skill!", `${p.name} — ${p.desc}`);
+      notify("✨ New skill!", `${p.name} · ${p.desc}`);
     }
   });
   box.innerHTML = PERKS.map((p) => {
@@ -542,7 +542,7 @@ function renderBoss() {
     </div>
     <div class="boss-bar"><span style="width:${pct}%"></span></div>
     <div class="boss-foot">${dead
-      ? `🏆 Earned +${boss.reward} XP — a new boss arrives next week!`
+      ? `🏆 Earned +${boss.reward} XP · a new boss arrives next week!`
       : `Focus <b>${remaining} more min</b> this week to defeat it · reward <b>+${boss.reward} XP</b>`}</div>`;
 }
 
@@ -781,7 +781,7 @@ function syncReminderUI() {
   remLead.value = String(state.reminders.lead);
   summaryToggle.checked = !!state.reminders.summary;
   leadRow.style.display = summaryRow.style.display = on ? "flex" : "none";
-  remHint.textContent = on ? `On — pings ${state.reminders.lead} min before each class` : "Off — get a ping before class";
+  remHint.textContent = on ? `On · pings ${state.reminders.lead} min before each class` : "Off · get a ping before class";
 }
 function notify(title, body) {
   if (!("Notification" in window) || Notification.permission !== "granted") return;
@@ -815,7 +815,7 @@ function checkReminders() {
     if (nowMin === h * 60 + m - state.reminders.lead) {
       const k = `${s.id}-${key}`;
       if (notified.has(k)) return; notified.add(k);
-      notify("📚 " + s.subject, `Starts at ${s.start} · ${fmtDur(s.duration)} — in ${state.reminders.lead} min`);
+      notify("📚 " + s.subject, `Starts at ${s.start} · ${fmtDur(s.duration)} · in ${state.reminders.lead} min`);
       toast(`🔔 ${s.subject} in ${state.reminders.lead} min`);
     }
   });
@@ -823,7 +823,7 @@ function checkReminders() {
     const k = "summary-" + key;
     if (!notified.has(k)) { notified.add(k);
       const mins = state.focusByDay[key] || 0;
-      notify("🌙 Daily summary", mins ? `Today you focused for ${fmtHrs(mins)}. Great job!` : "No focus logged today — a short 15-min session still counts!");
+      notify("🌙 Daily summary", mins ? `Today you focused for ${fmtHrs(mins)}. Great job!` : "No focus logged today · a short 15-min session still counts!");
     }
   }
 }
@@ -848,7 +848,7 @@ importFile.addEventListener("change", () => {
       state = Object.assign(DEFAULTS(), data, { reminders: Object.assign(DEFAULTS().reminders, data.reminders || {}) });
       save(); applyTheme(state.theme || document.documentElement.dataset.theme); render(); syncReminderUI();
       toast(`Imported ${state.sessions.length} quests ✓`);
-    } catch (_) { toast("Couldn't read that file — invalid format"); }
+    } catch (_) { toast("Couldn't read that file · invalid format"); }
     importFile.value = "";
   };
   reader.readAsText(file);
@@ -856,7 +856,7 @@ importFile.addEventListener("change", () => {
 
 // ---------- Focus music: local MP3 files ----------
 // Built-in songs: drop an .mp3 into music/ and add a line below.
-// Users can also add their own songs at runtime — see the picker below.
+// Users can also add their own songs at runtime · see the picker below.
 let TRACKS = [
   { id: "lofi-sleep", file: "music/lofi-sleep.mp3", label: "💤 Lofi Sleep" },
 ];
@@ -957,7 +957,7 @@ musicFile?.addEventListener("change", async (e) => {
   if (added) toast(`Added ${added} song${added > 1 ? "s" : ""} ✓`);
 });
 
-// "Đổi ảnh nhân vật" — pick a photo, save it in the browser, use it as the avatar.
+// "Đổi ảnh nhân vật" · pick a photo, save it in the browser, use it as the avatar.
 const avatarFile = document.getElementById("avatarFile");
 document.getElementById("avatarBtn")?.addEventListener("click", () => avatarFile.click());
 avatarFile?.addEventListener("change", async (e) => {
@@ -987,7 +987,7 @@ function stopMusic() { currentTrack = "off"; markSoundBtn("off"); audio.pause();
 document.getElementById("vol").addEventListener("input", (e) => { audio.volume = (+e.target.value) / 100; });
 const soundWithTimer = document.getElementById("soundWithTimer");
 
-// ---------- Add to phone calendar (.ics — native reminders even when app closed) ----------
+// ---------- Add to phone calendar (.ics · native reminders even when app closed) ----------
 function icsEsc(t) { return t.replace(/([,;\\])/g, "\\$1").replace(/\n/g, "\\n"); }
 function buildICS() {
   const BYDAY = { Mon: "MO", Tue: "TU", Wed: "WE", Thu: "TH", Fri: "FR", Sat: "SA", Sun: "SU" };
@@ -1012,7 +1012,7 @@ document.getElementById("calBtn").addEventListener("click", () => {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a"); a.href = url; a.download = "focusflow.ics"; a.click();
   URL.revokeObjectURL(url);
-  toast("📅 Calendar file saved — open it in your calendar app");
+  toast("📅 Calendar file saved · open it in your calendar app");
 });
 
 // ---------- Clock ----------
@@ -1029,7 +1029,7 @@ function tickDday() {
   const days = Math.ceil((EXAM_DATE - now) / 86400000);
   const lbl = document.querySelector(".dday-lbl");
   if (days > 0) { el.textContent = days; if (lbl) lbl.textContent = "ngày tới kỳ thi"; }
-  else if (days === 0) { el.textContent = "🔥"; if (lbl) lbl.textContent = "Hôm nay thi — cố lên!"; }
+  else if (days === 0) { el.textContent = "🔥"; if (lbl) lbl.textContent = "Hôm nay thi, cố lên!"; }
   else { el.textContent = "✓"; if (lbl) lbl.textContent = "Kỳ thi đã qua"; }
 }
 tickDday(); setInterval(tickDday, 3600000);
@@ -1075,7 +1075,7 @@ function showInstallHelp() {
   const ios = /iphone|ipad|ipod/i.test(ua) || (/mac/i.test(ua) && "ontouchend" in document);
   const android = /android/i.test(ua);
   let html;
-  if (ios) html = "On iPhone / iPad (use <b>Safari</b>):<br>1. Tap the <b>Share</b> button ⬆️<br>2. Scroll to <b>Add to Home Screen</b><br>3. Tap <b>Add</b> — done! 🎉";
+  if (ios) html = "On iPhone / iPad (use <b>Safari</b>):<br>1. Tap the <b>Share</b> button ⬆️<br>2. Scroll to <b>Add to Home Screen</b><br>3. Tap <b>Add</b> · done! 🎉";
   else if (android) html = "On Android (use <b>Chrome</b>):<br>Tap the menu <b>⋮</b> → <b>Add to Home screen</b> → <b>Install</b>.";
   else html = "On desktop <b>Chrome / Edge</b>:<br>Click the <b>install icon ⊕</b> in the address bar,<br>or menu <b>⋮ → Install FocusFlow</b>.";
   openInfo("📲 Install FocusFlow", html);
