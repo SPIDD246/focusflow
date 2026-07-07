@@ -416,10 +416,7 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
   border: 1px solid rgba(0, 229, 180, 0.22);
   box-shadow: 0 0 28px rgba(0,229,180,0.16), inset 0 0 26px rgba(0,229,180,0.07);
 }
-.timer-ring::after {
-  content: ""; position: absolute; inset: 14px; border-radius: 50%; pointer-events: none;
-  background: radial-gradient(circle at 50% 45%, rgba(0,229,180,0.10), transparent 68%);
-}
+
 
 .ring-bg { fill: none; stroke: rgba(0,229,180,0.1); stroke-width: 9; }
 .ring-fg {
@@ -521,25 +518,16 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
 .session {
-  border-radius: 12px; padding: 10px 38px 10px 13px; cursor: pointer; position: relative;
+  border-radius: 12px; padding: 12px 14px; cursor: pointer; position: relative;
   border: 1px solid var(--card-brd); background: var(--surface);
   transition: transform .18s var(--ease), box-shadow .2s, border-color .2s;
   animation: pop .28s var(--ease);
+  text-align: center;
 }
-.session:hover { transform: translateX(3px); box-shadow: var(--neon-glow); border-color: rgba(0,229,180,0.35); }
-.session.done { opacity: 0.55; }
-.session.done .s-subj { text-decoration: line-through; opacity: .7; }
-.session .s-bar { position: absolute; left: 0; top: 10px; bottom: 10px; width: 4px; border-radius: 4px; box-shadow: 0 0 8px currentColor; }
-.session .s-subj { font-weight: 700; font-size: var(--fs-md); padding-left: 9px; }
-.session .s-time { color: var(--muted); font-size: var(--fs-xs); padding-left: 9px; margin-top: 3px; font-weight: 600; font-family: "Orbitron", sans-serif; letter-spacing: .5px; }
-.session .s-check {
-  position: absolute; right: 9px; top: 50%; transform: translateY(-50%);
-  width: 22px; height: 22px; border-radius: 50%; cursor: pointer;
-  border: 1.5px solid var(--card-brd-hi); background: transparent; color: transparent;
-  display: grid; place-items: center; font-size: 12px; transition: all .2s var(--ease);
-}
-.session .s-check:hover { border-color: var(--accent); box-shadow: var(--neon-glow); }
-.session.done .s-check { background: var(--accent); border-color: var(--accent); color: #030f0c; box-shadow: var(--neon-glow); }
+.session:hover { transform: translateY(-2px); box-shadow: var(--neon-glow); border-color: rgba(0,229,180,0.35); }
+.session .s-bar { position: absolute; left: 0; top: 8px; bottom: 8px; width: 4px; border-radius: 4px; box-shadow: 0 0 8px currentColor; }
+.session .s-subj { font-weight: 700; font-size: var(--fs-md); }
+.session .s-time { color: var(--muted); font-size: var(--fs-xs); margin-top: 4px; font-weight: 600; font-family: "Orbitron", sans-serif; letter-spacing: .5px; }
 .session .s-del {
   position: absolute; top: 4px; right: 7px; color: var(--muted-2); font-size: 15px;
   opacity: 0; transition: opacity .2s, color .2s; background: none; border: none; cursor: pointer;

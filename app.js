@@ -75,19 +75,11 @@ function sessionEl(s, isDone) {
     <span class="s-bar" style="background:${s.color}"></span>
     <button class="s-del" title="Delete">&times;</button>
     <div class="s-subj">${escapeHtml(s.subject)}</div>
-    <div class="s-time">${s.start}–${addMinutes(s.start, s.duration)} · ${fmtDur(s.duration)}</div>
-    <button class="s-check" title="Mark done">✓</button>`;
+    <div class="s-time">${s.start}–${addMinutes(s.start, s.duration)}</div>`;
   el.querySelector(".s-del").addEventListener("click", (e) => {
     e.stopPropagation();
     state.sessions = state.sessions.filter((x) => x.id !== s.id);
     render(); toast("Quest removed");
-  });
-  el.querySelector(".s-check").addEventListener("click", (e) => {
-    e.stopPropagation();
-    const dm = doneMap();
-    if (dm[s.id]) { delete dm[s.id]; }
-    else { dm[s.id] = true; burst(e.clientX, e.clientY); toast(`✓ ${s.subject} done · nice work!`); }
-    render();
   });
   el.addEventListener("click", () => openModal(s));
   return el;
