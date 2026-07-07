@@ -374,8 +374,11 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
 /* ================================================================
    10. TIMER
    ================================================================ */
-.timer-card { display: flex; flex-direction: column; align-items: center; }
-.timer-ring { position: relative; width: 218px; height: 218px; }
+.timer-card { display: flex; flex-direction: column; }
+/* Layout 2 cột: đồng hồ trái · điều khiển phải */
+.timer-body { display: flex; gap: 18px; align-items: flex-start; }
+.timer-side { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+.timer-ring { position: relative; width: 170px; height: 170px; flex: none; }
 .timer-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
 
 /* outer neon ring frame */
@@ -395,12 +398,12 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
 
 .timer-display {
   position: absolute; inset: 0; display: grid; place-items: center;
-  font-size: 40px; font-weight: 700; font-variant-numeric: tabular-nums;
+  font-size: 32px; font-weight: 700; font-variant-numeric: tabular-nums;
   color: var(--accent);
   text-shadow: var(--neon-glow);
 }
 
-.timer-controls { display: flex; gap: 10px; margin: 20px 0 14px; width: 100%; }
+.timer-controls { display: flex; gap: 10px; width: 100%; }
 .timer-controls .btn { flex: 1; }
 
 /* chip presets */
@@ -426,7 +429,7 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
 }
 
 /* train chips */
-.train-row { display: flex; align-items: center; gap: 9px; margin-top: 14px; }
+.train-row { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; }
 .train-label { font-size: 9px; font-weight: 800; letter-spacing: 2px; color: var(--muted); font-family: "Orbitron", sans-serif; text-transform: uppercase; }
 .train-chips { display: flex; gap: 7px; flex: 1; }
 .train-chip {
@@ -531,17 +534,17 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
 /* ================================================================
    14. BADGES / ACHIEVEMENTS
    ================================================================ */
-.badges { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; }
+.badges { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: 8px; }
 .badge {
   background: var(--surface); border: 1px solid var(--card-brd); border-radius: var(--radius-sm);
-  padding: 14px 8px; text-align: center; transition: transform .2s var(--ease), box-shadow .25s;
+  padding: 9px 5px; text-align: center; transition: transform .2s var(--ease), box-shadow .25s;
 }
 .badge.earned { border-color: rgba(0,229,180,0.28); box-shadow: var(--shadow-sm); }
 .badge.earned:hover { transform: translateY(-3px) scale(1.03); box-shadow: var(--neon-glow), var(--shadow-md); }
 .badge.locked { opacity: 0.28; filter: grayscale(1); }
-.badge-ico { font-size: 28px; }
-.badge-num { font-family: "Orbitron", sans-serif; font-size: 11px; font-weight: 700; margin-top: 6px; color: var(--accent); }
-.badge-sub { font-size: 10px; color: var(--muted); margin-top: 2px; font-weight: 600; letter-spacing: .5px; }
+.badge-ico { font-size: 20px; }
+.badge-num { font-family: "Orbitron", sans-serif; font-size: 9px; font-weight: 700; margin-top: 4px; color: var(--accent); }
+.badge-sub { font-size: 8.5px; color: var(--muted); margin-top: 1px; font-weight: 600; letter-spacing: .3px; }
 
 /* ================================================================
    15. FOCUS MUSIC SECTION
