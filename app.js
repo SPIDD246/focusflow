@@ -333,11 +333,11 @@ function renderRadar() {
   const dataPts = order.map((k) => pt(k, Math.max(0.16, levels[k] / maxLv))).join(" ");
   const verts = order.map((k) => { const [x, y] = pt(k, Math.max(0.16, levels[k] / maxLv)).split(","); return `<circle cx="${x}" cy="${y}" r="3.5" fill="${RADAR_COLOR[k]}"/>`; }).join("");
   const labels =
-    `<text x="${C}" y="18" text-anchor="middle">INT</text>` +
-    `<text x="${C + R + 12}" y="${C + 4}" text-anchor="middle">DIS</text>` +
-    `<text x="${C}" y="${C + R + 22}" text-anchor="middle">FOC</text>` +
-    `<text x="${C - R - 12}" y="${C + 4}" text-anchor="middle">STR</text>`;
-  box.innerHTML = `<svg viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg" class="radar-svg">
+    `<text x="${C}" y="4" text-anchor="middle">INT</text>` +
+    `<text x="${C + R + 20}" y="${C + 4}" text-anchor="start">DIS</text>` +
+    `<text x="${C}" y="${C + R + 26}" text-anchor="middle">FOC</text>` +
+    `<text x="${C - R - 20}" y="${C + 4}" text-anchor="end">STR</text>`;
+  box.innerHTML = `<svg viewBox="-16 -8 212 200" xmlns="http://www.w3.org/2000/svg" class="radar-svg">
     ${rings}${axes}
     <polygon points="${dataPts}" fill="var(--accent)" fill-opacity="0.22" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/>
     ${verts}
