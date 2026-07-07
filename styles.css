@@ -491,7 +491,7 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
 /* ================================================================
    12. WEEK GRID / QUEST SLOTS
    ================================================================ */
-.week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; }
+.week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 12px; }
 .day-col {
   position: relative; background: var(--card); border: 1px solid var(--card-brd);
   border-radius: 16px; padding: 12px; min-height: 190px;

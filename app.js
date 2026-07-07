@@ -75,7 +75,7 @@ function sessionEl(s, isDone) {
     <span class="s-bar" style="background:${s.color}"></span>
     <button class="s-del" title="Delete">&times;</button>
     <div class="s-subj">${escapeHtml(s.subject)}</div>
-    <div class="s-time">${s.start} · ${fmtDur(s.duration)}</div>
+    <div class="s-time">${s.start}–${addMinutes(s.start, s.duration)} · ${fmtDur(s.duration)}</div>
     <button class="s-check" title="Mark done">✓</button>`;
   el.querySelector(".s-del").addEventListener("click", (e) => {
     e.stopPropagation();
@@ -639,9 +639,9 @@ function openModal(session = null) {
   document.getElementById("saveBtn").textContent = session ? "Save changes" : "Add Quest";
   if (session) {
     form.subject.value = session.subject; form.day.value = session.day;
-    form.start.value = session.start; form.duration.value = session.duration; pickedColor = session.color;
+    form.start.value = session.start; form.end.value = addMinutes(session.start, session.duration); pickedColor = session.color;
   } else {
-    form.reset(); form.day.value = DAYS[todayIdx()]; pickedColor = COLORS[0];
+    form.reset(); form.day.value = DAYS[todayIdx()]; form.start.value = "18:00"; form.end.value = "19:00"; pickedColor = COLORS[0];
   }
   [...swatchWrap.children].forEach((x, i) => x.classList.toggle("sel", COLORS[i] === pickedColor));
   modal.hidden = false;
@@ -653,8 +653,11 @@ modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); }
 
 form.addEventListener("submit", (e) => {
   e.preventDefault();
-  const data = { subject: form.subject.value.trim(), day: form.day.value, start: form.start.value, duration: parseInt(form.duration.value, 10), color: pickedColor };
-  if (!data.subject) return;
+  const subject = form.subject.value.trim();
+  if (!subject) return;
+  const dur = diffMinutes(form.start.value, form.end.value);
+  if (dur <= 0) { toast("Giờ kết thúc phải sau giờ bắt đầu"); return; }
+  const data = { subject, day: form.day.value, start: form.start.value, duration: dur, color: pickedColor };
   if (editingId) { Object.assign(state.sessions.find((x) => x.id === editingId), data); toast("Quest updated"); }
   else { state.sessions.push({ id: uid(), ...data }); toast("Quest added"); }
   closeModal(); render();
@@ -1036,6 +1039,20 @@ tickDday(); setInterval(tickDday, 3600000);
 
 // ---------- Helpers ----------
 function fmtDur(min) { if (min < 60) return `${min}m`; const h = Math.floor(min / 60), m = min % 60; return m ? `${h}h ${m}m` : `${h}h`; }
+// Số phút giữa 2 mốc "HH:MM" (nếu end <= start thì coi như qua nửa đêm, +24h)
+function diffMinutes(start, end) {
+  const [sh, sm] = start.split(":").map(Number), [eh, em] = end.split(":").map(Number);
+  let d = (eh * 60 + em) - (sh * 60 + sm);
+  if (d <= 0) d += 24 * 60;
+  return d;
+}
+// Cộng phút vào "HH:MM" → trả lại "HH:MM" (wrap 24h)
+function addMinutes(start, min) {
+  const [sh, sm] = start.split(":").map(Number);
+  let t = (sh * 60 + sm + min) % (24 * 60);
+  const h = Math.floor(t / 60), m = t % 60;
+  return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+}
 function fmtHrs(min) { const h = min / 60; return (Number.isInteger(h) ? h : h.toFixed(1)) + "h"; }
 function fmtHrsShort(min) { return min >= 60 ? (min / 60).toFixed(min % 60 ? 1 : 0) + "h" : min + "m"; }
 function hexToRgba(hex, a) { const n = parseInt(hex.slice(1), 16); return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`; }
