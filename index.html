@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -14,19 +14,31 @@
   <link rel="apple-touch-icon" href="icon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=10" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Orbitron:wght@400;500;600;700;800;900&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css?v=31" />
 </head>
 <body>
   <div class="aurora"></div>
+  <div class="sparks" aria-hidden="true">
+    <span style="--x:8%; --dur:9s; --delay:0s">✦</span>
+    <span style="--x:22%; --dur:12s; --delay:2.4s">✧</span>
+    <span style="--x:47%; --dur:10s; --delay:5.1s">✦</span>
+    <span style="--x:66%; --dur:13s; --delay:1.2s">✧</span>
+    <span style="--x:81%; --dur:11s; --delay:3.6s">✦</span>
+    <span style="--x:93%; --dur:14s; --delay:6.3s">✧</span>
+  </div>
   <canvas class="confetti" id="confetti"></canvas>
+  <div class="level-flash" id="levelFlash">
+    <div class="lf-ring"></div>
+    <div class="lf-text"><span class="lf-up">LEVEL UP</span><span class="lf-lv"><span id="lfLevel">2</span></span></div>
+  </div>
 
   <header class="topbar">
     <div class="brand">
       <div class="logo">✦</div>
       <div>
         <h1>FocusFlow</h1>
-        <p class="tagline">Plan your week. Track your focus.</p>
+        <p class="tagline">⚔ Your learning adventure</p>
       </div>
     </div>
     <div class="top-actions">
@@ -37,24 +49,37 @@
   </header>
 
   <main class="layout">
-    <!-- LEFT -->
+    <!-- LEFT: Character -->
     <aside class="col side">
-      <section class="card glow">
-        <h2 class="card-title">This Week</h2>
-        <div class="stat-grid">
-          <div class="stat"><span class="stat-num" id="statSessions">0</span><span class="stat-label">Sessions</span></div>
-          <div class="stat"><span class="stat-num" id="statDone">0</span><span class="stat-label">Done</span></div>
-          <div class="stat"><span class="stat-num" id="statFocus">0h</span><span class="stat-label">Focused</span></div>
-          <div class="stat"><span class="stat-num" id="statStreak">0</span><span class="stat-label">Day streak</span></div>
+      <section class="card hero-card">
+        <div class="hero-top">
+          <div class="hero-avatar-frame" id="heroFrame">
+            <div class="hero-avatar" id="heroAvatar"></div>
+            <div class="hero-lv-badge"><span id="heroLevel">1</span></div>
+          </div>
+          <div class="hero-meta">
+            <div class="hero-title" id="heroTitle">Novice</div>
+            <div class="hero-rank">⚔ Adventurer</div>
+            <div class="xp-row">
+              <span class="xp-label">XP</span>
+              <div class="xp-track"><div class="xp-fill" id="xpFill"></div></div>
+            </div>
+            <div class="xp-text" id="xpText">0 / 15 XP</div>
+          </div>
         </div>
-        <div class="progress-wrap">
-          <div class="progress-head"><span>Weekly goal</span><span id="goalText">0 / 10h</span></div>
-          <div class="progress-track"><div class="progress-fill" id="goalFill"></div></div>
-        </div>
+        <div class="stat-radar" id="statRadar"></div>
+        <div class="stat-bars" id="statBars"></div>
+        <button class="btn ghost hero-avatar-btn" id="avatarBtn">📷 Change portrait</button>
+        <input type="file" id="avatarFile" accept="image/*" hidden />
+      </section>
+
+      <section class="card">
+        <h2 class="card-title">Skill Tree</h2>
+        <div class="perk-tree" id="perkTree"></div>
       </section>
 
       <section class="card timer-card">
-        <h2 class="card-title">Focus Timer</h2>
+        <h2 class="card-title">Training</h2>
         <div class="timer-ring">
           <svg viewBox="0 0 120 120">
             <defs>
@@ -70,25 +95,76 @@
           <div class="timer-display" id="timerDisplay">25:00</div>
         </div>
         <div class="timer-controls">
-          <button class="btn ghost" id="timerReset">Reset</button>
-          <button class="btn primary" id="timerToggle">Start</button>
+          <button class="btn ghost" id="timerReset">↺ Reset</button>
+          <button class="btn primary" id="timerToggle">⚔ Train</button>
         </div>
         <div class="timer-presets">
           <button data-min="25" class="chip active">25m</button>
           <button data-min="45" class="chip">45m</button>
           <button data-min="15" class="chip">15m</button>
+          <div class="chip-custom">
+            <input type="number" id="customMin" min="1" max="180" step="1" placeholder="min" aria-label="Custom minutes" />
+            <button class="chip" id="customSet">Set</button>
+          </div>
+        </div>
+        <div class="train-row">
+          <span class="train-label">TRAIN</span>
+          <div class="train-chips" id="trainChips"></div>
+        </div>
+      </section>
+    </aside>
+
+    <!-- CENTER: Quest Board -->
+    <section class="col main">
+      <div class="section-head">
+        <h2>⚔ Quest Board</h2>
+        <button class="btn primary" id="openAdd">+ New Quest</button>
+      </div>
+      <div class="week" id="week"></div>
+
+      <div class="quest-boss">
+        <section class="card quest-card">
+          <h2 class="card-title">🗡️ Daily Quests <span class="qb-count" id="questCount"></span></h2>
+          <div class="quest-list" id="questList"></div>
+        </section>
+        <section class="card boss-card">
+          <h2 class="card-title">👹 Weekly Boss</h2>
+          <div class="boss" id="bossCard"></div>
+        </section>
+      </div>
+
+      <section class="card">
+        <h2 class="card-title">Achievements <span class="qb-count" id="achCount"></span></h2>
+        <div class="badges" id="badges"></div>
+      </section>
+    </section>
+
+    <!-- RIGHT: Stats & Settings -->
+    <aside class="col side-right">
+      <section class="card glow">
+        <h2 class="card-title">Week Log</h2>
+        <div class="stat-grid">
+          <div class="stat"><span class="stat-num" id="statSessions">0</span><span class="stat-label">Quests</span></div>
+          <div class="stat"><span class="stat-num" id="statDone">0</span><span class="stat-label">Done</span></div>
+          <div class="stat"><span class="stat-num" id="statFocus">0h</span><span class="stat-label">Focused</span></div>
+          <div class="stat"><span class="stat-num" id="statStreak">0</span><span class="stat-label">Streak</span></div>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-head"><span>◈ Weekly Goal</span><span id="goalText">0 / 10h</span></div>
+          <div class="progress-track"><div class="progress-fill" id="goalFill"></div></div>
         </div>
       </section>
 
       <section class="card">
-        <h2 class="card-title">Focus Music · Lofi Girl</h2>
-        <div class="yt-wrap"><div id="ytPlayer"></div></div>
-        <div class="sound-grid">
-          <button class="sound-btn active" data-yt="jfKfPfyJRdk">📚 Study</button>
-          <button class="sound-btn" data-yt="rUxyKA_-grg">💤 Sleep</button>
-          <button class="sound-btn" data-yt="4xDzrJKXOOY">🌌 Synthwave</button>
-          <button class="sound-btn" data-yt="off">⏸ Stop</button>
-        </div>
+        <h2 class="card-title">Focus This Week</h2>
+        <div class="bar-chart" id="barChart"></div>
+      </section>
+
+      <section class="card">
+        <h2 class="card-title">Focus Music</h2>
+        <div class="sound-grid" id="soundGrid"><!-- buttons injected from TRACKS in app.js --></div>
+        <button class="btn ghost" id="addMusicBtn" style="width:100%;margin-top:10px">＋ Add your own music</button>
+        <input type="file" id="musicFile" accept="audio/*" multiple hidden />
         <label class="setting-row" style="border:none;padding-bottom:0">
           <span class="setting-label">🔊 Volume</span>
           <input type="range" id="vol" class="range" min="0" max="100" value="55" />
@@ -96,7 +172,7 @@
         <div class="setting-row" style="padding-top:6px">
           <div>
             <div class="setting-label">Play with timer</div>
-            <div class="setting-hint">Auto-start Lofi Girl when focusing</div>
+            <div class="setting-hint">Auto-start music when training</div>
           </div>
           <label class="switch"><input type="checkbox" id="soundWithTimer" /><span class="slider"></span></label>
         </div>
@@ -134,41 +210,16 @@
         </div>
         <button class="btn primary" id="calBtn" style="width:100%;margin-top:10px">📅 Add to phone calendar</button>
         <div class="setting-hint" style="margin-top:9px;text-align:center;line-height:1.5">
-          Saves a file — open it in Google / Apple Calendar to get native reminders,<br>even when the app is closed.
+          Saves a file — open it in Google / Apple Calendar for native reminders,<br>even when the app is closed.
         </div>
       </section>
     </aside>
-
-    <!-- CENTER -->
-    <section class="col main">
-      <div class="section-head">
-        <h2>Weekly Schedule</h2>
-        <button class="btn primary" id="openAdd">+ Add session</button>
-      </div>
-      <div class="week" id="week"></div>
-
-      <div class="insights">
-        <section class="card">
-          <h2 class="card-title">Focus this week</h2>
-          <div class="bar-chart" id="barChart"></div>
-        </section>
-        <section class="card">
-          <h2 class="card-title">Time by subject</h2>
-          <div class="subject-list" id="subjectList"></div>
-        </section>
-      </div>
-
-      <section class="card">
-        <h2 class="card-title">Achievements</h2>
-        <div class="badges" id="badges"></div>
-      </section>
-    </section>
   </main>
 
   <!-- Modal -->
   <div class="modal-backdrop" id="modal" hidden>
     <div class="modal card">
-      <h2 class="card-title" id="modalTitle">New session</h2>
+      <h2 class="card-title" id="modalTitle">New Quest</h2>
       <form id="sessionForm" class="form">
         <label>Subject
           <input name="subject" type="text" placeholder="e.g. Calculus" required maxlength="40" />
@@ -196,6 +247,6 @@
 
   <div class="toast" id="toast" hidden></div>
 
-  <script src="app.js?v=10"></script>
+  <script src="app.js?v=31"></script>
 </body>
 </html>

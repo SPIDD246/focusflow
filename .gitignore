@@ -1,0 +1,5 @@
+# Claude Code local config (not needed for the app)
+.claude/
+
+# OS junk
+.DS_Store
