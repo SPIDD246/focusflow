@@ -122,14 +122,11 @@ function streak() {
 }
 
 // ---------- Study RPG (Phase 1) ----------
-// 4 môn thi vào lớp 10 chuyên Lý - THPT Lê Hồng Phong.
-// Keys giữ nguyên (int/dis/foc/str) để không phá localStorage & perks cũ,
-// chỉ đổi nhãn hiển thị sang môn thật.
 const STAT_DEFS = [
-  { key: "int", abbr: "LÝ",   icon: "⚡", name: "Vật Lý (chuyên)" },
-  { key: "dis", abbr: "TOÁN", icon: "📐", name: "Toán" },
-  { key: "foc", abbr: "VĂN",  icon: "📖", name: "Ngữ Văn" },
-  { key: "str", abbr: "ANH",  icon: "🔤", name: "Tiếng Anh" },
+  { key: "int", abbr: "INT", icon: "🧠", name: "Intelligence" },
+  { key: "dis", abbr: "DIS", icon: "🎯", name: "Discipline" },
+  { key: "foc", abbr: "FOC", icon: "🧘", name: "Focus" },
+  { key: "str", abbr: "STR", icon: "💪", name: "Strength" },
 ];
 // Tiers unlock by character level (highest match wins).
 // `key` is the image filename used for the anime avatar: avatars/<key>.png (jpg/webp also work).
@@ -185,14 +182,16 @@ function gainFocus(mins, paused) {
   const perks = unlockedPerks(before);
   let mult = 1;
   if (perks.has("focused")) mult += 0.10;                 // Deep Focus: +10% always
-  if (perks.has("scholar") && target === "int") mult += 0.15; // Nhà Vật Lý: +15% XP khi học Lý
+  if (perks.has("scholar") && target === "int") mult += 0.15; // Scholar's Mind: +15% training INT
   if (perks.has("unstoppable")) mult += 0.25;             // Unstoppable: +25% always
   if (perks.has("weekend")) { const wd = new Date().getDay(); if (wd === 0 || wd === 6) mult += 1; } // ×2 Sat/Sun
   const gain = Math.max(1, Math.round(mins * mult));
   const add = (k, v) => { state.rpg.stats[k] += v; };
   state.rpg.xp += gain;
-  // Mỗi phiên focus chỉ cộng XP cho ĐÚNG môn đang học → radar phản ánh thật môn nào học nhiều.
-  add(target, gain);
+  add(target, gain);                                   // the stat you trained
+  if (target !== "foc") add("foc", gain);              // Focus = all time focused
+  if (!paused && target !== "dis") add("dis", gain);   // Discipline: finish without pausing
+  add("str", Math.max(1, streak()) * (perks.has("grit") ? 2 : 1)); // Grit doubles Strength gains
   state.rpg.totalSessions += 1;
   const after = levelInfo(state.rpg.xp).level;
   return { gain, levels: after - before };
@@ -325,7 +324,7 @@ function renderHero() {
 }
 // 4-axis radar (INT top, DIS right, FOC bottom, STR left) showing each stat's level.
 // The shape is relative — the strongest stat reaches the edge so you see your build at a glance.
-const RADAR_COLOR = { int: "#f5a623", dis: "#5fb0d6", foc: "#f2795f", str: "#6fce88" };
+const RADAR_COLOR = { int: "#5fb0d6", dis: "#ecb44e", foc: "#6fce88", str: "#f2795f" };
 function renderRadar() {
   const box = document.getElementById("statRadar");
   if (!box) return;
@@ -377,7 +376,7 @@ function buildTrainChips() {
 const PERKS = [
   { key: "focused",     lv: 3,  icon: "🎯", name: "Deep Focus",      desc: "+10% XP every session" },
   { key: "grit",        lv: 6,  icon: "💪", name: "Iron Will",       desc: "STR gains are doubled" },
-  { key: "scholar",     lv: 10, icon: "⚡", name: "Nhà Vật Lý",  desc: "+15% XP khi học môn Lý" },
+  { key: "scholar",     lv: 10, icon: "📚", name: "Scholar's Mind",  desc: "+15% XP while training INT" },
   { key: "weekend",     lv: 14, icon: "🌙", name: "Weekend Warrior", desc: "XP ×2 on Sat & Sun" },
   { key: "unstoppable", lv: 20, icon: "⚡", name: "Unstoppable",     desc: "+25% XP every session" },
 ];

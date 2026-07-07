@@ -706,7 +706,7 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
   border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--sc) 15%, transparent), transparent 70%);
   pointer-events: none;
 }
-.c-int { --sc: #f5a623; } .c-dis { --sc: #5fb0d6; } .c-foc { --sc: #f2795f; } .c-str { --sc: #6fce88; }
+.c-int { --sc: #40b4e5; } .c-dis { --sc: #f5a623; } .c-foc { --sc: #00e5b4; } .c-str { --sc: #ff6b4a; }
 
 .stat-top { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 8px; }
 .stat-abbr { font-family: "Orbitron", sans-serif; font-weight: 900; font-size: 14px; letter-spacing: 2px; color: var(--text); }
