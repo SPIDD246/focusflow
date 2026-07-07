@@ -1045,10 +1045,16 @@ function toast(msg) { const t = document.getElementById("toast"); t.textContent 
 
 // ---------- Seed demo (first run only) ----------
 if (state.sessions.length === 0 && !localStorage.getItem(STORE_KEY)) {
+  // Lịch Hè 2026 — các lớp học thêm (Nova set sẵn)
   state.sessions = [
-    { id: uid(), subject: "Calculus", day: "Mon", start: "18:00", duration: 60, color: COLORS[0] },
-    { id: uid(), subject: "Spanish", day: "Wed", start: "19:30", duration: 45, color: COLORS[1] },
-    { id: uid(), subject: "Reading", day: "Sat", start: "10:00", duration: 90, color: COLORS[2] },
+    { id: uid(), subject: "Lớp Code",     day: "Mon", start: "20:00", duration: 60,  color: COLORS[4] },
+    { id: uid(), subject: "Lớp Toán",     day: "Tue", start: "08:30", duration: 120, color: COLORS[3] },
+    { id: uid(), subject: "Lớp Anh",      day: "Wed", start: "09:30", duration: 120, color: COLORS[0] },
+    { id: uid(), subject: "Lớp Anh",      day: "Thu", start: "17:45", duration: 195, color: COLORS[0] },
+    { id: uid(), subject: "Tiếng Trung",  day: "Sat", start: "10:30", duration: 90,  color: COLORS[5] },
+    { id: uid(), subject: "Lớp Toán",     day: "Sat", start: "13:30", duration: 120, color: COLORS[3] },
+    { id: uid(), subject: "⚡ Chuyên Lý",  day: "Sat", start: "17:30", duration: 210, color: COLORS[2] },
+    { id: uid(), subject: "Tiếng Trung",  day: "Sun", start: "10:30", duration: 90,  color: COLORS[5] },
   ];
 }
 
