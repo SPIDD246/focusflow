@@ -383,10 +383,13 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
     var(--card);
   border-color: rgba(0,229,180,0.22);
 }
+/* Training giãn cao để đáy thẳng hàng với cột Daily Quests + Reminders */
+.boss-col .timer-card { flex: 1; justify-content: center; }
 /* Layout 2 cột: đồng hồ trái · điều khiển phải */
-.timer-body { display: flex; gap: 24px; align-items: center; padding: 4px 2px; }
-.timer-side { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 15px; }
-.timer-ring { position: relative; width: 200px; height: 200px; flex: none; }
+.timer-body { display: flex; gap: 22px; align-items: center; padding: 4px 2px; flex-wrap: wrap; }
+.timer-side { flex: 1 1 220px; min-width: 200px; display: flex; flex-direction: column; gap: 15px; }
+/* Ring co giãn: to khi rộng, tự thu khi cột hẹp — không đè lên nút */
+.timer-ring { position: relative; width: clamp(160px, 44%, 210px); aspect-ratio: 1; height: auto; flex: none; margin: 0 auto; }
 .timer-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
 
 /* outer neon ring frame — double halo */
@@ -416,7 +419,10 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
 }
 
 .timer-controls { display: flex; gap: 10px; width: 100%; }
-.timer-controls .btn { flex: 1; }
+.timer-controls .btn {
+  flex: 1 1 0; min-width: 0; padding: 12px 10px; font-size: 13px; letter-spacing: .3px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center;
+}
 
 /* chip presets */
 .timer-presets { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
@@ -780,7 +786,7 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
 /* ================================================================
    22. QUEST BOARD + BOSS
    ================================================================ */
-.quest-boss { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: start; }
+.quest-boss { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: stretch; }
 .boss-col, .quest-col { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
 .quest-list { display: flex; flex-direction: column; gap: 10px; }
 .quest {
