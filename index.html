@@ -44,6 +44,10 @@
     <div class="top-actions">
       <button class="icon-btn" id="themeToggle" title="Toggle light / dark">🌙</button>
       <button class="btn install" id="installBtn" hidden>⬇️ Install</button>
+      <div class="dday" id="dday" title="Đếm ngược tới kỳ thi vào 10 chuyên Lý LHP">
+        <span class="dday-num" id="ddayNum">—</span>
+        <span class="dday-lbl">ngày tới kỳ thi</span>
+      </div>
       <div class="clock" id="clock">—</div>
     </div>
   </header>
@@ -142,15 +146,19 @@
     <!-- RIGHT: Stats & Settings -->
     <aside class="col side-right">
       <section class="card glow">
-        <h2 class="card-title">Week Log</h2>
+        <h2 class="card-title">Nhật ký tuần</h2>
         <div class="stat-grid">
-          <div class="stat"><span class="stat-num" id="statSessions">0</span><span class="stat-label">Quests</span></div>
-          <div class="stat"><span class="stat-num" id="statDone">0</span><span class="stat-label">Done</span></div>
-          <div class="stat"><span class="stat-num" id="statFocus">0h</span><span class="stat-label">Focused</span></div>
-          <div class="stat"><span class="stat-num" id="statStreak">0</span><span class="stat-label">Streak</span></div>
+          <div class="stat"><span class="stat-num" id="statSessions">0</span><span class="stat-label">Nhiệm vụ</span></div>
+          <div class="stat"><span class="stat-num" id="statDone">0</span><span class="stat-label">Hoàn thành</span></div>
+          <div class="stat"><span class="stat-num" id="statFocus">0h</span><span class="stat-label">Đã học</span></div>
+          <div class="stat"><span class="stat-num" id="statStreak">0</span><span class="stat-label">🔥 Streak</span></div>
         </div>
         <div class="progress-wrap">
-          <div class="progress-head"><span>◈ Weekly Goal</span><span id="goalText">0 / 10h</span></div>
+          <div class="progress-head"><span>🎯 Mục tiêu hôm nay</span><span id="dailyText">0 / 120 phút</span></div>
+          <div class="progress-track"><div class="progress-fill" id="dailyFill"></div></div>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-head"><span>◈ Mục tiêu tuần</span><span id="goalText">0 / 14h</span></div>
           <div class="progress-track"><div class="progress-fill" id="goalFill"></div></div>
         </div>
       </section>

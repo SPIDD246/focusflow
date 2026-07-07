@@ -182,6 +182,17 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
 }
 .btn.install { background: var(--card); color: var(--accent-2); border: 1px solid var(--accent); }
 
+/* D-day countdown tới kỳ thi */
+.dday {
+  display: flex; flex-direction: column; align-items: center; line-height: 1;
+  padding: 6px 16px; border-radius: 14px;
+  border: 1px solid rgba(245,166,35,0.45);
+  background: linear-gradient(135deg, rgba(245,166,35,0.16), rgba(245,166,35,0.05));
+  box-shadow: var(--shadow-sm), inset 0 0 0 1px rgba(245,166,35,0.08);
+}
+.dday-num { font-family: "Orbitron", monospace; font-size: 20px; font-weight: 800; color: #f5a623; }
+.dday-lbl { font-size: 8.5px; letter-spacing: 1px; text-transform: uppercase; color: #f0c877; font-weight: 700; margin-top: 2px; }
+
 /* ================================================================
    5. LAYOUT
    ================================================================ */
@@ -695,7 +706,7 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
   border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--sc) 15%, transparent), transparent 70%);
   pointer-events: none;
 }
-.c-int { --sc: #40b4e5; } .c-dis { --sc: #f5a623; } .c-foc { --sc: #00e5b4; } .c-str { --sc: #ff6b4a; }
+.c-int { --sc: #f5a623; } .c-dis { --sc: #5fb0d6; } .c-foc { --sc: #f2795f; } .c-str { --sc: #6fce88; }
 
 .stat-top { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 8px; }
 .stat-abbr { font-family: "Orbitron", sans-serif; font-weight: 900; font-size: 14px; letter-spacing: 2px; color: var(--text); }

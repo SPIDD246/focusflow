@@ -1,7 +1,8 @@
 // ---------- FocusFlow ----------
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const COLORS = ["#6fae7c", "#3f9d7f", "#e6b25f", "#6aa7c4", "#b490d4", "#ef7d5d"];
-const WEEKLY_GOAL_H = 10;
+const WEEKLY_GOAL_H = 14;   // ~2h/ngày theo roadmap ôn thi
+const DAILY_GOAL_MIN = 120; // mục tiêu 120 phút học mỗi ngày
 const STORE_KEY = "focusflow.v1";
 
 // ---------- State ----------
@@ -103,6 +104,14 @@ function renderStats() {
   const focusH = weekFocus / 60;
   document.getElementById("goalFill").style.width = Math.min(100, (focusH / WEEKLY_GOAL_H) * 100) + "%";
   document.getElementById("goalText").textContent = `${focusH.toFixed(1)} / ${WEEKLY_GOAL_H}h`;
+  // Mục tiêu phút/ngày
+  const todayMin = state.focusByDay[isoDay(new Date())] || 0;
+  const dFill = document.getElementById("dailyFill");
+  const dText = document.getElementById("dailyText");
+  if (dFill && dText) {
+    dFill.style.width = Math.min(100, (todayMin / DAILY_GOAL_MIN) * 100) + "%";
+    dText.textContent = `${Math.round(todayMin)} / ${DAILY_GOAL_MIN} phút` + (todayMin >= DAILY_GOAL_MIN ? " ✅" : "");
+  }
 }
 
 function streak() {
@@ -113,11 +122,14 @@ function streak() {
 }
 
 // ---------- Study RPG (Phase 1) ----------
+// 4 môn thi vào lớp 10 chuyên Lý - THPT Lê Hồng Phong.
+// Keys giữ nguyên (int/dis/foc/str) để không phá localStorage & perks cũ,
+// chỉ đổi nhãn hiển thị sang môn thật.
 const STAT_DEFS = [
-  { key: "int", abbr: "INT", icon: "🧠", name: "Intelligence" },
-  { key: "dis", abbr: "DIS", icon: "🎯", name: "Discipline" },
-  { key: "foc", abbr: "FOC", icon: "🧘", name: "Focus" },
-  { key: "str", abbr: "STR", icon: "💪", name: "Strength" },
+  { key: "int", abbr: "LÝ",   icon: "⚡", name: "Vật Lý (chuyên)" },
+  { key: "dis", abbr: "TOÁN", icon: "📐", name: "Toán" },
+  { key: "foc", abbr: "VĂN",  icon: "📖", name: "Ngữ Văn" },
+  { key: "str", abbr: "ANH",  icon: "🔤", name: "Tiếng Anh" },
 ];
 // Tiers unlock by character level (highest match wins).
 // `key` is the image filename used for the anime avatar: avatars/<key>.png (jpg/webp also work).
@@ -173,16 +185,14 @@ function gainFocus(mins, paused) {
   const perks = unlockedPerks(before);
   let mult = 1;
   if (perks.has("focused")) mult += 0.10;                 // Deep Focus: +10% always
-  if (perks.has("scholar") && target === "int") mult += 0.15; // Scholar's Mind: +15% training INT
+  if (perks.has("scholar") && target === "int") mult += 0.15; // Nhà Vật Lý: +15% XP khi học Lý
   if (perks.has("unstoppable")) mult += 0.25;             // Unstoppable: +25% always
   if (perks.has("weekend")) { const wd = new Date().getDay(); if (wd === 0 || wd === 6) mult += 1; } // ×2 Sat/Sun
   const gain = Math.max(1, Math.round(mins * mult));
   const add = (k, v) => { state.rpg.stats[k] += v; };
   state.rpg.xp += gain;
-  add(target, gain);                                   // the stat you trained
-  if (target !== "foc") add("foc", gain);              // Focus = all time focused
-  if (!paused && target !== "dis") add("dis", gain);   // Discipline: finish without pausing
-  add("str", Math.max(1, streak()) * (perks.has("grit") ? 2 : 1)); // Grit doubles Strength gains
+  // Mỗi phiên focus chỉ cộng XP cho ĐÚNG môn đang học → radar phản ánh thật môn nào học nhiều.
+  add(target, gain);
   state.rpg.totalSessions += 1;
   const after = levelInfo(state.rpg.xp).level;
   return { gain, levels: after - before };
@@ -315,7 +325,7 @@ function renderHero() {
 }
 // 4-axis radar (INT top, DIS right, FOC bottom, STR left) showing each stat's level.
 // The shape is relative — the strongest stat reaches the edge so you see your build at a glance.
-const RADAR_COLOR = { int: "#5fb0d6", dis: "#ecb44e", foc: "#6fce88", str: "#f2795f" };
+const RADAR_COLOR = { int: "#f5a623", dis: "#5fb0d6", foc: "#f2795f", str: "#6fce88" };
 function renderRadar() {
   const box = document.getElementById("statRadar");
   if (!box) return;
@@ -332,11 +342,12 @@ function renderRadar() {
   // data polygon (min 0.16 so tiny stats still show)
   const dataPts = order.map((k) => pt(k, Math.max(0.16, levels[k] / maxLv))).join(" ");
   const verts = order.map((k) => { const [x, y] = pt(k, Math.max(0.16, levels[k] / maxLv)).split(","); return `<circle cx="${x}" cy="${y}" r="3.5" fill="${RADAR_COLOR[k]}"/>`; }).join("");
+  const ab = {}; STAT_DEFS.forEach((s) => { ab[s.key] = s.abbr; });
   const labels =
-    `<text x="${C}" y="4" text-anchor="middle">INT</text>` +
-    `<text x="${C + R + 20}" y="${C + 4}" text-anchor="start">DIS</text>` +
-    `<text x="${C}" y="${C + R + 26}" text-anchor="middle">FOC</text>` +
-    `<text x="${C - R - 20}" y="${C + 4}" text-anchor="end">STR</text>`;
+    `<text x="${C}" y="4" text-anchor="middle">${ab.int}</text>` +
+    `<text x="${C + R + 20}" y="${C + 4}" text-anchor="start">${ab.dis}</text>` +
+    `<text x="${C}" y="${C + R + 26}" text-anchor="middle">${ab.foc}</text>` +
+    `<text x="${C - R - 20}" y="${C + 4}" text-anchor="end">${ab.str}</text>`;
   box.innerHTML = `<svg viewBox="-16 -8 212 200" xmlns="http://www.w3.org/2000/svg" class="radar-svg">
     ${rings}${axes}
     <polygon points="${dataPts}" fill="var(--accent)" fill-opacity="0.22" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/>
@@ -366,7 +377,7 @@ function buildTrainChips() {
 const PERKS = [
   { key: "focused",     lv: 3,  icon: "🎯", name: "Deep Focus",      desc: "+10% XP every session" },
   { key: "grit",        lv: 6,  icon: "💪", name: "Iron Will",       desc: "STR gains are doubled" },
-  { key: "scholar",     lv: 10, icon: "📚", name: "Scholar's Mind",  desc: "+15% XP while training INT" },
+  { key: "scholar",     lv: 10, icon: "⚡", name: "Nhà Vật Lý",  desc: "+15% XP khi học môn Lý" },
   { key: "weekend",     lv: 14, icon: "🌙", name: "Weekend Warrior", desc: "XP ×2 on Sat & Sun" },
   { key: "unstoppable", lv: 20, icon: "⚡", name: "Unstoppable",     desc: "+25% XP every session" },
 ];
@@ -1008,6 +1019,21 @@ document.getElementById("calBtn").addEventListener("click", () => {
 // ---------- Clock ----------
 function tickClock() { document.getElementById("clock").textContent = new Date().toLocaleString(undefined, { weekday: "long", hour: "2-digit", minute: "2-digit" }); }
 setInterval(tickClock, 1000); tickClock();
+
+// ---------- D-day countdown tới kỳ thi vào 10 chuyên Lý LHP ----------
+// Kỳ thi TPHCM thường đầu tháng 6. Dự kiến ~06/06/2027 (cập nhật khi Sở công bố lịch chính thức).
+const EXAM_DATE = new Date("2027-06-06T00:00:00");
+function tickDday() {
+  const el = document.getElementById("ddayNum");
+  if (!el) return;
+  const now = new Date(); now.setHours(0, 0, 0, 0);
+  const days = Math.ceil((EXAM_DATE - now) / 86400000);
+  const lbl = document.querySelector(".dday-lbl");
+  if (days > 0) { el.textContent = days; if (lbl) lbl.textContent = "ngày tới kỳ thi"; }
+  else if (days === 0) { el.textContent = "🔥"; if (lbl) lbl.textContent = "Hôm nay thi — cố lên!"; }
+  else { el.textContent = "✓"; if (lbl) lbl.textContent = "Kỳ thi đã qua"; }
+}
+tickDday(); setInterval(tickDday, 3600000);
 
 // ---------- Helpers ----------
 function fmtDur(min) { if (min < 60) return `${min}m`; const h = Math.floor(min / 60), m = min % 60; return m ? `${h}h ${m}m` : `${h}h`; }
