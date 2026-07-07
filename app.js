@@ -1070,7 +1070,31 @@ if (state.sessions.length === 0 && !localStorage.getItem(STORE_KEY)) {
 document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !modal.hidden) closeModal(); });
 
 // ---------- PWA ----------
-if ("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+// Service worker: tự phát hiện bản mới và reload 1 lần để nạp ngay (không cần đóng tab / clear cache)
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", async () => {
+    try {
+      const reg = await navigator.serviceWorker.register("sw.js");
+      // Khi có SW mới cài xong trong lúc đang mở app → kích hoạt ngay
+      reg.addEventListener("updatefound", () => {
+        const sw = reg.installing;
+        if (!sw) return;
+        sw.addEventListener("statechange", () => {
+          if (sw.state === "installed" && navigator.serviceWorker.controller) {
+            sw.postMessage("skip-waiting");
+          }
+        });
+      });
+      // Kiểm tra update mỗi khi quay lại tab
+      document.addEventListener("visibilitychange", () => { if (!document.hidden) reg.update(); });
+    } catch (_) {}
+  });
+  // SW mới đã nắm quyền → reload đúng 1 lần để dùng bản mới
+  let reloaded = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (reloaded) return; reloaded = true; location.reload();
+  });
+}
 let deferredPrompt = null;
 const installBtn = document.getElementById("installBtn");
 const isStandalone = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone;
