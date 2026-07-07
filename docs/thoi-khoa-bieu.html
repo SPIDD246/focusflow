@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<style>
+  @page { size: A4 landscape; margin: 0; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif; background:#0a0e17; color:#e2f0ee;
+    -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .page { width:297mm; min-height:210mm; padding:11mm 10mm; position:relative;
+    page-break-after:always; overflow:hidden;
+    background:radial-gradient(1000px 500px at 88% -10%, rgba(0,229,180,0.08), transparent 60%),
+               radial-gradient(700px 400px at -8% 110%, rgba(0,191,216,0.08), transparent 55%), #0a0e17; }
+  .page:last-child { page-break-after:auto; }
+
+  .head { display:flex; align-items:baseline; gap:14px; margin-bottom:3px; }
+  .head h1 { font-size:25px; font-weight:800;
+    background:linear-gradient(120deg,#00e5b4,#00bfd8); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .head .tag { font-size:11px; color:#93b4c2; letter-spacing:2px; text-transform:uppercase; }
+  .sub { font-size:12px; color:#6b8f9e; margin-bottom:12px; }
+
+  table { width:100%; border-collapse:separate; border-spacing:3px; table-layout:fixed; }
+  col.tcol { width:6.5%; } col.dcol { width:13.35%; }
+  th { font-size:11px; text-transform:uppercase; letter-spacing:1px; color:#93b4c2; padding:6px 4px; font-weight:800; }
+  th.day { background:rgba(255,255,255,0.05); border-radius:8px; }
+  td.time { font-size:9.5px; color:#6b8f9e; font-weight:700; text-align:right; padding-right:6px; white-space:nowrap; vertical-align:middle; }
+  td.cell { border-radius:9px; padding:7px 9px; vertical-align:top; height:42px;
+    background:rgba(255,255,255,0.025); border:1px solid rgba(255,255,255,0.05); }
+  .ev { font-size:11px; font-weight:700; line-height:1.3; }
+  .ev .t { font-size:9px; opacity:0.75; font-weight:600; display:block; margin-top:1px; }
+
+  .cls-code{background:rgba(180,144,212,0.22)!important;border:1px solid rgba(180,144,212,0.5)!important;color:#d3bce8;}
+  .cls-toan{background:rgba(95,176,214,0.22)!important;border:1px solid rgba(95,176,214,0.5)!important;color:#bfe0f0;}
+  .cls-anh{background:rgba(111,206,136,0.22)!important;border:1px solid rgba(111,206,136,0.5)!important;color:#bfe8c8;}
+  .cls-ly{background:rgba(245,166,35,0.22)!important;border:1px solid rgba(245,166,35,0.5)!important;color:#f5d59a;}
+  .cls-van{background:rgba(242,121,95,0.22)!important;border:1px solid rgba(242,121,95,0.5)!important;color:#f5c3b5;}
+  .cls-trung{background:rgba(255,77,144,0.18)!important;border:1px solid rgba(255,77,144,0.45)!important;color:#f5a8c5;}
+  .cls-self{background:rgba(0,229,180,0.12)!important;border:1px dashed rgba(0,229,180,0.5)!important;color:#8ff0d8;}
+  .cls-rest{background:rgba(255,255,255,0.03)!important;color:#6b8f9e;}
+
+  .legend { display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; }
+  .lg { display:flex; align-items:center; gap:6px; font-size:10.5px; color:#c4d6d3; }
+  .lg .sw { width:13px; height:13px; border-radius:4px; }
+
+  .note { margin-top:10px; background:rgba(0,229,180,0.07); border:1px solid rgba(0,229,180,0.28);
+    border-radius:10px; padding:9px 14px; font-size:11px; line-height:1.5; color:#c4e8de; }
+  .note b { color:#00e5b4; }
+  .footer { position:absolute; bottom:6mm; left:12mm; right:12mm; display:flex;
+    justify-content:space-between; font-size:9px; color:#4d6570; letter-spacing:1px; }
+
+  .lbl { display:inline-block; font-size:9px; font-weight:800; padding:1px 6px; border-radius:5px;
+    background:rgba(0,229,180,0.15); color:#00e5b4; margin-left:6px; text-transform:uppercase; letter-spacing:.5px; }
+</style>
+</head>
+<body>
+
+<!-- SUMMER SCHEDULE -->
+<section class="page">
+  <div class="head"><h1>🌞 Thời Khóa Biểu HÈ</h1><span class="tag">Lịch hiện tại + tự học xen kẽ</span></div>
+  <div class="sub">Ô liền = lớp học thêm đã có · Ô <b style="color:#8ff0d8;">viền nét đứt xanh</b> = slot tự học Nova đề xuất · Ưu tiên: Lý (luyện đề) & Văn (tự học 100%)</div>
+
+  <table>
+    <colgroup><col class="tcol"><col class="dcol"><col class="dcol"><col class="dcol"><col class="dcol"><col class="dcol"><col class="dcol"><col class="dcol"></colgroup>
+    <thead><tr><th></th>
+      <th class="day">T2</th><th class="day">T3</th><th class="day">T4</th><th class="day">T5</th><th class="day">T6</th><th class="day">T7</th><th class="day">CN</th>
+    </tr></thead>
+    <tbody>
+      <tr>
+        <td class="time">8:00–10:30</td>
+        <td class="cell cls-self"><div class="ev">Tự học Lý<span class="t">Luyện đề Cơ học</span></div></td>
+        <td class="cell cls-toan"><div class="ev">Lớp Toán<span class="t">8:30–10:30</span></div></td>
+        <td class="cell cls-anh"><div class="ev">Lớp Anh<span class="t">9:30–11:30</span></div></td>
+        <td class="cell cls-self"><div class="ev">Tự học Lý<span class="t">Luyện đề Điện</span></div></td>
+        <td class="cell cls-self"><div class="ev">Tự học Văn<span class="t">Đọc hiểu VB lạ</span></div></td>
+        <td class="cell cls-trung"><div class="ev">Trung<span class="t">10:30–12:00</span></div></td>
+        <td class="cell cls-trung"><div class="ev">Trung<span class="t">10:30–12:00</span></div></td>
+      </tr>
+      <tr>
+        <td class="time">10:30–12:00</td>
+        <td class="cell cls-self"><div class="ev">Tự học Văn<span class="t">NLXH 1 đoạn</span></div></td>
+        <td class="cell cls-self"><div class="ev">BT Toán<span class="t">Củng cố buổi sáng</span></div></td>
+        <td class="cell cls-self"><div class="ev">Ôn từ vựng Anh<span class="t">Flashcard</span></div></td>
+        <td class="cell cls-self"><div class="ev">Tự học Lý<span class="t">Sổ lỗi sai</span></div></td>
+        <td class="cell cls-self"><div class="ev">Tự học Văn<span class="t">Phân tích thơ</span></div></td>
+        <td class="cell cls-rest"><div class="ev">(nối lớp Trung)</div></td>
+        <td class="cell cls-self"><div class="ev">Ôn tổng hợp<span class="t">Nhẹ nhàng</span></div></td>
+      </tr>
+      <tr>
+        <td class="time">13:30–15:30</td>
+        <td class="cell cls-rest"><div class="ev">Nghỉ trưa / tự do</div></td>
+        <td class="cell cls-self"><div class="ev">Tự học Lý<span class="t">Chuyên đề mới</span></div></td>
+        <td class="cell cls-self"><div class="ev">Tự học Toán<span class="t">Thống kê–XS</span></div></td>
+        <td class="cell cls-self"><div class="ev">BT Anh<span class="t">Ngữ pháp</span></div></td>
+        <td class="cell cls-self"><div class="ev">Tự học Lý<span class="t">Luyện đề Nhiệt</span></div></td>
+        <td class="cell cls-toan"><div class="ev">Lớp Toán<span class="t">1:30–3:30</span></div></td>
+        <td class="cell cls-rest"><div class="ev">Nghỉ / thư giãn</div></td>
+      </tr>
+      <tr>
+        <td class="time">15:45–17:15</td>
+        <td class="cell cls-self"><div class="ev">Đọc sách Văn<span class="t">Tích dẫn chứng</span></div></td>
+        <td class="cell cls-self"><div class="ev">BT Lý<span class="t">Vận dụng</span></div></td>
+        <td class="cell cls-rest"><div class="ev">Nghỉ / vận động</div></td>
+        <td class="cell cls-rest"><div class="ev">Nghỉ trước lớp tối</div></td>
+        <td class="cell cls-self"><div class="ev">Tự học Toán<span class="t">Hình không gian</span></div></td>
+        <td class="cell cls-rest"><div class="ev">Nghỉ trước Lý</div></td>
+        <td class="cell cls-self"><div class="ev">Kế hoạch tuần<span class="t">Review + set goal</span></div></td>
+      </tr>
+      <tr>
+        <td class="time">17:30–21:00</td>
+        <td class="cell cls-code"><div class="ev">Lớp Code<span class="t">20:00–21:00</span></div></td>
+        <td class="cell cls-rest"><div class="ev">Tự do buổi tối</div></td>
+        <td class="cell cls-rest"><div class="ev">Tự do buổi tối</div></td>
+        <td class="cell cls-anh"><div class="ev">Lớp Anh<span class="t">17:45–21:00</span></div></td>
+        <td class="cell cls-rest"><div class="ev">Tự do / nghỉ ngơi</div></td>
+        <td class="cell cls-ly"><div class="ev">⚡ Chuyên Lý<span class="t">17:30–21:00</span></div></td>
+        <td class="cell cls-rest"><div class="ev">Nghỉ ngơi, ngủ sớm</div></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="legend">
+    <span class="lg"><span class="sw" style="background:#f5a623;"></span>Lý (chuyên)</span>
+    <span class="lg"><span class="sw" style="background:#5fb0d6;"></span>Toán</span>
+    <span class="lg"><span class="sw" style="background:#f2795f;"></span>Văn</span>
+    <span class="lg"><span class="sw" style="background:#6fce88;"></span>Anh</span>
+    <span class="lg"><span class="sw" style="background:#b490d4;"></span>Code</span>
+    <span class="lg"><span class="sw" style="background:#ff4d90;"></span>Trung</span>
+    <span class="lg"><span class="sw" style="background:rgba(0,229,180,0.4);border:1px dashed #00e5b4;"></span>Tự học (Nova đề xuất)</span>
+  </div>
+
+  <div class="note"><b>💡 Logic xếp lịch hè:</b> Văn (không có lớp) được 4 slot tự học/tuần · Lý (chỉ 1 lớp) được 5 slot luyện đề · Toán/Anh tự học ngắn để củng cố ngay sau buổi lớp (học xong làm bài luôn = nhớ lâu). T6 là ngày "cày" Văn + Toán mảng mới vì trống hoàn toàn. CN nhẹ nhàng + lập kế hoạch tuần.</div>
+  <div class="footer"><span>NOVA ✨ — Thời khóa biểu Hè 2026</span><span>Trang 1</span></div>
+</section>
+
+<!-- SCHOOL YEAR TEMPLATE -->
+<section class="page">
+  <div class="head"><h1>🏫 Template NĂM HỌC</h1><span class="tag">Khi học chính quy 7:30–16:10 (T2–T6)</span></div>
+  <div class="sub">Khung mẫu — bạn sẽ cập nhật lịch học thêm chính thức sau. Tự học dồn vào <b>tối T2–T6</b> + <b>cuối tuần</b>.</div>
+
+  <table>
+    <colgroup><col class="tcol"><col class="dcol"><col class="dcol"><col class="dcol"><col class="dcol"><col class="dcol"><col class="dcol"><col class="dcol"></colgroup>
+    <thead><tr><th></th>
+      <th class="day">T2</th><th class="day">T3</th><th class="day">T4</th><th class="day">T5</th><th class="day">T6</th><th class="day">T7</th><th class="day">CN</th>
+    </tr></thead>
+    <tbody>
+      <tr>
+        <td class="time">7:30–16:10</td>
+        <td class="cell cls-rest" colspan="1"><div class="ev">Học chính quy</div></td>
+        <td class="cell cls-rest"><div class="ev">Học chính quy</div></td>
+        <td class="cell cls-rest"><div class="ev">Học chính quy</div></td>
+        <td class="cell cls-rest"><div class="ev">Học chính quy</div></td>
+        <td class="cell cls-rest"><div class="ev">Học chính quy</div></td>
+        <td class="cell cls-self"><div class="ev">Buổi cày chính<span class="t">Lý + Toán</span></div></td>
+        <td class="cell cls-self"><div class="ev">Buổi cày chính<span class="t">Văn + Anh</span></div></td>
+      </tr>
+      <tr>
+        <td class="time">16:30–18:00</td>
+        <td class="cell cls-self"><div class="ev">Nghỉ + BT trên lớp<span class="t">Thư giãn</span></div></td>
+        <td class="cell cls-self"><div class="ev">Tự học Lý<span class="t">1 chuyên đề</span></div></td>
+        <td class="cell cls-self"><div class="ev">Tự học Văn<span class="t">Đọc hiểu</span></div></td>
+        <td class="cell cls-self"><div class="ev">Tự học Toán<span class="t">Luyện dạng</span></div></td>
+        <td class="cell cls-self"><div class="ev">Tự học Anh<span class="t">Từ vựng + đọc</span></div></td>
+        <td class="cell cls-self"><div class="ev">Luyện đề Lý<span class="t">Bấm giờ</span></div></td>
+        <td class="cell cls-self"><div class="ev">Luyện đề Văn<span class="t">Viết đúng giờ</span></div></td>
+      </tr>
+      <tr>
+        <td class="time">19:30–21:30</td>
+        <td class="cell cls-self"><div class="ev">Ôn bài + Flashcard<span class="t">SM-2 nhẹ</span></div></td>
+        <td class="cell cls-self"><div class="ev">BT Lý + sổ lỗi<span class="t">Ghi lỗi sai</span></div></td>
+        <td class="cell cls-self"><div class="ev">NLXH/NLVH<span class="t">1 đoạn/bài</span></div></td>
+        <td class="cell cls-self"><div class="ev">Toán mảng mới<span class="t">TK-XS / Hình KG</span></div></td>
+        <td class="cell cls-rest"><div class="ev">Tự do / xả hơi<span class="t">Giữ sức</span></div></td>
+        <td class="cell cls-self"><div class="ev">Sửa đề + rà lỗi<span class="t">Phân tích điểm</span></div></td>
+        <td class="cell cls-self"><div class="ev">Kế hoạch tuần<span class="t">Review tuần</span></div></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="note"><b>💡 Nguyên tắc năm học:</b> Ban ngày kín lớp → tự học dồn <b>2 khung tối (16:30 & 19:30)</b> mỗi ngày, mỗi khung 1 môn để không loãng. Cuối tuần là <b>2 buổi cày chính</b> — luyện đề bấm giờ như thi thật. Giữ tối T6 nghỉ để tránh kiệt sức. Mỗi tối chỉ 3–4h tự học là bền — không nhồi.</div>
+  <div class="footer"><span>NOVA ✨ — Template Năm học 2026–2027</span><span>Trang 2</span></div>
+</section>
+
+</body>
+</html>
