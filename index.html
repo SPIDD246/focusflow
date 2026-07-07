@@ -82,40 +82,6 @@
         <div class="perk-tree" id="perkTree"></div>
       </section>
 
-      <section class="card timer-card">
-        <h2 class="card-title">Training</h2>
-        <div class="timer-ring">
-          <svg viewBox="0 0 120 120">
-            <defs>
-              <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stop-color="#9ccf8f" />
-                <stop offset="55%" stop-color="#6fae7c" />
-                <stop offset="100%" stop-color="#3f9d7f" />
-              </linearGradient>
-            </defs>
-            <circle class="ring-bg" cx="60" cy="60" r="52" />
-            <circle class="ring-fg" id="ringFg" cx="60" cy="60" r="52" />
-          </svg>
-          <div class="timer-display" id="timerDisplay">25:00</div>
-        </div>
-        <div class="timer-controls">
-          <button class="btn ghost" id="timerReset">↺ Reset</button>
-          <button class="btn primary" id="timerToggle">⚔ Train</button>
-        </div>
-        <div class="timer-presets">
-          <button data-min="25" class="chip active">25m</button>
-          <button data-min="45" class="chip">45m</button>
-          <button data-min="15" class="chip">15m</button>
-          <div class="chip-custom">
-            <input type="number" id="customMin" min="1" max="180" step="1" placeholder="min" aria-label="Custom minutes" />
-            <button class="chip" id="customSet">Set</button>
-          </div>
-        </div>
-        <div class="train-row">
-          <span class="train-label">TRAIN</span>
-          <div class="train-chips" id="trainChips"></div>
-        </div>
-      </section>
     </aside>
 
     <!-- CENTER: Quest Board -->
@@ -131,10 +97,46 @@
           <h2 class="card-title">🗡️ Daily Quests <span class="qb-count" id="questCount"></span></h2>
           <div class="quest-list" id="questList"></div>
         </section>
-        <section class="card boss-card">
-          <h2 class="card-title">👹 Weekly Boss</h2>
-          <div class="boss" id="bossCard"></div>
-        </section>
+        <div class="boss-col">
+          <section class="card boss-card">
+            <h2 class="card-title">👹 Weekly Boss</h2>
+            <div class="boss" id="bossCard"></div>
+          </section>
+          <section class="card timer-card">
+            <h2 class="card-title">Training</h2>
+            <div class="timer-ring">
+              <svg viewBox="0 0 120 120">
+                <defs>
+                  <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#9ccf8f" />
+                    <stop offset="55%" stop-color="#6fae7c" />
+                    <stop offset="100%" stop-color="#3f9d7f" />
+                  </linearGradient>
+                </defs>
+                <circle class="ring-bg" cx="60" cy="60" r="52" />
+                <circle class="ring-fg" id="ringFg" cx="60" cy="60" r="52" />
+              </svg>
+              <div class="timer-display" id="timerDisplay">25:00</div>
+            </div>
+            <div class="timer-controls">
+              <button class="btn ghost" id="timerReset">↺ Reset</button>
+              <button class="btn primary" id="timerToggle">⚔ Train</button>
+            </div>
+            <div class="timer-presets">
+              <button data-min="25" class="chip active">25m</button>
+              <button data-min="45" class="chip">45m</button>
+              <button data-min="15" class="chip">15m</button>
+              <div class="chip-custom">
+                <input type="number" id="customMin" min="1" max="180" step="1" placeholder="min" aria-label="Custom minutes" />
+                <button class="chip" id="customSet">Set</button>
+              </div>
+            </div>
+            <div class="train-row">
+              <span class="train-label">TRAIN</span>
+              <div class="train-chips" id="trainChips"></div>
+            </div>
+          </section>
+        </div>
       </div>
 
       <section class="card">

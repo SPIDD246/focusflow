@@ -766,6 +766,7 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
    22. QUEST BOARD + BOSS
    ================================================================ */
 .quest-boss { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: start; }
+.boss-col { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
 .quest-list { display: flex; flex-direction: column; gap: 10px; }
 .quest {
   display: flex; align-items: center; gap: 11px; padding: 10px 12px; border-radius: 12px;
