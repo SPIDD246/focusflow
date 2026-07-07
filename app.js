@@ -21,7 +21,12 @@ function load() {
   } catch (_) {}
   return d;
 }
-function save() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+function save() {
+  state.updatedAt = Date.now();
+  localStorage.setItem(STORE_KEY, JSON.stringify(state));
+  // Đẩy lên cloud nếu đã đăng nhập (firebase-sync.js lo phần debounce)
+  if (window.FFSync && window.FFSync.user) window.FFSync.scheduleSync();
+}
 
 const uid = () => Math.random().toString(36).slice(2, 9);
 const todayIdx = () => (new Date().getDay() + 6) % 7; // Mon=0
@@ -1131,6 +1136,40 @@ installBtn.addEventListener("click", async () => {
   }
 });
 window.addEventListener("appinstalled", () => { installBtn.hidden = true; toast("FocusFlow installed ✓"); });
+
+// ---------- Cloud sync bridge (firebase-sync.js dùng window.FF) ----------
+window.FF = {
+  getState: () => state,
+  setState: (incoming) => {
+    if (!incoming || !incoming.sessions) return;
+    state = Object.assign(DEFAULTS(), incoming, {
+      reminders: Object.assign(DEFAULTS().reminders, incoming.reminders || {}),
+    });
+    localStorage.setItem(STORE_KEY, JSON.stringify(state));
+    applyTheme(state.theme || document.documentElement.dataset.theme);
+    render(); syncReminderUI();
+  },
+  onSyncStatus: (text, kind) => {
+    const label = document.getElementById("syncLabel");
+    const btn = document.getElementById("syncBtn");
+    if (!label || !btn) return;
+    btn.dataset.state = kind || "";
+    if (kind === "signed-in") { label.textContent = "Đã đăng nhập"; btn.title = text + " · bấm để đăng xuất"; }
+    else if (kind === "signed-out") { label.textContent = "Đăng nhập"; btn.title = "Đăng nhập để lưu tiến trình lên cloud"; }
+    else if (kind === "syncing") { label.textContent = "Đang đồng bộ…"; }
+    else if (kind === "ok") { label.textContent = "Đã đồng bộ ✓"; setTimeout(() => { if (window.FFSync && window.FFSync.user) label.textContent = "Đã đăng nhập"; }, 2000); }
+    else if (kind === "error") { label.textContent = "Lỗi đồng bộ"; btn.title = text; }
+  },
+};
+// Nút sync: chưa đăng nhập → login; đã đăng nhập → hỏi đăng xuất
+document.getElementById("syncBtn").addEventListener("click", () => {
+  if (!window.FFSync) { toast("Đang tải Firebase…"); return; }
+  if (window.FFSync.user) {
+    if (confirm("Đăng xuất khỏi cloud sync? (tiến trình vẫn lưu trên máy)")) window.FFSync.logout();
+  } else {
+    window.FFSync.login();
+  }
+});
 
 paintTimer();
 syncReminderUI();
