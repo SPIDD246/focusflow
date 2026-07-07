@@ -93,10 +93,47 @@
       <div class="week" id="week"></div>
 
       <div class="quest-boss">
-        <section class="card quest-card">
-          <h2 class="card-title">🗡️ Daily Quests <span class="qb-count" id="questCount"></span></h2>
-          <div class="quest-list" id="questList"></div>
-        </section>
+        <div class="quest-col">
+          <section class="card quest-card">
+            <h2 class="card-title">🗡️ Daily Quests <span class="qb-count" id="questCount"></span></h2>
+            <div class="quest-list" id="questList"></div>
+          </section>
+          <section class="card reminders-card">
+            <h2 class="card-title">🔔 Reminders & Data</h2>
+            <div class="setting-row">
+              <div>
+                <div class="setting-label">Study reminders</div>
+                <div class="setting-hint" id="remHint">Off — get a ping before class</div>
+              </div>
+              <label class="switch"><input type="checkbox" id="remToggle" /><span class="slider"></span></label>
+            </div>
+            <div class="setting-row" id="leadRow" style="display:none">
+              <div class="setting-label">Notify me</div>
+              <select id="remLead" class="mini-select">
+                <option value="5">5 min before</option>
+                <option value="10" selected>10 min before</option>
+                <option value="15">15 min before</option>
+                <option value="30">30 min before</option>
+              </select>
+            </div>
+            <div class="setting-row" id="summaryRow" style="display:none">
+              <div>
+                <div class="setting-label">Daily summary</div>
+                <div class="setting-hint">A recap at 8:00 PM</div>
+              </div>
+              <label class="switch"><input type="checkbox" id="summaryToggle" /><span class="slider"></span></label>
+            </div>
+            <div class="data-btns">
+              <button class="btn ghost" id="exportBtn">⬇️ Export</button>
+              <button class="btn ghost" id="importBtn">⭱ Import</button>
+              <input type="file" id="importFile" accept="application/json" hidden />
+            </div>
+            <button class="btn primary" id="calBtn" style="width:100%;margin-top:10px">📅 Add to phone calendar</button>
+            <div class="setting-hint" style="margin-top:9px;text-align:center;line-height:1.5">
+              Saves a file — open it in Google / Apple Calendar for native reminders,<br>even when the app is closed.
+            </div>
+          </section>
+        </div>
         <div class="boss-col">
           <section class="card boss-card">
             <h2 class="card-title">👹 Weekly Boss</h2>
@@ -192,41 +229,6 @@
         </div>
       </section>
 
-      <section class="card">
-        <h2 class="card-title">Reminders & Data</h2>
-        <div class="setting-row">
-          <div>
-            <div class="setting-label">Study reminders</div>
-            <div class="setting-hint" id="remHint">Off — get a ping before class</div>
-          </div>
-          <label class="switch"><input type="checkbox" id="remToggle" /><span class="slider"></span></label>
-        </div>
-        <div class="setting-row" id="leadRow" style="display:none">
-          <div class="setting-label">Notify me</div>
-          <select id="remLead" class="mini-select">
-            <option value="5">5 min before</option>
-            <option value="10" selected>10 min before</option>
-            <option value="15">15 min before</option>
-            <option value="30">30 min before</option>
-          </select>
-        </div>
-        <div class="setting-row" id="summaryRow" style="display:none">
-          <div>
-            <div class="setting-label">Daily summary</div>
-            <div class="setting-hint">A recap at 8:00 PM</div>
-          </div>
-          <label class="switch"><input type="checkbox" id="summaryToggle" /><span class="slider"></span></label>
-        </div>
-        <div class="data-btns">
-          <button class="btn ghost" id="exportBtn">⬇️ Export</button>
-          <button class="btn ghost" id="importBtn">⭱ Import</button>
-          <input type="file" id="importFile" accept="application/json" hidden />
-        </div>
-        <button class="btn primary" id="calBtn" style="width:100%;margin-top:10px">📅 Add to phone calendar</button>
-        <div class="setting-hint" style="margin-top:9px;text-align:center;line-height:1.5">
-          Saves a file — open it in Google / Apple Calendar for native reminders,<br>even when the app is closed.
-        </div>
-      </section>
     </aside>
   </main>
 

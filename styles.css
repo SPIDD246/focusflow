@@ -374,23 +374,35 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
 /* ================================================================
    10. TIMER
    ================================================================ */
-.timer-card { display: flex; flex-direction: column; }
+/* Training card — nâng cấp: nền gradient tinh tế, viền glow */
+.timer-card {
+  display: flex; flex-direction: column;
+  background:
+    radial-gradient(120% 90% at 12% 0%, rgba(0,229,180,0.09), transparent 55%),
+    radial-gradient(120% 90% at 100% 100%, rgba(0,191,216,0.08), transparent 55%),
+    var(--card);
+  border-color: rgba(0,229,180,0.22);
+}
 /* Layout 2 cột: đồng hồ trái · điều khiển phải */
-.timer-body { display: flex; gap: 18px; align-items: flex-start; }
-.timer-side { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
-.timer-ring { position: relative; width: 170px; height: 170px; flex: none; }
+.timer-body { display: flex; gap: 24px; align-items: center; padding: 4px 2px; }
+.timer-side { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 15px; }
+.timer-ring { position: relative; width: 200px; height: 200px; flex: none; }
 .timer-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
 
-/* outer neon ring frame */
+/* outer neon ring frame — double halo */
 .timer-ring::before {
-  content: ""; position: absolute; inset: -6px; border-radius: 50%; pointer-events: none;
-  border: 1px solid rgba(0, 229, 180, 0.15);
-  box-shadow: 0 0 20px rgba(0,229,180,0.12), inset 0 0 20px rgba(0,229,180,0.06);
+  content: ""; position: absolute; inset: -8px; border-radius: 50%; pointer-events: none;
+  border: 1px solid rgba(0, 229, 180, 0.22);
+  box-shadow: 0 0 28px rgba(0,229,180,0.16), inset 0 0 26px rgba(0,229,180,0.07);
+}
+.timer-ring::after {
+  content: ""; position: absolute; inset: 14px; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle at 50% 45%, rgba(0,229,180,0.10), transparent 68%);
 }
 
-.ring-bg { fill: none; stroke: rgba(0,229,180,0.1); stroke-width: 10; }
+.ring-bg { fill: none; stroke: rgba(0,229,180,0.1); stroke-width: 9; }
 .ring-fg {
-  fill: none; stroke: url(#ringGrad); stroke-width: 10; stroke-linecap: round;
+  fill: none; stroke: url(#ringGrad); stroke-width: 9; stroke-linecap: round;
   stroke-dasharray: 326.7; stroke-dashoffset: 0;
   transition: stroke-dashoffset 1s linear;
   filter: drop-shadow(0 0 8px rgba(0,229,180,0.8)) drop-shadow(0 0 16px rgba(0,229,180,0.4));
@@ -398,7 +410,7 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
 
 .timer-display {
   position: absolute; inset: 0; display: grid; place-items: center;
-  font-size: 32px; font-weight: 700; font-variant-numeric: tabular-nums;
+  font-size: 42px; font-weight: 700; font-variant-numeric: tabular-nums;
   color: var(--accent);
   text-shadow: var(--neon-glow);
 }
@@ -769,7 +781,7 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
    22. QUEST BOARD + BOSS
    ================================================================ */
 .quest-boss { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: start; }
-.boss-col { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+.boss-col, .quest-col { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
 .quest-list { display: flex; flex-direction: column; gap: 10px; }
 .quest {
   display: flex; align-items: center; gap: 11px; padding: 10px 12px; border-radius: 12px;
