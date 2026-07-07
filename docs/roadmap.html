@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<style>
+  @page { size: A4; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    background: #0a0e17;
+    color: #e2f0ee;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .page {
+    width: 210mm; min-height: 297mm; padding: 16mm 14mm;
+    background: radial-gradient(1200px 600px at 80% -10%, rgba(0,229,180,0.10), transparent 60%),
+                radial-gradient(900px 500px at -10% 110%, rgba(0,191,216,0.10), transparent 55%),
+                #0a0e17;
+    position: relative; page-break-after: always; overflow: hidden;
+  }
+  .page:last-child { page-break-after: auto; }
+
+  /* Cover */
+  .cover { display: flex; flex-direction: column; justify-content: center; }
+  .badge { display:inline-block; align-self:flex-start; font-size:12px; letter-spacing:3px;
+    text-transform:uppercase; color:#00e5b4; border:1px solid rgba(0,229,180,0.4);
+    padding:6px 14px; border-radius:999px; margin-bottom:26px; font-weight:700; }
+  .cover h1 { font-size:46px; line-height:1.1; font-weight:800;
+    background:linear-gradient(120deg,#00e5b4,#00bfd8 60%,#b490d4);
+    -webkit-background-clip:text; background-clip:text; color:transparent; margin-bottom:14px; }
+  .cover .sub { font-size:18px; color:#93b4c2; max-width:520px; line-height:1.5; margin-bottom:34px; }
+  .cover .meta { display:flex; gap:14px; flex-wrap:wrap; }
+  .chip { background:rgba(255,255,255,0.04); border:1px solid rgba(0,229,180,0.18);
+    border-radius:12px; padding:12px 18px; }
+  .chip .k { font-size:11px; color:#6b8f9e; text-transform:uppercase; letter-spacing:1.5px; }
+  .chip .v { font-size:16px; font-weight:700; color:#e2f0ee; margin-top:3px; }
+  .cover .dday { margin-top:40px; font-size:14px; color:#f5a623; font-weight:700;
+    border-left:3px solid #f5a623; padding-left:14px; }
+
+  /* Headings */
+  .ph-head { display:flex; align-items:center; gap:14px; margin-bottom:8px; }
+  .ph-num { font-size:34px; font-weight:800; color:#00e5b4; font-variant-numeric:tabular-nums; }
+  .ph-title { font-size:26px; font-weight:800; color:#e2f0ee; }
+  .ph-when { font-size:13px; color:#93b4c2; margin-bottom:22px; padding-left:2px;
+    text-transform:uppercase; letter-spacing:2px; }
+
+  /* Timeline bar */
+  .tl { display:flex; gap:6px; margin-bottom:26px; }
+  .tl .seg { flex:1; height:8px; border-radius:6px; background:rgba(255,255,255,0.07); }
+  .tl .seg.on { background:linear-gradient(90deg,#00e5b4,#00bfd8); }
+
+  /* Cards */
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .card { background:rgba(255,255,255,0.035); border:1px solid rgba(0,229,180,0.16);
+    border-radius:16px; padding:16px 18px; }
+  .card.full { grid-column:1 / -1; }
+  .card h3 { font-size:15px; font-weight:800; margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+  .card h3 .em { font-size:18px; }
+  .card ul { list-style:none; }
+  .card li { font-size:12.5px; line-height:1.55; color:#c4d6d3; padding-left:16px;
+    position:relative; margin-bottom:5px; }
+  .card li::before { content:''; position:absolute; left:0; top:7px; width:6px; height:6px;
+    border-radius:50%; background:#00e5b4; }
+  .goal { margin-top:16px; background:rgba(0,229,180,0.08); border:1px solid rgba(0,229,180,0.3);
+    border-radius:12px; padding:12px 16px; font-size:13px; }
+  .goal b { color:#00e5b4; }
+
+  .c-toan h3 { color:#5fb0d6; } .c-toan li::before{background:#5fb0d6;}
+  .c-van  h3 { color:#f2795f; } .c-van li::before{background:#f2795f;}
+  .c-anh  h3 { color:#6fce88; } .c-anh li::before{background:#6fce88;}
+  .c-chuyen h3 { color:#b490d4; } .c-chuyen li::before{background:#b490d4;}
+
+  .tag { font-size:10px; font-weight:700; padding:2px 8px; border-radius:999px; margin-left:auto;
+    text-transform:uppercase; letter-spacing:1px; }
+  .tag.focus { background:rgba(242,121,95,0.18); color:#f2795f; border:1px solid rgba(242,121,95,0.4); }
+
+  /* Distribution bars */
+  .dist { display:flex; flex-direction:column; gap:12px; margin-top:6px; }
+  .dist .row { display:flex; align-items:center; gap:12px; }
+  .dist .lbl { width:120px; font-size:13px; font-weight:700; }
+  .dist .track { flex:1; height:14px; background:rgba(255,255,255,0.06); border-radius:8px; overflow:hidden; }
+  .dist .fill { height:100%; border-radius:8px; }
+  .dist .pct { width:44px; text-align:right; font-size:13px; font-weight:800; font-variant-numeric:tabular-nums; }
+
+  .note { margin-top:24px; background:rgba(245,166,35,0.08); border:1px solid rgba(245,166,35,0.35);
+    border-radius:12px; padding:14px 18px; font-size:13px; line-height:1.55; color:#f0d9a8; }
+  .note b { color:#f5a623; }
+
+  .footer { position:absolute; bottom:10mm; left:14mm; right:14mm; display:flex;
+    justify-content:space-between; font-size:10px; color:#4d6570; letter-spacing:1px; }
+
+  /* Feature roadmap */
+  .sprint { background:rgba(255,255,255,0.035); border:1px solid rgba(0,191,216,0.18);
+    border-radius:16px; padding:16px 18px; margin-bottom:14px; }
+  .sprint h3 { font-size:16px; font-weight:800; color:#00bfd8; margin-bottom:4px; }
+  .sprint .when { font-size:11px; color:#6b8f9e; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:12px; }
+  .feat { display:flex; align-items:flex-start; gap:10px; margin-bottom:9px; }
+  .feat .n { flex:none; width:22px; height:22px; border-radius:7px; background:linear-gradient(135deg,#00e5b4,#00bfd8);
+    color:#04141a; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center; }
+  .feat .txt { font-size:12.5px; line-height:1.5; color:#c4d6d3; }
+  .feat .txt b { color:#e2f0ee; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<section class="page cover">
+  <span class="badge">✦ FocusFlow · Study Roadmap</span>
+  <h1>Lộ trình 12 tháng<br>chinh phục trường chuyên</h1>
+  <p class="sub">Kế hoạch ôn thi vào lớp 10 — bám sát mục tiêu đậu trường cấp 3 mong muốn. Gồm 2 lớp: lộ trình học tập theo giai đoạn & lộ trình tính năng app theo sprint.</p>
+  <div class="meta">
+    <div class="chip"><div class="k">Mục tiêu</div><div class="v">🎓 Trường chuyên</div></div>
+    <div class="chip"><div class="k">Môn thi</div><div class="v">Toán · Văn · Anh · Chuyên</div></div>
+    <div class="chip"><div class="k">Cần ưu tiên</div><div class="v">🔥 Ngữ văn</div></div>
+  </div>
+  <div class="dday">⏳ Còn ~12 tháng — mỗi ngày học đều đặn = một bước gần đích hơn.</div>
+  <div class="footer"><span>NOVA ✨ — Thinking partner for the long run</span><span>Roadmap · 2026</span></div>
+</section>
+
+<!-- DISTRIBUTION -->
+<section class="page">
+  <div class="ph-head"><span class="ph-num">◈</span><span class="ph-title">Tổng quan & Phân bổ thời gian</span></div>
+  <div class="ph-when">3 giai đoạn · 12 tháng · 4 môn</div>
+  <div class="tl"><span class="seg on"></span><span class="seg on"></span><span class="seg on"></span></div>
+
+  <div class="grid">
+    <div class="card"><h3>🌱 GĐ1 — Nền tảng</h3><ul><li>Tháng 1–3</li><li>Gốc kiến thức + thói quen học đều</li></ul></div>
+    <div class="card"><h3>📈 GĐ2 — Củng cố</h3><ul><li>Tháng 4–8</li><li>Chuyên đề, lấp lỗ hổng, đào sâu chuyên</li></ul></div>
+    <div class="card full"><h3>🏁 GĐ3 — Tăng tốc</h3><ul><li>Tháng 9–12 · Thi thử, luyện đề, giữ phong độ tâm lý vững</li></ul></div>
+  </div>
+
+  <div class="ph-head" style="margin-top:30px;"><span class="ph-num">%</span><span class="ph-title">Phân bổ thời gian mỗi tuần</span></div>
+  <div class="ph-when">Ưu tiên môn hệ số cao & môn yếu</div>
+  <div class="dist">
+    <div class="row"><span class="lbl" style="color:#b490d4;">Môn chuyên</span><div class="track"><div class="fill" style="width:40%;background:linear-gradient(90deg,#b490d4,#8f6fc4);"></div></div><span class="pct">40%</span></div>
+    <div class="row"><span class="lbl" style="color:#f2795f;">Ngữ văn 🔥</span><div class="track"><div class="fill" style="width:25%;background:linear-gradient(90deg,#f2795f,#e05a3f);"></div></div><span class="pct">25%</span></div>
+    <div class="row"><span class="lbl" style="color:#5fb0d6;">Toán</span><div class="track"><div class="fill" style="width:20%;background:linear-gradient(90deg,#5fb0d6,#3f90c6);"></div></div><span class="pct">20%</span></div>
+    <div class="row"><span class="lbl" style="color:#6fce88;">Tiếng Anh</span><div class="track"><div class="fill" style="width:15%;background:linear-gradient(90deg,#6fce88,#4faf68);"></div></div><span class="pct">15%</span></div>
+  </div>
+
+  <div class="note"><b>⚠️ Lưu ý chiến lược:</b> Thi chuyên mà yếu Văn → Văn là môn điều kiện (phải qua điểm liệt). Dành 25% thời gian cho Văn — cao hơn mức thông thường — để nó không kéo tổng điểm xuống. Môn chuyên hệ số 2 nên chiếm phần lớn nhất.</div>
+  <div class="footer"><span>NOVA ✨</span><span>Trang 2</span></div>
+</section>
+
+<!-- GD1 -->
+<section class="page">
+  <div class="ph-head"><span class="ph-num">01</span><span class="ph-title">Nền tảng & Thói quen</span></div>
+  <div class="ph-when">Tháng 1 – 3 · Xây gốc</div>
+  <div class="tl"><span class="seg on"></span><span class="seg"></span><span class="seg"></span></div>
+  <div class="grid">
+    <div class="card c-toan"><h3><span class="em">📐</span>Toán</h3><ul><li>Ôn lại đại số: hàm số, phương trình</li><li>Hình học cơ bản</li><li>Mỗi ngày 5–10 bài</li></ul></div>
+    <div class="card c-van"><h3><span class="em">📖</span>Ngữ văn<span class="tag focus">Trọng tâm</span></h3><ul><li>Đọc lại toàn bộ tác phẩm lớp 9</li><li>Sơ đồ: tác giả–tác phẩm–nội dung–nghệ thuật</li><li>Mở sổ dẫn chứng nghị luận xã hội</li><li>Viết 1 đoạn/tuần, tự sửa</li></ul></div>
+    <div class="card c-anh"><h3><span class="em">🔤</span>Tiếng Anh</h3><ul><li>20 từ vựng/tuần</li><li>Ôn thì & ngữ pháp nền</li></ul></div>
+    <div class="card c-chuyen"><h3><span class="em">⭐</span>Môn chuyên</h3><ul><li>Làm quen dạng đề chuyên</li><li>Xác định mình đang ở đâu</li></ul></div>
+  </div>
+  <div class="goal">✅ <b>Cuối GĐ1:</b> Học được ≥ 20 ngày/tháng · Nắm hết tác phẩm Văn · Có thói quen ngồi vào bàn mỗi ngày.</div>
+  <div class="footer"><span>NOVA ✨</span><span>Trang 3</span></div>
+</section>
+
+<!-- GD2 -->
+<section class="page">
+  <div class="ph-head"><span class="ph-num">02</span><span class="ph-title">Củng cố & Luyện chuyên đề</span></div>
+  <div class="ph-when">Tháng 4 – 8 · Từ "biết" thành "thành thạo"</div>
+  <div class="tl"><span class="seg on"></span><span class="seg on"></span><span class="seg"></span></div>
+  <div class="grid">
+    <div class="card c-toan"><h3><span class="em">📐</span>Toán</h3><ul><li>Luyện theo chuyên đề: hàm số, hệ PT, hình phẳng</li><li>Ghi sổ tay lỗi sai</li></ul></div>
+    <div class="card c-van"><h3><span class="em">📖</span>Ngữ văn<span class="tag focus">Trọng tâm</span></h3><ul><li>Nghị luận văn học theo từng tác phẩm</li><li>Nghị luận xã hội: 2 đề/tuần</li><li>Học thuộc dẫn chứng → flashcard ôn lặp</li><li>Chấm theo barem</li></ul></div>
+    <div class="card c-anh"><h3><span class="em">🔤</span>Tiếng Anh</h3><ul><li>Đọc hiểu + ngữ pháp nâng cao</li><li>Luyện đề trắc nghiệm</li></ul></div>
+    <div class="card c-chuyen"><h3><span class="em">⭐</span>Môn chuyên</h3><ul><li>Luyện dạng khó, đề chuyên các năm</li><li>Học nâng cao (40% thời gian)</li></ul></div>
+  </div>
+  <div class="goal">✅ <b>Cuối GĐ2:</b> Văn viết được bài hoàn chỉnh đúng barem · Môn chuyên làm được 60–70% đề.</div>
+  <div class="footer"><span>NOVA ✨</span><span>Trang 4</span></div>
+</section>
+
+<!-- GD3 -->
+<section class="page">
+  <div class="ph-head"><span class="ph-num">03</span><span class="ph-title">Tăng tốc & Thực chiến</span></div>
+  <div class="ph-when">Tháng 9 – 12 · Quen áp lực phòng thi</div>
+  <div class="tl"><span class="seg on"></span><span class="seg on"></span><span class="seg on"></span></div>
+  <div class="grid">
+    <div class="card full"><h3><span class="em">⏱️</span>Thi thử định kỳ</h3><ul><li>Mỗi môn 1 đề/tuần, bấm giờ như thi thật</li><li>Sau mỗi đề: phân tích mất điểm chỗ nào → ôn lại chỗ đó</li></ul></div>
+    <div class="card c-van"><h3><span class="em">📖</span>Ngữ văn<span class="tag focus">Trọng tâm</span></h3><ul><li>Luyện viết nhanh đúng giờ</li><li>Rà lại toàn bộ dẫn chứng</li></ul></div>
+    <div class="card c-chuyen"><h3><span class="em">⭐</span>Môn chuyên</h3><ul><li>Luyện đề chuyên liên tục</li><li>Chốt dạng thường ra</li></ul></div>
+    <div class="card full"><h3><span class="em">🧘</span>Tháng cuối</h3><ul><li>Giảm tải, ôn lướt, ngủ đủ, giữ sức khỏe & tâm lý</li></ul></div>
+  </div>
+  <div class="goal">✅ <b>Cuối GĐ3:</b> Điểm thi thử ≥ điểm chuẩn trường · Tâm lý vững · Sẵn sàng phòng thi.</div>
+  <div class="footer"><span>NOVA ✨</span><span>Trang 5</span></div>
+</section>
+
+<!-- FEATURE ROADMAP -->
+<section class="page">
+  <div class="ph-head"><span class="ph-num">⚙</span><span class="ph-title">Lộ trình tính năng App</span></div>
+  <div class="ph-when">Xây đúng lúc cần dùng — khớp 3 giai đoạn học</div>
+
+  <div class="sprint">
+    <h3>🔨 Sprint 1–2 — Làm ngay (phục vụ GĐ1)</h3>
+    <div class="when">Nền tảng động lực & thói quen</div>
+    <div class="feat"><span class="n">1</span><span class="txt"><b>Đổi chỉ số RPG → Môn thi thật</b> (Toán/Văn/Anh/Chuyên) — radar cho thấy ngay Văn đang thấp.</span></div>
+    <div class="feat"><span class="n">2</span><span class="txt"><b>Daily streak</b> — đếm chuỗi ngày học liên tục.</span></div>
+    <div class="feat"><span class="n">3</span><span class="txt"><b>Mục tiêu phút/ngày + thanh tiến độ</b> — VD 120 phút/ngày.</span></div>
+    <div class="feat"><span class="n">4</span><span class="txt"><b>D-day countdown</b> — nhập ngày thi → "còn N ngày" nổi bật.</span></div>
+  </div>
+
+  <div class="sprint">
+    <h3>📚 Sprint 3–4 — Phục vụ GĐ2 (trọng tâm học)</h3>
+    <div class="when">Nội dung & luyện tập</div>
+    <div class="feat"><span class="n">5</span><span class="txt"><b>Sổ tay lỗi sai</b> — ghi bài sai + tag môn/chương. Hiệu quả học cao nhất.</span></div>
+    <div class="feat"><span class="n">6</span><span class="txt"><b>Flashcard ôn lặp ngắt quãng (SM-2)</b> — hợp cho dẫn chứng Văn & từ vựng Anh.</span></div>
+    <div class="feat"><span class="n">7</span><span class="txt"><b>Quest theo chương/chuyên đề</b> — thay quest chung chung.</span></div>
+    <div class="feat"><span class="n">8</span><span class="txt"><b>Thống kê theo môn</b> — cảnh báo nếu tuần này bỏ bê Văn.</span></div>
+  </div>
+
+  <div class="sprint">
+    <h3>🏁 Sprint 5–6 — Phục vụ GĐ3 (thi thử)</h3>
+    <div class="when">Thực chiến</div>
+    <div class="feat"><span class="n">9</span><span class="txt"><b>Exam mode</b> — timer 90–120 phút liền, rèn sức bền.</span></div>
+    <div class="feat"><span class="n">10</span><span class="txt"><b>Nhập điểm thi thử + biểu đồ xu hướng</b> — so với điểm chuẩn trường.</span></div>
+    <div class="feat"><span class="n">11</span><span class="txt"><b>Gợi ý ôn lại</b> chuyên đề lâu chưa động đến.</span></div>
+  </div>
+
+  <div class="note"><b>📌 Nguyên tắc:</b> App là công cụ, không phải mục tiêu. Đừng để việc code app ngốn thời gian học Văn. Làm từng sprint, dùng thử vài tuần rồi mới làm tiếp.</div>
+  <div class="footer"><span>NOVA ✨ — Understanding &gt; Speed &gt; Correctness</span><span>Trang 6</span></div>
+</section>
+
+</body>
+</html>
