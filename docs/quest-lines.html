@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<style>
+  @page { size: A4; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Segoe UI','Helvetica Neue',Arial,sans-serif; background:#0a0e17; color:#e2f0ee;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .page { width:210mm; min-height:297mm; padding:15mm 13mm; position:relative;
+    page-break-after:always; overflow:hidden;
+    background:radial-gradient(1100px 550px at 85% -10%, rgba(0,229,180,0.08), transparent 60%),
+               radial-gradient(800px 450px at -10% 110%, rgba(0,191,216,0.08), transparent 55%), #0a0e17; }
+  .page:last-child { page-break-after:auto; }
+
+  .hero { display:flex; flex-direction:column; justify-content:center; min-height:267mm; }
+  .badge { align-self:flex-start; font-size:12px; letter-spacing:3px; text-transform:uppercase;
+    color:#00e5b4; border:1px solid rgba(0,229,180,0.4); padding:6px 14px; border-radius:999px;
+    margin-bottom:24px; font-weight:700; }
+  .hero h1 { font-size:42px; line-height:1.1; font-weight:800;
+    background:linear-gradient(120deg,#00e5b4,#00bfd8 55%,#b490d4);
+    -webkit-background-clip:text; background-clip:text; color:transparent; margin-bottom:16px; }
+  .hero .sub { font-size:16px; color:#93b4c2; max-width:540px; line-height:1.55; margin-bottom:30px; }
+  .lines { display:flex; flex-direction:column; gap:12px; }
+  .linerow { display:flex; align-items:center; gap:14px; background:rgba(255,255,255,0.035);
+    border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:14px 18px; }
+  .linerow .ic { font-size:26px; }
+  .linerow .info { flex:1; }
+  .linerow .nm { font-size:16px; font-weight:800; }
+  .linerow .dc { font-size:12px; color:#93b4c2; margin-top:2px; }
+  .linerow .cls { font-size:11px; font-weight:700; padding:4px 10px; border-radius:999px; }
+
+  .head { display:flex; align-items:center; gap:14px; margin-bottom:6px; }
+  .head .ic { font-size:32px; }
+  .head h2 { font-size:26px; font-weight:800; }
+  .head .cls { font-size:11px; font-weight:800; padding:4px 12px; border-radius:999px; margin-left:auto; text-transform:uppercase; letter-spacing:1px; }
+  .role { font-size:13px; margin-bottom:4px; font-style:italic; }
+  .callout { font-size:12.5px; padding:10px 15px; border-radius:10px; margin-bottom:18px; line-height:1.5; }
+
+  .sec-t { font-size:13px; font-weight:800; text-transform:uppercase; letter-spacing:2px;
+    color:#6b8f9e; margin:16px 0 10px; }
+  table { width:100%; border-collapse:collapse; }
+  th,td { text-align:left; padding:9px 12px; font-size:12.5px; }
+  thead th { font-size:10.5px; text-transform:uppercase; letter-spacing:1px; color:#6b8f9e; border-bottom:1px solid rgba(255,255,255,0.1); }
+  tbody tr { border-bottom:1px solid rgba(255,255,255,0.05); }
+  tbody td:first-child { font-size:15px; width:44px; text-align:center; }
+  .zn { font-weight:700; }
+  .boss { color:#93b4c2; }
+
+  .cols { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:6px; }
+  .box { background:rgba(255,255,255,0.035); border:1px solid rgba(255,255,255,0.09); border-radius:14px; padding:13px 16px; }
+  .box h4 { font-size:12px; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:9px; }
+  .box ul { list-style:none; }
+  .box li { font-size:12px; line-height:1.5; padding-left:22px; position:relative; margin-bottom:6px; color:#c4d6d3; }
+  .box li .e { position:absolute; left:0; top:0; }
+
+  .footer { position:absolute; bottom:9mm; left:13mm; right:13mm; display:flex;
+    justify-content:space-between; font-size:10px; color:#4d6570; letter-spacing:1px; }
+
+  /* per-subject accents */
+  .toan .head h2,.toan .zn{color:#5fb0d6;} .toan .cls{background:rgba(95,176,214,0.18);color:#5fb0d6;border:1px solid rgba(95,176,214,0.4);} .toan .callout{background:rgba(95,176,214,0.08);border:1px solid rgba(95,176,214,0.3);color:#bfe0f0;}
+  .van .head h2,.van .zn{color:#f2795f;} .van .cls{background:rgba(242,121,95,0.18);color:#f2795f;border:1px solid rgba(242,121,95,0.4);} .van .callout{background:rgba(242,121,95,0.08);border:1px solid rgba(242,121,95,0.3);color:#f5c3b5;}
+  .anh .head h2,.anh .zn{color:#6fce88;} .anh .cls{background:rgba(111,206,136,0.18);color:#6fce88;border:1px solid rgba(111,206,136,0.4);} .anh .callout{background:rgba(111,206,136,0.08);border:1px solid rgba(111,206,136,0.3);color:#bfe8c8;}
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<section class="page">
+ <div class="hero">
+  <span class="badge">✦ FocusFlow · Quest Lines — 3 môn chung</span>
+  <h1>Ba Tuyến Nhiệm Vụ<br>Toán · Văn · Anh</h1>
+  <p class="sub">Kế hoạch học tập gamify hóa cho 3 môn thi chung — bổ trợ cho tuyến chính Chuyên Lý (LHP 2027). Mỗi môn là một Quest Line có class, bản đồ các màn (zones), boss, thành tựu và vật phẩm.</p>
+  <div class="lines">
+    <div class="linerow"><span class="ic">📐</span><div class="info"><div class="nm" style="color:#5fb0d6;">LOGIC FORGE — Lò Rèn Suy Luận</div><div class="dc">Toán · nền tảng cho Vật Lý</div></div><span class="cls" style="background:rgba(95,176,214,0.18);color:#5fb0d6;">⚔️ Warrior</span></div>
+    <div class="linerow"><span class="ic">📖</span><div class="info"><div class="nm" style="color:#f2795f;">WORDWEAVER — Người Dệt Chữ</div><div class="dc">Văn · môn điều kiện, XP nhân đôi</div></div><span class="cls" style="background:rgba(242,121,95,0.18);color:#f2795f;">🧙 Mage</span></div>
+    <div class="linerow"><span class="ic">🔤</span><div class="info"><div class="nm" style="color:#6fce88;">POLYGLOT PATH — Con Đường Đa Ngữ</div><div class="dc">Anh · ăn điểm nhờ tích lũy đều</div></div><span class="cls" style="background:rgba(111,206,136,0.18);color:#6fce88;">🏹 Ranger</span></div>
+  </div>
+  <div class="footer"><span>NOVA ✨ — Thinking partner for the long run</span><span>Quest Lines · 2026–2027</span></div>
+ </div>
+</section>
+
+<!-- TOAN -->
+<section class="page toan">
+  <div class="head"><span class="ic">📐</span><h2>LOGIC FORGE</h2><span class="cls">⚔️ Warrior</span></div>
+  <div class="role" style="color:#5fb0d6;">Lò Rèn Suy Luận · Chỉ số chính: STR (sức bật giải toán)</div>
+  <div class="callout">🎯 <b>Vai trò:</b> Nền tảng cho đấu trường Chuyên Lý. Toán mạnh = Lý mạnh. Rèn kỹ biến đổi đại số, đồ thị, bất đẳng thức.</div>
+
+  <div class="sec-t">🗺️ Bản đồ các màn</div>
+  <table><thead><tr><th></th><th>Zone — Chuyên đề</th><th>Boss cần hạ</th></tr></thead><tbody>
+    <tr><td>🟢</td><td class="zn">Zone 1 · Đại Số Căn Bản</td><td class="boss">Rút gọn biểu thức, căn thức</td></tr>
+    <tr><td>🟢</td><td class="zn">Zone 2 · Hàm Số & Đồ Thị</td><td class="boss">Parabol vs đường thẳng</td></tr>
+    <tr><td>🟡</td><td class="zn">Zone 3 · Phương Trình & Hệ</td><td class="boss">PT bậc 2, định lý Vi-ète</td></tr>
+    <tr><td>🟡</td><td class="zn">Zone 4 · Bất Đẳng Thức</td><td class="boss">BĐT Cauchy — mini-boss cho Lý</td></tr>
+    <tr><td>🔴</td><td class="zn">Zone 5 · Hình Học Phẳng</td><td class="boss">Tứ giác nội tiếp, góc, đường tròn</td></tr>
+    <tr><td>🔴</td><td class="zn">Zone 6 · Toán Thực Tế</td><td class="boss">Bài toán lập PT / Hệ</td></tr>
+  </tbody></table>
+
+  <div class="cols">
+    <div class="box"><h4 style="color:#5fb0d6;">🏆 Thành tựu</h4><ul>
+      <li><span class="e">🥉</span>First Blood — giải đúng 100 bài</li>
+      <li><span class="e">🥈</span>Combo Master — 7 ngày không sai hình</li>
+      <li><span class="e">🥇</span>Boss Slayer — 1 đề thi thử ≥ 8 điểm</li></ul></div>
+    <div class="box"><h4 style="color:#5fb0d6;">💡 Vật phẩm (Loot)</h4><ul>
+      <li><span class="e">📓</span>Combat Log — sổ ghi mọi bài sai</li>
+      <li><span class="e">📜</span>Grimoire công thức — flashcard định lý hay quên</li></ul></div>
+  </div>
+  <div class="footer"><span>NOVA ✨</span><span>Toán · Warrior</span></div>
+</section>
+
+<!-- VAN -->
+<section class="page van">
+  <div class="head"><span class="ic">📖</span><h2>WORDWEAVER</h2><span class="cls">🧙 Mage</span></div>
+  <div class="role" style="color:#f2795f;">Người Dệt Chữ · Chỉ số chính: INT (nội lực ngôn từ)</div>
+  <div class="callout">🔥 <b>Độ khó HARD</b> — môn bạn yếu nhất → vượt qua thì XP nhân đôi! Là <b>môn điều kiện</b>, tuyệt đối không để điểm liệt.</div>
+
+  <div class="sec-t">🗺️ Bản đồ các màn</div>
+  <table><thead><tr><th></th><th>Zone — Chuyên đề</th><th>Boss cần hạ</th></tr></thead><tbody>
+    <tr><td>🟢</td><td class="zn">Zone 1 · Kho Tàng Tác Phẩm</td><td class="boss">Thuộc tác giả–hoàn cảnh–nội dung</td></tr>
+    <tr><td>🟢</td><td class="zn">Zone 2 · Giải Mã Thơ</td><td class="boss">Hình ảnh, biện pháp tu từ</td></tr>
+    <tr><td>🟡</td><td class="zn">Zone 3 · Ngọn Lửa Văn Xuôi</td><td class="boss">Phân tích nhân vật, tình huống</td></tr>
+    <tr><td>🟡</td><td class="zn">Zone 4 · Đấu Trường NLXH</td><td class="boss">Viết bài có dẫn chứng</td></tr>
+    <tr><td>🔴</td><td class="zn">Zone 5 · Đại Chiến NLVH</td><td class="boss">Bài hoàn chỉnh đúng barem</td></tr>
+    <tr><td>🔴</td><td class="zn">Zone 6 · Bút Pháp Tốc Độ</td><td class="boss">Viết nhanh đúng giờ thi</td></tr>
+  </tbody></table>
+
+  <div class="cols">
+    <div class="box"><h4 style="color:#f2795f;">🏆 Thành tựu</h4><ul>
+      <li><span class="e">📜</span>Lore Keeper — thuộc 100% tác phẩm</li>
+      <li><span class="e">🖋️</span>Quill of Fire — 30 dẫn chứng NLXH</li>
+      <li><span class="e">🏆</span>Barem Breaker — 1 bài ≥ 7 điểm</li></ul></div>
+    <div class="box"><h4 style="color:#f2795f;">💡 Vật phẩm (Loot)</h4><ul>
+      <li><span class="e">📕</span>Spellbook dẫn chứng — flashcard câu thơ/danh ngôn</li>
+      <li><span class="e">🗂️</span>Codex tác phẩm — sơ đồ tư duy mỗi bài</li></ul></div>
+  </div>
+  <div class="footer"><span>NOVA ✨</span><span>Văn · Mage</span></div>
+</section>
+
+<!-- ANH -->
+<section class="page anh">
+  <div class="head"><span class="ic">🔤</span><h2>POLYGLOT PATH</h2><span class="cls">🏹 Ranger</span></div>
+  <div class="role" style="color:#6fce88;">Con Đường Đa Ngữ · Chỉ số chính: DIS (kỷ luật tích lũy)</div>
+  <div class="callout">🎯 <b>Chiến thuật:</b> Môn ăn điểm ổn định nhờ tích lũy đều mỗi ngày. Giữ streak học từ vựng = ít rủi ro mất điểm.</div>
+
+  <div class="sec-t">🗺️ Bản đồ các màn</div>
+  <table><thead><tr><th></th><th>Zone — Chuyên đề</th><th>Boss cần hạ</th></tr></thead><tbody>
+    <tr><td>🟢</td><td class="zn">Zone 1 · Từ Vựng — Mỏ Vàng</td><td class="boss">1500+ từ theo chủ đề</td></tr>
+    <tr><td>🟢</td><td class="zn">Zone 2 · Thành Trì Ngữ Pháp</td><td class="boss">12 thì, mệnh đề, bị động</td></tr>
+    <tr><td>🟡</td><td class="zn">Zone 3 · Mê Cung Biến Đổi Câu</td><td class="boss">Rewrite, word form</td></tr>
+    <tr><td>🟡</td><td class="zn">Zone 4 · Rừng Đọc Hiểu</td><td class="boss">Reading comprehension</td></tr>
+    <tr><td>🔴</td><td class="zn">Zone 5 · Đỉnh Giao Tiếp</td><td class="boss">Collocation, phrasal verb</td></tr>
+    <tr><td>🔴</td><td class="zn">Zone 6 · Thử Thách Đề Tổng Hợp</td><td class="boss">Luyện đề bấm giờ</td></tr>
+  </tbody></table>
+
+  <div class="cols">
+    <div class="box"><h4 style="color:#6fce88;">🏆 Thành tựu</h4><ul>
+      <li><span class="e">💰</span>Gold Hoarder — thuộc 1000 từ</li>
+      <li><span class="e">🔥</span>Streak Ranger — 30 ngày không đứt</li>
+      <li><span class="e">🎯</span>Sharpshooter — đọc hiểu đúng ≥ 90%</li></ul></div>
+    <div class="box"><h4 style="color:#6fce88;">💡 Vật phẩm (Loot)</h4><ul>
+      <li><span class="e">🏹</span>Quiver từ vựng — flashcard SM-2 mỗi ngày</li>
+      <li><span class="e">🗺️</span>Map ngữ pháp — bảng tổng hợp 12 thì</li></ul></div>
+  </div>
+  <div class="footer"><span>NOVA ✨</span><span>Anh · Ranger</span></div>
+</section>
+
+</body>
+</html>
