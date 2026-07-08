@@ -313,6 +313,25 @@ function updateRankBadge(level) {
   b.title = `Rank ${r.g} · ${r.label}`;
 }
 
+// Count-up animation: tween an element's number from its previous value to the new one.
+// Guard: only animates when the value INCREASED (avoids spinning on every render / level reset).
+const _countState = {};
+const _reducedMotion = () => window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function countUp(id, to, suffix) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const from = _countState[id];
+  _countState[id] = to;
+  if (from === undefined || to <= from || _reducedMotion()) { el.textContent = to + (suffix || ""); return; }
+  const dur = 600, start = performance.now();
+  const step = (now) => {
+    const p = Math.min(1, (now - start) / dur);
+    const eased = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.round(from + (to - from) * eased) + (suffix || "");
+    if (p < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
 function renderHero() {
   ensureRpg();
   const info = levelInfo(state.rpg.xp);
@@ -321,8 +340,12 @@ function renderHero() {
   renderAvatar(info.level);
   set("heroTitle", t.title);
   set("heroLevel", info.level);
-  set("xpText", `${info.into} / ${info.need} XP`);
+  // XP text with a dedicated span so the "into" number can count up when it climbs.
+  const xt = document.getElementById("xpText");
+  if (xt) { const shown = _countState["xpInto"] ?? info.into; xt.innerHTML = `<span id="xpInto">${shown}</span> / ${info.need} XP`; }
+  countUp("xpInto", info.into, "");
   updateRankBadge(info.level);
+  renderNextUnlock(info);
   const frame = document.getElementById("heroFrame");
   if (frame) { frame.style.setProperty("--tier", t.aura); frame.classList.toggle("glow-tier", !!t.glow); }
   const xf = document.getElementById("xpFill"); if (xf) xf.style.width = Math.min(100, (info.into / info.need) * 100) + "%";
@@ -340,6 +363,34 @@ function renderHero() {
   }
   renderRadar();
 }
+// Total XP still needed to reach a given character level from your current XP.
+function xpToReachLevel(targetLv) {
+  let need = 0;
+  for (let lv = 1; lv < targetLv; lv++) need += xpToNext(lv);
+  return Math.max(0, need - Math.floor(state.rpg.xp));
+}
+// "Next unlock" teaser under the XP bar: the closest locked perk or level-badge, and the XP to reach it.
+function renderNextUnlock(info) {
+  const el = document.getElementById("nextUnlock");
+  if (!el) return;
+  const lv = info.level;
+  // Candidates: locked skill-tree perks + locked level-badges (Lv 5/10/20/30).
+  const cands = [];
+  PERKS.forEach((p) => { if (lv < p.lv) cands.push({ lv: p.lv, icon: p.icon, name: p.name }); });
+  [{ lv: 5, icon: "🌱", name: "Rank badge" }, { lv: 10, icon: "📘", name: "Rank badge" },
+   { lv: 20, icon: "🎓", name: "Rank badge" }, { lv: 30, icon: "🧙", name: "Rank badge" }]
+    .forEach((b) => { if (lv < b.lv) cands.push(b); });
+  if (!cands.length) {
+    el.hidden = false;
+    el.innerHTML = `<span class="nu-ico">⚡</span><span class="nu-txt">Đã mở khoá tất cả — bạn ở <b>đỉnh System</b></span>`;
+    return;
+  }
+  cands.sort((a, b) => a.lv - b.lv);
+  const next = cands[0];
+  const xpLeft = xpToReachLevel(next.lv);
+  el.hidden = false;
+  el.innerHTML = `<span class="nu-ico">${next.icon}</span><span class="nu-txt">còn <b>${xpLeft} XP</b> → mở khoá <b>${escapeHtml(next.name)}</b> <i>Lv ${next.lv}</i></span>`;
+}
 // 4-axis radar (INT top, DIS right, FOC bottom, STR left) showing each stat's level.
 // The shape is relative · the strongest stat reaches the edge so you see your build at a glance.
 const RADAR_COLOR = { int: "#5fb0d6", dis: "#ecb44e", foc: "#6fce88", str: "#f2795f" };
@@ -348,8 +399,18 @@ function renderRadar() {
   if (!box) return;
   const C = 90, R = 60; // center, max radius
   const dirs = { int: [0, -1], dis: [1, 0], foc: [0, 1], str: [-1, 0] };
-  const levels = {}; let maxLv = 1;
-  STAT_DEFS.forEach((s) => { const lv = levelInfo(state.rpg.stats[s.key] || 0).level; levels[s.key] = lv; if (lv > maxLv) maxLv = lv; });
+  const levels = {}; let maxLv = 1; let totalStat = 0;
+  STAT_DEFS.forEach((s) => { const raw = state.rpg.stats[s.key] || 0; totalStat += raw; const lv = levelInfo(raw).level; levels[s.key] = lv; if (lv > maxLv) maxLv = lv; });
+  // Empty-state: chưa train stat nào → radar 'AWAITING DATA' nhấp nháy thay vì hình phẳng vô hồn.
+  if (totalStat === 0) {
+    box.innerHTML = `<svg viewBox="-16 -8 212 200" xmlns="http://www.w3.org/2000/svg" class="radar-svg radar-empty">
+      <polygon points="90,30 150,90 90,150 30,90" fill="none" stroke="var(--card-brd)" stroke-width="1"/>
+      <polygon points="90,50 130,90 90,130 50,90" fill="none" stroke="var(--card-brd)" stroke-width="1"/>
+      <text x="90" y="86" text-anchor="middle" class="radar-awaiting">AWAITING</text>
+      <text x="90" y="104" text-anchor="middle" class="radar-awaiting">DATA</text>
+    </svg>`;
+    return;
+  }
   const pt = (key, frac) => `${(C + dirs[key][0] * R * frac).toFixed(1)},${(C + dirs[key][1] * R * frac).toFixed(1)}`;
   const order = ["int", "dis", "foc", "str"];
   // grid rings
@@ -416,12 +477,16 @@ function renderPerks() {
       notify("✨ New skill!", `${p.name} · ${p.desc}`);
     }
   });
+  // The closest still-locked perk gets a "next" highlight (countdown of levels to go).
+  const nextPerk = PERKS.filter((p) => lv < p.lv).sort((a, b) => a.lv - b.lv)[0];
   box.innerHTML = PERKS.map((p) => {
     const on = lv >= p.lv;
-    return `<div class="perk ${on ? "on" : "off"}" data-perk="${p.key}">
-      <div class="perk-node">${on ? p.icon : "🔒"}</div>
+    const isNext = !on && nextPerk && p.key === nextPerk.key;
+    const lock = isNext ? `<span class="perk-lock next">còn ${p.lv - lv} LV</span>` : (on ? "" : `<span class="perk-lock">Lv ${p.lv}</span>`);
+    return `<div class="perk ${on ? "on" : "off"}${isNext ? " next" : ""}" data-perk="${p.key}">
+      <div class="perk-node">${on ? p.icon : (isNext ? p.icon : "🔒")}</div>
       <div class="perk-info">
-        <div class="perk-name">${escapeHtml(p.name)}${on ? "" : `<span class="perk-lock">Lv ${p.lv}</span>`}</div>
+        <div class="perk-name">${escapeHtml(p.name)}${lock}</div>
         <div class="perk-desc">${escapeHtml(p.desc)}</div>
       </div>
     </div>`;
@@ -485,6 +550,16 @@ function renderQuests() {
   const box = document.getElementById("questList");
   if (!box) return;
   const quests = todayQuests();
+  // Empty-state: mọi quest đã claim → banner 'ALL QUESTS CLEARED' thay vì danh sách toàn ✓.
+  const allClaimed = quests.length > 0 && quests.every((q) => state.quests.claimed[q.key]);
+  if (allClaimed) {
+    box.innerHTML = `<div class="quest-cleared"><div class="qc-mark">⚔️</div>
+      <div class="qc-title">ALL QUESTS CLEARED</div>
+      <div class="qc-sub">Boss đang chờ · quay lại ngày mai cho nhiệm vụ mới</div></div>`;
+    const cnt0 = document.getElementById("questCount");
+    if (cnt0) cnt0.textContent = `${quests.length}/${quests.length}`;
+    return;
+  }
   box.innerHTML = quests.map((q) => {
     const prog = Math.min(q.goal, q.prog());
     const pct = Math.round((prog / q.goal) * 100);
@@ -644,12 +719,18 @@ function renderBadges() {
       setTimeout(() => toast(`🏅 New achievement: ${b.label} · ${b.sub}!`), 300);
     }
   });
+  const mystery = `
+    <div class="badge locked mystery" data-tier="secret">
+      <div class="badge-ico">❔</div>
+      <div class="badge-num">???</div>
+      <div class="badge-sub">bí ẩn</div>
+    </div>`;
   document.getElementById("badges").innerHTML = list.map((b) => `
     <div class="badge ${b.earned ? "earned" : "locked"}" data-tier="${b.tier}">
       <div class="badge-ico">${b.ico}</div>
       <div class="badge-num">${b.label}</div>
       <div class="badge-sub">${b.sub}</div>
-    </div>`).join("");
+    </div>`).join("") + mystery;
   const cnt = document.getElementById("achCount");
   if (cnt) cnt.textContent = `${list.filter((b) => b.earned).length}/${list.length}`;
 }
@@ -1234,6 +1315,29 @@ document.getElementById("syncBtn").addEventListener("click", () => {
 paintTimer();
 syncReminderUI();
 render();
+
+/* ================================================================
+   DAILY SYSTEM MESSAGE v43 — panel 【SYSTEM】 chào 1 lần/ngày
+   ================================================================ */
+function dailySystemMessage() {
+  ensureRpg();
+  const today = isoDay(new Date());
+  if (state.rpg.sysMsgDay === today) return;      // đã chào hôm nay
+  state.rpg.sysMsgDay = today; save();
+  const info = levelInfo(state.rpg.xp);
+  const st = (typeof streak === "function") ? streak() : 0;
+  const quests = todayQuests();
+  const claimed = quests.filter((q) => state.quests.claimed[q.key]).length;
+  const hour = new Date().getHours();
+  const greet = hour < 5 ? "Khuya rồi, Thợ Săn" : hour < 11 ? "Chào buổi sáng, Thợ Săn" : hour < 18 ? "Chào buổi chiều, Thợ Săn" : "Chào buổi tối, Thợ Săn";
+  const lines = [
+    `${greet}. Bạn đang ở <b>Lv ${info.level}</b>${st > 0 ? ` · chuỗi <b>${st} ngày</b> 🔥` : ""}.`,
+    claimed >= quests.length && quests.length ? `Mọi nhiệm vụ hôm qua đã dọn sạch — <b>${quests.length} nhiệm vụ mới</b> đang chờ.` : `Hôm nay có <b>${quests.length} nhiệm vụ</b>. Bắt đầu một phiên Train để lên cấp.`,
+  ];
+  // Trì hoãn nhẹ để không đè lên system panel khác lúc khởi động
+  setTimeout(() => systemPanel("NHIỆM VỤ TRONG NGÀY", lines, "【 SYSTEM 】"), 700);
+}
+dailySystemMessage();
 
 /* ================================================================
    SYSTEM HUD v39 — inject khung/glow + scanline overlay + cursor glow

@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Orbitron:wght@400;500;600;700;800;900&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=42" />
+  <link rel="stylesheet" href="styles.css?v=43" />
 </head>
 <body>
   <div class="aurora"></div>
@@ -69,7 +69,8 @@
               <span class="xp-label">XP</span>
               <div class="xp-track"><div class="xp-fill" id="xpFill"></div></div>
             </div>
-            <div class="xp-text" id="xpText">0 / 15 XP</div>
+            <div class="xp-text" id="xpText"><span id="xpInto">0</span> / <span id="xpNeed">15</span> XP</div>
+            <div class="next-unlock" id="nextUnlock" hidden></div>
           </div>
         </div>
         <div class="stat-radar" id="statRadar"></div>
@@ -264,8 +265,8 @@
 
   <div class="toast" id="toast" hidden></div>
 
-  <script src="app.js?v=42"></script>
-  <script type="module" src="firebase-sync.js?v=42"></script>
+  <script src="app.js?v=43"></script>
+  <script type="module" src="firebase-sync.js?v=43"></script>
 </body>
 </html>
 >
