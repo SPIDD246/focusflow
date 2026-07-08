@@ -1577,42 +1577,11 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
   .radar-awaiting, .quest-cleared .qc-mark, .badge.mystery .badge-ico { animation: none; }
 }
 
-/* ---- empty-states (v43) ---- */
-.radar-awaiting { fill: var(--muted); font-family: "Orbitron", sans-serif; font-size: 13px; font-weight: 800; letter-spacing: 2px; animation: awaitBlink 2.4s ease-in-out infinite; }
-.radar-empty polygon { opacity: .5; }
-@keyframes awaitBlink { 0%,100% { opacity: .35; } 50% { opacity: .9; } }
-
-.quest-cleared { text-align: center; padding: 22px 14px; border: 1px dashed color-mix(in srgb, var(--amber) 45%, transparent); border-radius: 12px; background: color-mix(in srgb, var(--amber) 6%, transparent); }
-.quest-cleared .qc-mark { font-size: 30px; filter: drop-shadow(0 0 10px color-mix(in srgb, var(--amber) 60%, transparent)); animation: awaitBlink 2.6s ease-in-out infinite; }
-.quest-cleared .qc-title { margin-top: 6px; font-family: "Orbitron", sans-serif; font-weight: 800; letter-spacing: 1.5px; color: var(--amber); font-size: 13px; }
-.quest-cleared .qc-sub { margin-top: 3px; font-size: 10.5px; color: var(--muted); }
-
-.badge.mystery { opacity: .8; border-style: dashed; }
-.badge.mystery .badge-ico { animation: awaitBlink 3s ease-in-out infinite; }
-.badge.mystery .badge-num { letter-spacing: 2px; }
-
-@media (prefers-reduced-motion: reduce) {
-  .radar-awaiting, .quest-cleared .qc-mark, .badge.mystery .badge-ico { animation: none; }
-}
-
-/* ---- idle micro-motion (v43) ---- */
-/* Timer ring "thở" nhẹ khi KHÔNG chạy → màn hình sống mà không rối */
-.timer-ring:not(.running)::before { animation: ringBreathe 4s ease-in-out infinite; }
-@keyframes ringBreathe { 0%,100% { opacity: .5; } 50% { opacity: .85; } }
-/* Count-up number nảy nhẹ khi vừa cập nhật */
-#xpInto { display: inline-block; }
-
-@media (prefers-reduced-motion: reduce) {
-  .timer-ring:not(.running)::before { animation: none; }
-}
-
 /* ---- idle micro-motion (v43) ---- */
 /* Timer ring 'thở' nhẹ khi rảnh (không train) để màn hình không chết cứng */
 .timer-ring:not(.running) .ring-fg { animation: ringBreath 4s ease-in-out infinite; }
 @keyframes ringBreath { 0%,100% { opacity: .8; filter: drop-shadow(0 0 2px var(--accent)); } 50% { opacity: 1; filter: drop-shadow(0 0 7px var(--accent)); } }
-/* Hero aura chớp định kỳ */
-.hero-aura, [class*="aura"] { }
-.xp-text #xpInto { color: var(--accent); font-weight: 800; }
+.xp-text #xpInto { display: inline-block; color: var(--accent); font-weight: 800; }
 
 @media (prefers-reduced-motion: reduce) {
   .timer-ring:not(.running) .ring-fg { animation: none !important; }
