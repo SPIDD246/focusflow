@@ -9,27 +9,27 @@
    1. DESIGN TOKENS
    ================================================================ */
 :root {
-  /* --- Dark RPG palette (default) --- */
-  --bg:        #050b0e;
-  --bg-2:      #0a1319;
-  --card:      rgba(10, 22, 30, 0.82);
-  --surface:   rgba(15, 30, 42, 0.90);
+  /* --- Solo Leveling dark palette (default) --- */
+  --bg:        #08080f;
+  --bg-2:      #0e0e1c;
+  --card:      rgba(16, 16, 34, 0.86);
+  --surface:   rgba(24, 24, 48, 0.92);
   --track:     rgba(255, 255, 255, 0.08);
-  --card-brd:  rgba(0, 220, 180, 0.14);
-  --card-brd-hi: rgba(0, 220, 180, 0.38);
+  --card-brd:  rgba(139, 92, 246, 0.18);
+  --card-brd-hi: rgba(139, 92, 246, 0.45);
 
-  --text:   #e2f0ee;
-  --muted:  #93b4c2;
-  --muted-2:#5f7d8a;
+  --text:   #e6e6ff;
+  --muted:  #a6a6d0;
+  --muted-2:#6c6c9a;
 
-  --accent:   #00e5b4;   /* neon teal */
-  --accent-2: #00bfd8;   /* electric cyan */
+  --accent:   #8b5cf6;   /* violet — monarch */
+  --accent-2: #4fd6ff;   /* electric cyan */
   --amber:    #f5a623;
   --pink:     #ff4d90;
   --purple:   #b490d4;
 
-  --neon-glow: 0 0 12px rgba(0, 229, 180, 0.55), 0 0 28px rgba(0, 229, 180, 0.25);
-  --cyan-glow: 0 0 14px rgba(0, 191, 216, 0.6),  0 0 32px rgba(0, 191, 216, 0.22);
+  --neon-glow: 0 0 12px rgba(139, 92, 246, 0.55), 0 0 28px rgba(139, 92, 246, 0.25);
+  --cyan-glow: 0 0 14px rgba(79, 214, 255, 0.6),  0 0 32px rgba(79, 214, 255, 0.22);
   --amber-glow: 0 0 12px rgba(245, 166, 35, 0.5);
   --pink-glow:  0 0 12px rgba(255, 77, 144, 0.55);
 
@@ -45,7 +45,7 @@
   --spring-soft: cubic-bezier(0.4, 1.35, 0.5, 1);
 
   /* HUD bracket color */
-  --hud: rgba(0, 229, 180, 0.45);
+  --hud: rgba(139, 92, 246, 0.45);
 
   /* --- Fluid typography scale (clamp: min@mobile → max@desktop) --- */
   --fs-2xs: clamp(9px,  0.55vw + 7.5px, 10.5px);  /* micro labels */
@@ -65,33 +65,33 @@
 
 /* ---- Light override (toggle keeps all vars, just flips values) ---- */
 [data-theme="light"] {
-  --bg:       #eef4e8;
+  --bg:       #f2f0fb;
   --bg-2:     #ffffff;
-  --card:     rgba(251, 253, 247, 0.95);
-  --surface:  rgba(242, 248, 236, 0.95);
-  --track:    #dfe8d5;
-  --card-brd: rgba(74, 100, 66, 0.15);
-  --card-brd-hi: rgba(74, 100, 66, 0.32);
+  --card:     rgba(252, 251, 255, 0.95);
+  --surface:  rgba(245, 243, 253, 0.95);
+  --track:    #e4e0f2;
+  --card-brd: rgba(110, 80, 190, 0.16);
+  --card-brd-hi: rgba(110, 80, 190, 0.34);
 
-  --text:   #1e2b20;
-  --muted:  #5a7060;
-  --muted-2:#8fa889;
+  --text:   #221c38;
+  --muted:  #62587e;
+  --muted-2:#948bb0;
 
-  --accent:   #1fa87a;
+  --accent:   #6d3fd4;
   --accent-2: #0d8ea0;
   --amber:    #d9900f;
   --pink:     #d4316e;
 
-  --neon-glow: 0 0 10px rgba(31, 168, 122, 0.35);
-  --cyan-glow: 0 0 10px rgba(13, 142, 160, 0.35);
+  --neon-glow: 0 0 10px rgba(109, 63, 212, 0.32);
+  --cyan-glow: 0 0 10px rgba(13, 142, 160, 0.32);
   --amber-glow: 0 0 8px rgba(217, 144, 15, 0.3);
   --pink-glow:  0 0 8px rgba(212, 49, 110, 0.3);
 
-  --shadow-lg: 0 28px 56px -24px rgba(60, 100, 70, 0.38);
-  --shadow-md: 0 16px 38px -22px rgba(60, 100, 70, 0.28);
-  --shadow-sm: 0 8px 20px -12px rgba(60, 100, 70, 0.22);
+  --shadow-lg: 0 28px 56px -24px rgba(80, 60, 130, 0.36);
+  --shadow-md: 0 16px 38px -22px rgba(80, 60, 130, 0.26);
+  --shadow-sm: 0 8px 20px -12px rgba(80, 60, 130, 0.20);
 
-  --hud: rgba(31, 168, 122, 0.38);
+  --hud: rgba(109, 63, 212, 0.36);
 }
 
 /* ================================================================
@@ -116,12 +116,12 @@ body {
 body::after {
   content: "";
   position: fixed; inset: 0; z-index: -1; pointer-events: none;
-  background-image: radial-gradient(circle, rgba(0, 229, 180, 0.12) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(139, 92, 246, 0.12) 1px, transparent 1px);
   background-size: 28px 28px;
   opacity: 1;
   transition: opacity .4s;
 }
-[data-theme="light"] body::after { opacity: 0.35; background-image: radial-gradient(circle, rgba(31, 168, 122, 0.14) 1px, transparent 1px); }
+[data-theme="light"] body::after { opacity: 0.35; background-image: radial-gradient(circle, rgba(109, 63, 212, 0.14) 1px, transparent 1px); }
 
 h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunito", sans-serif; letter-spacing: -0.01em; }
 
@@ -131,7 +131,7 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
   font-family: "Orbitron", "Quicksand", sans-serif !important;
 }
 
-::selection { background: rgba(0, 229, 180, 0.28); color: var(--text); }
+::selection { background: rgba(139, 92, 246, 0.28); color: var(--text); }
 
 /* ================================================================
    3. AMBIENT / BACKGROUND
@@ -139,17 +139,17 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
 .aurora {
   position: fixed; inset: -25%; z-index: -2;
   background:
-    radial-gradient(42% 42% at 18% 18%, rgba(0, 229, 180, 0.22), transparent 65%),
-    radial-gradient(36% 36% at 82% 22%, rgba(0, 191, 216, 0.18), transparent 65%),
-    radial-gradient(44% 44% at 64% 90%, rgba(180, 144, 212, 0.14), transparent 65%);
-  filter: blur(56px) saturate(1.1);
+    radial-gradient(42% 42% at 18% 18%, rgba(139, 92, 246, 0.30), transparent 65%),
+    radial-gradient(36% 36% at 82% 22%, rgba(79, 214, 255, 0.20), transparent 65%),
+    radial-gradient(48% 48% at 64% 92%, rgba(99, 60, 200, 0.22), transparent 66%);
+  filter: blur(60px) saturate(1.15);
   animation: drift 24s ease-in-out infinite alternate;
 }
 [data-theme="light"] .aurora {
   background:
-    radial-gradient(40% 40% at 16% 16%, rgba(124, 190, 148, 0.38), transparent 64%),
-    radial-gradient(38% 38% at 84% 20%, rgba(63, 157, 127, 0.28), transparent 64%),
-    radial-gradient(46% 46% at 66% 92%, rgba(230, 178, 95, 0.18), transparent 64%);
+    radial-gradient(40% 40% at 16% 16%, rgba(150, 110, 230, 0.38), transparent 64%),
+    radial-gradient(38% 38% at 84% 20%, rgba(110, 70, 200, 0.28), transparent 64%),
+    radial-gradient(46% 46% at 66% 92%, rgba(180, 140, 240, 0.18), transparent 64%);
 }
 @keyframes drift {
   0%   { transform: translate(0, 0) scale(1); }
@@ -174,7 +174,7 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
   box-shadow: var(--neon-glow), inset 0 1px 0 rgba(255,255,255,0.3);
   transition: box-shadow .3s;
 }
-.logo:hover { box-shadow: 0 0 22px var(--accent), 0 0 44px rgba(0,229,180,0.3), inset 0 1px 0 rgba(255,255,255,0.3); }
+.logo:hover { box-shadow: 0 0 22px var(--accent), 0 0 44px rgba(139, 92, 246,0.3), inset 0 1px 0 rgba(255,255,255,0.3); }
 .topbar h1 {
   font-size: 22px; font-weight: 800;
   background: linear-gradient(120deg, var(--accent), var(--accent-2));
@@ -195,7 +195,7 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
   font-family: "Orbitron", monospace; font-size: 12px; letter-spacing: 1px;
   color: var(--accent); padding: 9px 16px;
   border: 1px solid var(--card-brd); border-radius: 999px;
-  background: var(--card); box-shadow: var(--shadow-sm), inset 0 0 0 1px rgba(0,229,180,0.07);
+  background: var(--card); box-shadow: var(--shadow-sm), inset 0 0 0 1px rgba(139, 92, 246,0.07);
   backdrop-filter: blur(10px);
 }
 .btn.install { background: var(--card); color: var(--accent-2); border: 1px solid var(--accent); }
@@ -240,7 +240,7 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
   border: 1px solid var(--card-brd);
   border-radius: var(--radius); padding: 24px;
   box-shadow: var(--shadow-md),
-              inset 0 0 0 1px rgba(0, 229, 180, 0.06);
+              inset 0 0 0 1px rgba(139, 92, 246, 0.06);
   backdrop-filter: blur(18px);
   transition: border-color .3s, box-shadow .3s;
 }
@@ -258,14 +258,14 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
   top: 10px; left: 10px;
   border-top: 2px solid var(--accent);
   border-left: 2px solid var(--accent);
-  box-shadow: -2px -2px 8px rgba(0, 229, 180, 0.3);
+  box-shadow: -2px -2px 8px rgba(139, 92, 246, 0.3);
   border-radius: 3px 0 0 0;
 }
 .card::after {
   bottom: 10px; right: 10px;
   border-bottom: 2px solid var(--accent);
   border-right: 2px solid var(--accent);
-  box-shadow: 2px 2px 8px rgba(0, 229, 180, 0.3);
+  box-shadow: 2px 2px 8px rgba(139, 92, 246, 0.3);
   border-radius: 0 0 3px 0;
 }
 
@@ -293,8 +293,8 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
 /* since ::before/::after already handle real brackets visually we remove them to avoid doubling */
 .card::before, .card::after { display: none; }
 
-.card:hover { border-color: var(--card-brd-hi); box-shadow: var(--shadow-md), 0 0 0 1px rgba(0,229,180,0.12), inset 0 0 0 1px rgba(0,229,180,0.08); }
-.card.glow::before { content: ""; display: block; position: absolute; top: -60%; right: -35%; width: 240px; height: 240px; background: radial-gradient(circle, rgba(0,229,180,0.12), transparent 70%); pointer-events: none; }
+.card:hover { border-color: var(--card-brd-hi); box-shadow: var(--shadow-md), 0 0 0 1px rgba(139, 92, 246,0.12), inset 0 0 0 1px rgba(139, 92, 246,0.08); }
+.card.glow::before { content: ""; display: block; position: absolute; top: -60%; right: -35%; width: 240px; height: 240px; background: radial-gradient(circle, rgba(139, 92, 246,0.12), transparent 70%); pointer-events: none; }
 
 /* ================================================================
    7. CARD TITLES — HUD panel header
@@ -302,7 +302,7 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
 .card-title {
   position: relative; display: flex; align-items: center; gap: 8px;
   padding: 0 0 12px; margin-bottom: 18px;
-  border-bottom: 1px solid rgba(0, 229, 180, 0.2);
+  border-bottom: 1px solid rgba(139, 92, 246, 0.2);
   font-family: "Orbitron", "Quicksand", sans-serif;
   font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
   color: var(--accent);
@@ -317,7 +317,7 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
   background: linear-gradient(90deg, var(--accent), transparent);
   box-shadow: var(--neon-glow);
 }
-[data-theme="light"] .card-title { color: var(--accent-2); border-bottom-color: rgba(31,168,122,0.25); }
+[data-theme="light"] .card-title { color: var(--accent-2); border-bottom-color: rgba(109, 63, 212,0.25); }
 [data-theme="light"] .card-title::before { text-shadow: none; }
 [data-theme="light"] .card-title::after { background: linear-gradient(90deg, var(--accent-2), transparent); box-shadow: none; }
 .qb-count { margin-left: auto; }
@@ -341,7 +341,7 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.45),
     0 4px 0 color-mix(in srgb, var(--accent-2) 55%, #000),
-    0 8px 22px -8px rgba(0, 229, 180, 0.65),
+    0 8px 22px -8px rgba(139, 92, 246, 0.65),
     var(--neon-glow);
 }
 .btn.primary:hover { filter: brightness(1.08); }
@@ -349,13 +349,13 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,.3),
     0 1px 0 color-mix(in srgb, var(--accent-2) 55%, #000),
-    0 4px 10px -6px rgba(0,229,180,0.5);
+    0 4px 10px -6px rgba(139, 92, 246,0.5);
 }
 
 .btn.ghost {
   background: var(--surface); color: var(--text);
   border: 1px solid var(--card-brd);
-  box-shadow: inset 0 0 0 1px rgba(0,229,180,0.07), 0 2px 0 rgba(0,229,180,0.1);
+  box-shadow: inset 0 0 0 1px rgba(139, 92, 246,0.07), 0 2px 0 rgba(139, 92, 246,0.1);
 }
 .btn.ghost:hover { background: var(--track); border-color: var(--card-brd-hi); }
 .btn.ghost:active { box-shadow: none; }
@@ -407,10 +407,10 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
 .timer-card {
   display: flex; flex-direction: column;
   background:
-    radial-gradient(120% 90% at 12% 0%, rgba(0,229,180,0.09), transparent 55%),
-    radial-gradient(120% 90% at 100% 100%, rgba(0,191,216,0.08), transparent 55%),
+    radial-gradient(120% 90% at 12% 0%, rgba(139, 92, 246,0.09), transparent 55%),
+    radial-gradient(120% 90% at 100% 100%, rgba(79, 214, 255,0.08), transparent 55%),
     var(--card);
-  border-color: rgba(0,229,180,0.22);
+  border-color: rgba(139, 92, 246,0.22);
 }
 /* Training giãn cao để đáy thẳng hàng với cột Daily Quests + Reminders */
 .boss-col .timer-card { flex: 1; justify-content: center; }
@@ -424,17 +424,17 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
 /* outer neon ring frame — double halo */
 .timer-ring::before {
   content: ""; position: absolute; inset: -8px; border-radius: 50%; pointer-events: none;
-  border: 1px solid rgba(0, 229, 180, 0.22);
-  box-shadow: 0 0 28px rgba(0,229,180,0.16);
+  border: 1px solid rgba(139, 92, 246, 0.22);
+  box-shadow: 0 0 28px rgba(139, 92, 246,0.16);
 }
 
 
-.ring-bg { fill: none; stroke: rgba(0,229,180,0.1); stroke-width: 9; }
+.ring-bg { fill: none; stroke: rgba(139, 92, 246,0.1); stroke-width: 9; }
 .ring-fg {
   fill: none; stroke: url(#ringGrad); stroke-width: 9; stroke-linecap: round;
   stroke-dasharray: 326.7; stroke-dashoffset: 0;
   transition: stroke-dashoffset 1s linear;
-  filter: drop-shadow(0 0 8px rgba(0,229,180,0.8)) drop-shadow(0 0 16px rgba(0,229,180,0.4));
+  filter: drop-shadow(0 0 8px rgba(139, 92, 246,0.8)) drop-shadow(0 0 16px rgba(139, 92, 246,0.4));
 }
 
 .timer-display {
@@ -459,7 +459,7 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
   font-family: "Orbitron", sans-serif; text-align: center; -moz-appearance: textfield;
 }
 .chip-custom input::-webkit-outer-spin-button, .chip-custom input::-webkit-inner-spin-button { -webkit-appearance: none; }
-.chip-custom input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,229,180,0.2); }
+.chip-custom input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(139, 92, 246,0.2); }
 .chip {
   border: 1px solid var(--card-brd); background: var(--surface); color: var(--muted);
   padding: 8px 14px; border-radius: 999px; cursor: pointer; font-size: 12px; font-weight: 700;
@@ -493,7 +493,7 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
   font-family: "Orbitron", "Quicksand", sans-serif; font-size: var(--fs-xl); font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase;
   background: linear-gradient(120deg, var(--text) 30%, var(--accent) 75%, var(--sys-purple));
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-  filter: drop-shadow(0 0 10px rgba(0, 229, 180, 0.25));
+  filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.25));
 }
 [data-theme="light"] .section-head h2 { background: linear-gradient(120deg, var(--text) 40%, var(--accent-2)); -webkit-background-clip: text; background-clip: text; }
 
@@ -514,10 +514,10 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
     linear-gradient(var(--hud), var(--hud)) right 7px bottom 7px / 1.5px 12px no-repeat,
     var(--card);
 }
-.day-col:hover { border-color: var(--card-brd-hi); transform: translateY(-3px); box-shadow: var(--shadow-md), 0 0 0 1px rgba(0,229,180,0.1); }
+.day-col:hover { border-color: var(--card-brd-hi); transform: translateY(-3px); box-shadow: var(--shadow-md), 0 0 0 1px rgba(139, 92, 246,0.1); }
 .day-col.today {
-  border-color: rgba(0,229,180,0.5);
-  box-shadow: 0 0 0 1px rgba(0,229,180,0.3), var(--shadow-md);
+  border-color: rgba(139, 92, 246,0.5);
+  box-shadow: 0 0 0 1px rgba(139, 92, 246,0.3), var(--shadow-md);
 }
 .day-head {
   display: flex; align-items: center; justify-content: space-between;
@@ -525,7 +525,7 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
   font-family: "Orbitron", sans-serif; letter-spacing: 1.5px; text-transform: uppercase;
   padding-bottom: 9px; border-bottom: 1px solid var(--card-brd);
 }
-.day-col.today .day-head { color: var(--accent); text-shadow: 0 0 8px rgba(0,229,180,0.5); }
+.day-col.today .day-head { color: var(--accent); text-shadow: 0 0 8px rgba(139, 92, 246,0.5); }
 .day-head .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: var(--neon-glow); animation: pulse 2s ease-in-out infinite; }
 @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
@@ -536,7 +536,7 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
   animation: pop .28s var(--ease);
   text-align: center;
 }
-.session:hover { transform: translateY(-2px); box-shadow: var(--neon-glow); border-color: rgba(0,229,180,0.35); }
+.session:hover { transform: translateY(-2px); box-shadow: var(--neon-glow); border-color: rgba(139, 92, 246,0.35); }
 .session .s-bar { position: absolute; left: 0; top: 8px; bottom: 8px; width: 4px; border-radius: 4px; box-shadow: 0 0 8px currentColor; }
 .session .s-subj { font-weight: 700; font-size: var(--fs-md); }
 .session .s-time { color: var(--muted); font-size: var(--fs-xs); margin-top: 4px; font-weight: 600; font-family: "Orbitron", sans-serif; letter-spacing: .5px; }
@@ -575,7 +575,7 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
   background: var(--surface); border: 1px solid var(--card-brd); border-radius: var(--radius-sm);
   padding: 9px 5px; text-align: center; transition: transform .2s var(--ease), box-shadow .25s;
 }
-.badge.earned { border-color: rgba(0,229,180,0.28); box-shadow: var(--shadow-sm); }
+.badge.earned { border-color: rgba(139, 92, 246,0.28); box-shadow: var(--shadow-sm); }
 .badge.earned:hover { transform: translateY(-3px) scale(1.03); box-shadow: var(--neon-glow), var(--shadow-md); }
 .badge.locked { opacity: 0.28; filter: grayscale(1); }
 .badge-ico { font-size: 20px; }
@@ -621,7 +621,7 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
   background: var(--surface); border: 1px solid var(--card-brd); border-radius: 10px;
   padding: 8px 10px; outline: none; cursor: pointer; transition: border-color .2s;
 }
-.mini-select:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(0,229,180,0.18); }
+.mini-select:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(139, 92, 246,0.18); }
 .mini-select option { background: var(--bg-2); }
 
 .switch { position: relative; display: inline-block; width: 48px; height: 27px; flex: none; }
@@ -653,7 +653,7 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
   background: var(--surface); border: 1px solid var(--card-brd); border-radius: 11px;
   padding: 11px 13px; outline: none; transition: border .2s, box-shadow .2s;
 }
-.form input:focus, .form select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,229,180,0.18); }
+.form input:focus, .form select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(139, 92, 246,0.18); }
 .form option { background: var(--bg-2); }
 .swatches { display: flex; gap: 9px; }
 .swatch { width: 27px; height: 27px; border-radius: 9px; cursor: pointer; border: 2px solid transparent; transition: transform .3s var(--spring); }
@@ -666,7 +666,7 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
    ================================================================ */
 .toast {
   position: fixed; bottom: calc(28px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%);
-  background: rgba(5, 20, 26, 0.95); border: 1px solid rgba(0,229,180,0.3); color: var(--accent);
+  background: rgba(5, 20, 26, 0.95); border: 1px solid rgba(139, 92, 246,0.3); color: var(--accent);
   padding: 11px 22px; border-radius: 12px;
   box-shadow: var(--neon-glow), var(--shadow-lg);
   z-index: 100; font-family: "Orbitron", sans-serif;
@@ -674,7 +674,7 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
   animation: rise .28s var(--ease); max-width: 90vw; text-align: center;
   backdrop-filter: blur(14px);
 }
-[data-theme="light"] .toast { background: rgba(240, 250, 245, 0.97); color: var(--accent-2); border-color: rgba(31,168,122,0.4); box-shadow: var(--shadow-lg); }
+[data-theme="light"] .toast { background: rgba(240, 250, 245, 0.97); color: var(--accent-2); border-color: rgba(109, 63, 212,0.4); box-shadow: var(--shadow-lg); }
 
 /* ================================================================
    19. RPG CHARACTER PANEL
@@ -711,8 +711,8 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
   display: inline-block; margin: 6px 0 10px; font-family: "Orbitron", sans-serif;
   font-size: 9px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase;
   color: var(--accent-2);
-  background: rgba(0,229,180,0.12); padding: 3px 9px; border-radius: 999px;
-  border: 1px solid rgba(0,229,180,0.2);
+  background: rgba(139, 92, 246,0.12); padding: 3px 9px; border-radius: 999px;
+  border: 1px solid rgba(139, 92, 246,0.2);
 }
 .xp-row { display: flex; align-items: center; gap: 7px; }
 .xp-label { font-family: "Orbitron", sans-serif; font-size: 9px; font-weight: 800; letter-spacing: 1.5px; color: var(--muted); text-transform: uppercase; }
@@ -745,7 +745,7 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
   border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--sc) 15%, transparent), transparent 70%);
   pointer-events: none;
 }
-.c-int { --sc: #40b4e5; } .c-dis { --sc: #f5a623; } .c-foc { --sc: #00e5b4; } .c-str { --sc: #ff6b4a; }
+.c-int { --sc: #40b4e5; } .c-dis { --sc: #f5a623; } .c-foc { --sc: #8b5cf6; } .c-str { --sc: #ff6b4a; }
 
 .stat-top { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 8px; }
 .stat-abbr { font-family: "Orbitron", sans-serif; font-weight: 900; font-size: 14px; letter-spacing: 2px; color: var(--text); }
@@ -783,13 +783,13 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
   content: ""; position: absolute; left: 18px; top: 50%; width: 2px; height: calc(100% + 3px);
   background: var(--card-brd); z-index: 0;
 }
-.perk.on:not(:last-child)::before { background: linear-gradient(var(--accent), var(--card-brd)); box-shadow: 0 0 6px rgba(0,229,180,0.3); }
+.perk.on:not(:last-child)::before { background: linear-gradient(var(--accent), var(--card-brd)); box-shadow: 0 0 6px rgba(139, 92, 246,0.3); }
 .perk-node {
   position: relative; z-index: 1; flex: none; width: 36px; height: 36px; border-radius: 50%;
   display: grid; place-items: center; font-size: 17px;
   background: var(--surface); border: 1.5px solid var(--card-brd); transition: all .3s var(--ease);
 }
-.perk.on .perk-node { border-color: var(--accent); background: rgba(0,229,180,0.12); box-shadow: var(--neon-glow); }
+.perk.on .perk-node { border-color: var(--accent); background: rgba(139, 92, 246,0.12); box-shadow: var(--neon-glow); }
 .perk.off { opacity: .45; }
 .perk.off .perk-node { filter: grayscale(.8); font-size: 14px; }
 .perk-info { min-width: 0; }
@@ -851,7 +851,7 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
   50%       { transform: translateY(-5px) rotate(2deg); }
 }
 .boss-head.dead .boss-emoji {
-  filter: grayscale(.8) drop-shadow(0 0 6px rgba(0,229,180,0.4));
+  filter: grayscale(.8) drop-shadow(0 0 6px rgba(139, 92, 246,0.4));
   animation: none;
 }
 .boss-name { flex: 1; min-width: 0; font-family: "Orbitron", sans-serif; font-weight: 800; font-size: var(--fs-md); color: var(--text); line-height: 1.2; letter-spacing: .5px; }
@@ -860,7 +860,7 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
   color: var(--pink); background: rgba(255,77,144,0.12); padding: 3px 9px; border-radius: 999px;
   border: 1px solid rgba(255,77,144,0.3); text-shadow: var(--pink-glow);
 }
-.boss-head.dead .boss-hp-txt { color: var(--accent-2); background: rgba(0,229,180,0.12); border-color: rgba(0,229,180,0.3); text-shadow: var(--neon-glow); }
+.boss-head.dead .boss-hp-txt { color: var(--accent-2); background: rgba(139, 92, 246,0.12); border-color: rgba(139, 92, 246,0.3); text-shadow: var(--neon-glow); }
 .boss-bar { height: 14px; border-radius: 999px; background: var(--track); overflow: hidden; position: relative; }
 .boss-bar::after {
   content: ""; position: absolute; inset: 0;
@@ -883,7 +883,7 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
   display: inline-block; margin-left: 8px; padding: 2px 8px; border-radius: 999px;
   font-family: "Orbitron", sans-serif; font-size: 10px; font-weight: 800; letter-spacing: .5px;
   text-transform: none; vertical-align: middle;
-  color: var(--accent); background: rgba(0,229,180,0.12); border: 1px solid rgba(0,229,180,0.2);
+  color: var(--accent); background: rgba(139, 92, 246,0.12); border: 1px solid rgba(139, 92, 246,0.2);
 }
 
 /* ================================================================
@@ -921,8 +921,8 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
 [data-theme="light"] .timer-display { color: var(--accent-2); text-shadow: none; }
 [data-theme="light"] .clock { color: var(--accent-2); }
 [data-theme="light"] .boss-emoji { filter: drop-shadow(0 2px 6px rgba(212,49,110,0.3)); }
-[data-theme="light"] .ring-fg { filter: drop-shadow(0 0 5px rgba(31,168,122,0.6)); }
-[data-theme="light"] .logo { box-shadow: 0 8px 20px -8px rgba(31,168,122,0.5); }
+[data-theme="light"] .ring-fg { filter: drop-shadow(0 0 5px rgba(109, 63, 212,0.6)); }
+[data-theme="light"] .logo { box-shadow: 0 8px 20px -8px rgba(109, 63, 212,0.5); }
 [data-theme="light"] .progress-fill { box-shadow: none; }
 [data-theme="light"] .xp-fill { box-shadow: none; }
 [data-theme="light"] .stat-fill { box-shadow: none; }
@@ -933,7 +933,7 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
 [data-theme="light"] .chip.active, [data-theme="light"] .chip:hover { color: #fff; }
 [data-theme="light"] .quest-claim { color: #fff; }
 [data-theme="light"] .train-chip.active { color: #fff; }
-[data-theme="light"] .btn.primary { color: #fff; box-shadow: 0 8px 20px -8px rgba(31,168,122,0.6), inset 0 1px 0 rgba(255,255,255,.4), 0 4px 0 color-mix(in srgb, var(--accent-2) 55%, #000); }
+[data-theme="light"] .btn.primary { color: #fff; box-shadow: 0 8px 20px -8px rgba(109, 63, 212,0.6), inset 0 1px 0 rgba(255,255,255,.4), 0 4px 0 color-mix(in srgb, var(--accent-2) 55%, #000); }
 [data-theme="light"] .sound-btn.active { color: #fff; }
 [data-theme="light"] .hero-lv-badge { color: #fff; }
 [data-theme="light"] .topbar h1 { background: linear-gradient(120deg, var(--text) 40%, var(--accent-2)); -webkit-background-clip: text; background-clip: text; }
@@ -941,8 +941,8 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
 [data-theme="light"] .section-head h2 { -webkit-text-fill-color: transparent; }
 [data-theme="light"] .day-head { color: var(--muted); }
 [data-theme="light"] .stat-abbr { color: var(--text); }
-[data-theme="light"] .card { box-shadow: var(--shadow-md), inset 0 0 0 1px rgba(31,168,122,0.06); }
-[data-theme="light"] body::after { background-image: radial-gradient(circle, rgba(31,168,122,0.12) 1px, transparent 1px); }
+[data-theme="light"] .card { box-shadow: var(--shadow-md), inset 0 0 0 1px rgba(109, 63, 212,0.06); }
+[data-theme="light"] body::after { background-image: radial-gradient(circle, rgba(109, 63, 212,0.12) 1px, transparent 1px); }
 
 /* ================================================================
    26. INFO / YT / misc legacy
