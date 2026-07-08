@@ -490,9 +490,10 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
    ================================================================ */
 .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
 .section-head h2 {
-  font-family: "Orbitron", "Quicksand", sans-serif; font-size: 18px; font-weight: 800; letter-spacing: .5px;
-  background: linear-gradient(120deg, var(--text) 40%, var(--accent));
+  font-family: "Orbitron", "Quicksand", sans-serif; font-size: var(--fs-xl); font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase;
+  background: linear-gradient(120deg, var(--text) 30%, var(--accent) 75%, var(--sys-purple));
   -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  filter: drop-shadow(0 0 10px rgba(0, 229, 180, 0.25));
 }
 [data-theme="light"] .section-head h2 { background: linear-gradient(120deg, var(--text) 40%, var(--accent-2)); -webkit-background-clip: text; background-clip: text; }
 
@@ -1101,3 +1102,56 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
 }
 
 
+
+/* ================================================================
+   25. SYSTEM PANEL — cảm hứng Solo Leveling (level up / quest / achievement)
+   ================================================================ */
+:root {
+  --sys-cyan: #4fd6ff;
+  --sys-purple: #9d6bff;
+  --sys-glow: 0 0 18px rgba(79, 214, 255, 0.55), 0 0 40px rgba(157, 107, 255, 0.35);
+}
+.sys-overlay {
+  position: fixed; inset: 0; z-index: 300; pointer-events: none;
+  display: grid; place-items: center;
+}
+.sys-panel {
+  position: relative; min-width: min(340px, 84vw); max-width: 90vw;
+  padding: 22px 30px 24px;
+  background: linear-gradient(180deg, rgba(8,14,28,0.94), rgba(12,10,30,0.96));
+  border: 1.5px solid var(--sys-cyan);
+  color: #dbeeff;
+  text-align: center;
+  /* góc vát kiểu HUD Solo Leveling */
+  clip-path: polygon(0 14px, 14px 0, calc(100% - 14px) 0, 100% 14px, 100% calc(100% - 14px), calc(100% - 14px) 100%, 14px 100%, 0 calc(100% - 14px));
+  box-shadow: var(--sys-glow), inset 0 0 30px rgba(79,214,255,0.10);
+  animation: sysIn .45s cubic-bezier(0.22,1.4,0.4,1);
+}
+.sys-panel::before {
+  content: ""; position: absolute; inset: 4px; pointer-events: none;
+  border: 1px solid rgba(157,107,255,0.35);
+  clip-path: polygon(0 12px, 12px 0, calc(100% - 12px) 0, 100% 12px, 100% calc(100% - 12px), calc(100% - 12px) 100%, 12px 100%, 0 calc(100% - 12px));
+}
+.sys-head {
+  font-family: "Orbitron", sans-serif; font-weight: 800;
+  font-size: var(--fs-xs); letter-spacing: 4px; text-transform: uppercase;
+  color: var(--sys-cyan); text-shadow: 0 0 10px rgba(79,214,255,0.8);
+  margin-bottom: 12px;
+  animation: sysBlink 1.4s ease-in-out infinite;
+}
+.sys-head::before, .sys-head::after { content: "◆"; margin: 0 8px; font-size: .7em; color: var(--sys-purple); }
+.sys-title {
+  font-family: "Quicksand", "Nunito", sans-serif; font-weight: 800;
+  font-size: var(--fs-lg); line-height: 1.15; margin-bottom: 8px;
+  color: #fff; text-shadow: 0 0 14px rgba(157,107,255,0.6);
+}
+.sys-line { font-size: var(--fs-sm); color: #a9c7e0; margin-top: 4px; font-weight: 600; }
+.sys-line b { color: var(--sys-cyan); font-family: "Orbitron", sans-serif; }
+.sys-panel.out { animation: sysOut .4s ease forwards; }
+@keyframes sysIn { from { opacity: 0; transform: translateY(16px) scale(.94); } to { opacity: 1; transform: none; } }
+@keyframes sysOut { to { opacity: 0; transform: translateY(-10px) scale(.97); } }
+@keyframes sysBlink { 0%,100% { opacity: 1; } 50% { opacity: .55; } }
+[data-theme="light"] .sys-panel { background: linear-gradient(180deg, rgba(240,246,255,0.97), rgba(244,240,255,0.98)); color: #24304a; }
+[data-theme="light"] .sys-title { color: #1a2440; }
+[data-theme="light"] .sys-line { color: #4a6080; }
+@media (prefers-reduced-motion: reduce) { .sys-head { animation: none; } .sys-panel { animation: none; } }

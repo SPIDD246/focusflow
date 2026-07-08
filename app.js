@@ -207,8 +207,8 @@ function celebrateLevels(gained) {
   const lv = levelInfo(state.rpg.xp).level, tier = tierFor(lv);
   setTimeout(() => {
     burst(window.innerWidth / 2, window.innerHeight / 3);
-    toast(`⬆️ LEVEL UP! You reached Level ${lv} · ${tier.title}`);
     flashLevelUp(lv, tier);
+    systemPanel("LEVEL UP", [`Bạn đã đạt <b>Level ${lv}</b>`, `Danh hiệu mới: <b>${tier.title}</b>`], "SYSTEM ⚡ LEVEL UP");
   }, 700);
   notify("⬆️ Level Up!", `You just hit Level ${lv} · ${tier.title}!`);
 }
@@ -391,7 +391,7 @@ function renderPerks() {
     if (lv >= p.lv && !state.rpg.perksSeen.includes(p.key)) {
       state.rpg.perksSeen.push(p.key);
       justUnlocked.push(p.key);
-      setTimeout(() => toast(`✨ Skill unlocked: ${p.name}!`), 450);
+      setTimeout(() => systemPanel("SKILL UNLOCKED", [`✨ <b>${p.name}</b>`, p.desc], "SYSTEM ✨ SKILL"), 450);
       notify("✨ New skill!", `${p.name} · ${p.desc}`);
     }
   });
@@ -490,7 +490,7 @@ function claimQuest(key) {
   const levels = grantXp(q.reward, trained);
   save(); render();
   burst(window.innerWidth / 2, window.innerHeight / 2);
-  toast(`🗡️ Quest complete! +${q.reward} XP`);
+  systemPanel("QUEST CLEAR", [`${q.icon} ${q.label}`, `Phần thưởng: <b>+${q.reward} XP</b>`], "SYSTEM 🗡️ QUEST");
   celebrateLevels(levels);
 }
 
@@ -525,7 +525,7 @@ function renderBoss() {
     const levels = grantXp(boss.reward, "str");
     save(); renderHero();
     burst(window.innerWidth / 2, window.innerHeight / 2);
-    toast(`🏆 Defeated ${boss.name}! +${boss.reward} XP`);
+    systemPanel("BOSS DEFEATED", [`Bạn đã hạ <b>${boss.name}</b>`, `Phần thưởng: <b>+${boss.reward} XP</b>`], "SYSTEM 👹 BOSS");
     notify("🏆 Boss defeated!", `You defeated ${boss.name} and earned ${boss.reward} XP!`);
     celebrateLevels(levels);
     const card = document.querySelector(".boss-card");
@@ -1056,6 +1056,25 @@ function hexToRgba(hex, a) { const n = parseInt(hex.slice(1), 16); return `rgba(
 function escapeHtml(s) { return s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
 let toastTimer = null;
 function toast(msg) { const t = document.getElementById("toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => (t.hidden = true), 2400); }
+
+// System panel kiểu Solo Leveling — dành cho event lớn (level up / quest / achievement)
+// title: dòng chính; lines: mảng string (hỗ trợ <b>); head: nhãn góc trên (mặc định SYSTEM)
+function systemPanel(title, lines = [], head = "SYSTEM") {
+  const overlay = document.createElement("div");
+  overlay.className = "sys-overlay";
+  const linesHtml = (Array.isArray(lines) ? lines : [lines]).filter(Boolean).map((l) => `<div class="sys-line">${l}</div>`).join("");
+  overlay.innerHTML = `<div class="sys-panel">
+    <div class="sys-head">${head}</div>
+    <div class="sys-title">${title}</div>
+    ${linesHtml}
+  </div>`;
+  document.body.appendChild(overlay);
+  const panel = overlay.querySelector(".sys-panel");
+  setTimeout(() => {
+    panel.classList.add("out");
+    setTimeout(() => overlay.remove(), 400);
+  }, 2800);
+}
 
 // ---------- Seed demo (first run only) ----------
 if (state.sessions.length === 0 && !localStorage.getItem(STORE_KEY)) {
