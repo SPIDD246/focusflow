@@ -453,25 +453,29 @@ const QUEST_POOL = [
   { key: "s2",  icon: "⚡", label: "Complete 2 focus runs", goal: 2,  unit: "",      reward: 25, cat: "sess", prog: sessToday },
   { key: "s3",  icon: "⚔️", label: "Complete 3 focus runs", goal: 3,  unit: "",      reward: 40, cat: "sess", prog: sessToday },
   { key: "s5",  icon: "💥", label: "Complete 5 focus runs", goal: 5,  unit: "",      reward: 70, cat: "sess", prog: sessToday },
-  { key: "d1",  icon: "✅", label: "Mark 1 class done",     goal: 1,  unit: "",      reward: 15, cat: "done", prog: doneTodayCount },
-  { key: "d2",  icon: "📚", label: "Mark 2 classes done",   goal: 2,  unit: "",      reward: 25, cat: "done", prog: doneTodayCount },
 ];
 const questByKey = (k) => QUEST_POOL.find((q) => q.key === k);
-// Draw 4 quests for the day: one from each category (min/sess/done) for variety, plus one wildcard.
+// Draw up to 4 quests for the day: one from each category (min/sess) for variety, plus wildcards.
 function pickDailyQuests() {
   const rand = (arr) => arr[Math.floor(Math.random() * arr.length)];
-  const pick = (cat) => rand(QUEST_POOL.filter((q) => q.cat === cat));
-  const picks = ["min", "sess", "done"].map((c) => pick(c).key);
-  const rest = QUEST_POOL.filter((q) => !picks.includes(q.key));
-  if (rest.length) picks.push(rand(rest).key);
+  const pick = (cat) => { const p = QUEST_POOL.filter((q) => q.cat === cat); return p.length ? rand(p).key : null; };
+  const picks = ["min", "sess"].map(pick).filter(Boolean);
+  // fill up to 4 total with random distinct wildcards from the rest of the pool
+  while (picks.length < 4) {
+    const rest = QUEST_POOL.filter((q) => !picks.includes(q.key));
+    if (!rest.length) break;
+    picks.push(rand(rest).key);
+  }
   return picks;
 }
 function ensureQuests() {
   const today = isoDay(new Date());
   if (!state.quests || state.quests.day !== today) {
     state.quests = { day: today, sessions: 0, claimed: {}, picks: pickDailyQuests() };
-  } else if (!Array.isArray(state.quests.picks) || !state.quests.picks.length) {
-    state.quests.picks = pickDailyQuests();          // migrate a same-day pre-random state
+  } else if (!Array.isArray(state.quests.picks) || !state.quests.picks.length
+             || state.quests.picks.some((k) => !questByKey(k))) {
+    // migrate: empty, or contains a retired key (vd d1/d2 "mark done" đã bỏ)
+    state.quests.picks = pickDailyQuests();
     if (!state.quests.claimed) state.quests.claimed = {};
   }
 }
