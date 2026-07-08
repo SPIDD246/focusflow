@@ -1367,3 +1367,161 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
   .card .hud-glow { display: none; }
   .sys-overlay::before { display: none; }
 }
+
+/* ================================================================
+   39. AAA GAME-UI POLISH — v41
+   Nâng chiều sâu thị giác cho hero, radar, bars, stat, quest,
+   timer, week, badges, buttons. Giữ chức năng + reduced-motion.
+   ================================================================ */
+
+/* ---- 39.1 Hero portrait: khung Thợ Săn viền đôi + aura rank ---- */
+.hero-avatar-frame {
+  padding: 4px;
+  background: linear-gradient(160deg, rgba(139,92,246,0.35), rgba(79,214,255,0.12), transparent);
+  border-radius: 20px;
+  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+}
+.hero-avatar {
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  box-shadow: 0 0 0 1.5px var(--accent), inset 0 0 22px -6px rgba(0,0,0,0.7);
+}
+/* vòng aura xoay quanh portrait */
+.hero-avatar-frame::after {
+  content: ""; position: absolute; inset: -3px; z-index: -1; border-radius: 22px;
+  background: conic-gradient(from 0deg, transparent, var(--accent) 40%, var(--accent-2) 55%, transparent 75%);
+  filter: blur(6px); opacity: .55; animation: heroAura 5s linear infinite;
+}
+@keyframes heroAura { to { transform: rotate(360deg); } }
+.hero-lv-badge {
+  box-shadow: 0 0 0 2px var(--bg-2), 0 0 14px -2px var(--accent);
+  font-family: "Orbitron", sans-serif; font-weight: 900;
+}
+
+/* ---- 39.2 XP bar + progress bars: shimmer + đầu bar sáng ---- */
+.xp-fill, .stat-fill, .progress-fill {
+  position: relative;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2)) !important;
+  box-shadow: 0 0 12px -1px var(--accent), inset 0 1px 0 rgba(255,255,255,0.35);
+}
+.xp-fill::after, .progress-fill::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+  background-size: 200% 100%; animation: barShimmer 2.4s linear infinite;
+}
+@keyframes barShimmer { 0% { background-position: 200% 0; } 100% { background-position: -60% 0; } }
+/* đầu bar phát sáng (chấm sáng ở mép phải) */
+.xp-track, .progress-track { position: relative; }
+.xp-fill::before, .progress-fill::before {
+  content: ""; position: absolute; right: 0; top: 50%; translate: 50% -50%;
+  width: 8px; height: 8px; border-radius: 50%;
+  background: #fff; box-shadow: 0 0 10px 2px var(--accent-2);
+}
+
+/* ---- 39.3 Radar: vòng nhấp nháy nhẹ + glow ---- */
+.radar-svg .radar-labels text {
+  font-family: "Orbitron", sans-serif; font-size: 10px; font-weight: 800;
+  fill: var(--muted); letter-spacing: 1px;
+}
+.radar-svg polygon[fill-opacity] {          /* data polygon */
+  filter: drop-shadow(0 0 8px rgba(139,92,246,0.7));
+  animation: radarPulse 3.4s ease-in-out infinite;
+}
+@keyframes radarPulse { 0%,100% { filter: drop-shadow(0 0 6px rgba(139,92,246,0.55)); } 50% { filter: drop-shadow(0 0 14px rgba(139,92,246,0.9)); } }
+.radar-svg circle { filter: drop-shadow(0 0 4px currentColor); }
+
+/* ---- 39.4 Stat-cards: hover lift + viền neon theo màu ---- */
+.stat-card { transition: transform .25s var(--spring), box-shadow .25s, border-color .25s; }
+.stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 22px -10px var(--cc, var(--accent)), inset 0 0 0 1px var(--cc, var(--accent)); }
+.stat-card.c-int { --cc: #5fb0d6; } .stat-card.c-dis { --cc: #ecb44e; }
+.stat-card.c-foc { --cc: #6fce88; } .stat-card.c-str { --cc: #f2795f; }
+.stat-lv b { text-shadow: 0 0 8px var(--cc, var(--accent)); }
+
+/* ---- 39.5 Train chips: pill bevel + active glow ---- */
+.train-chip { transition: transform .18s var(--spring), box-shadow .2s; }
+.train-chip:active { transform: scale(.92); }
+.train-chip.active { box-shadow: 0 0 12px -1px var(--accent), inset 0 0 0 1px var(--accent-2); }
+
+/* ---- 39.6 Quest rows: mission-log viền trái sáng ---- */
+.quest {
+  position: relative; border-radius: 12px;
+  transition: transform .2s var(--ease), background .25s;
+}
+.quest::before {
+  content: ""; position: absolute; left: 0; top: 8px; bottom: 8px; width: 3px; border-radius: 3px;
+  background: var(--cc, var(--accent)); box-shadow: 0 0 10px var(--cc, var(--accent));
+  opacity: .7; transition: opacity .25s;
+}
+.quest:hover { transform: translateX(3px); }
+.quest.ready::before { background: var(--amber); box-shadow: var(--amber-glow); animation: pulse 1.4s ease-in-out infinite; }
+.quest.claimed::before { opacity: .25; }
+.quest-track span { position: relative; }
+.quest-track span::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent);
+  background-size: 200% 100%; animation: barShimmer 2.4s linear infinite;
+}
+
+/* ---- 39.7 Timer ring: glow mạnh khi đang train ---- */
+.timer-ring::before { box-shadow: inset 0 0 30px -6px var(--accent); }
+.ring-fg { filter: drop-shadow(0 0 6px var(--accent)); }
+.timer-ring.running .ring-fg { animation: ringGlow 1.6s ease-in-out infinite; }
+@keyframes ringGlow { 0%,100% { filter: drop-shadow(0 0 5px var(--accent)); } 50% { filter: drop-shadow(0 0 14px var(--accent-2)); } }
+.timer-display { text-shadow: 0 0 16px rgba(139,92,246,0.5); }
+
+/* ---- 39.8 Week schedule: ô ngày HUD + hôm nay nổi bật ---- */
+.day-col {
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  transition: transform .22s var(--ease), box-shadow .22s, border-color .22s;
+}
+.day-col.today {
+  box-shadow: 0 0 0 1px var(--accent), 0 10px 26px -14px var(--accent), inset 0 0 20px -10px var(--accent);
+}
+.day-col.today::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, rgba(139,92,246,0.12), transparent 45%);
+}
+
+/* ---- 39.9 Badges: khung huy chương + unlocked phát sáng ---- */
+.badge {
+  clip-path: polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px);
+  transition: transform .25s var(--spring), box-shadow .25s;
+}
+.badge.earned {
+  background: radial-gradient(120% 90% at 50% 0%, color-mix(in srgb, var(--tc, var(--accent)) 18%, transparent), transparent 65%), var(--card);
+}
+.badge.earned .badge-ico { filter: drop-shadow(0 0 8px var(--tc, var(--accent))); }
+.badge.earned::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  clip-path: inherit; border: 1px solid color-mix(in srgb, var(--tc, var(--accent)) 45%, transparent);
+}
+
+/* ---- 39.10 Buttons: bevel + press feedback ---- */
+.btn { transition: transform .16s var(--spring), box-shadow .2s, filter .2s; }
+.btn:active { transform: translateY(1px) scale(.985); }
+.btn.primary { box-shadow: 0 6px 18px -8px var(--accent), inset 0 1px 0 rgba(255,255,255,0.25); }
+.btn.primary:hover { filter: brightness(1.08); box-shadow: var(--neon-glow), 0 8px 22px -8px var(--accent); }
+
+/* ---- 39.11 Section head "+ New Quest" cũng game-hoá ---- */
+.section-head h2 { text-shadow: 0 0 14px rgba(139,92,246,0.4); }
+
+/* ---- 39.12 Reduced-motion & light tinh chỉnh ---- */
+@media (prefers-reduced-motion: reduce) {
+  .hero-avatar-frame::after, .xp-fill::after, .progress-fill::after,
+  .quest-track span::after, .radar-svg polygon[fill-opacity],
+  .timer-ring.running .ring-fg, .quest.ready::before { animation: none !important; }
+}
+[data-theme="light"] .hero-avatar-frame::after { opacity: .35; }
+[data-theme="light"] .xp-fill::after, [data-theme="light"] .progress-fill::after,
+[data-theme="light"] .quest-track span::after { opacity: .5; }
+[data-theme="light"] .timer-display { text-shadow: none; }
+
+/* ---- 39.13 Mobile: giảm hiệu ứng nặng ---- */
+@media (max-width: 760px) {
+  .hero-avatar-frame::after { animation: none; opacity: .4; }
+  .radar-svg polygon[fill-opacity] { animation: none; }
+}
+
+/* map màu --cc theo data-cat cho quest row viền trái */
+.quest[data-cat="min"]  { --cc: var(--accent-2); }
+.quest[data-cat="sess"] { --cc: var(--amber); }
+.quest[data-cat="done"] { --cc: #40b4e5; }

@@ -491,7 +491,7 @@ function renderQuests() {
     const done = q.prog() >= q.goal;
     const claimed = !!state.quests.claimed[q.key];
     const cls = claimed ? "claimed" : done ? "ready" : "todo";
-    return `<div class="quest ${cls}">
+    return `<div class="quest ${cls}" data-cat="${q.cat}">
       <div class="quest-ico" data-cat="${q.cat}">${q.icon}</div>
       <div class="quest-mid">
         <div class="quest-label">${escapeHtml(q.label)}</div>
@@ -715,14 +715,17 @@ function paintTimer() {
   display.textContent = `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
   ring.style.strokeDashoffset = RING_LEN * (1 - remaining / totalSec);
 }
+const ringWrap = document.querySelector(".timer-ring");
 function startTimer() {
   running = true; toggleBtn.textContent = "❚❚ Pause";
+  if (ringWrap) ringWrap.classList.add("running");
   if (soundWithTimer && soundWithTimer.checked && currentTrack === "off") playMusic(MUSIC_DEFAULT);
   tick = setInterval(() => { remaining--; paintTimer(); if (remaining <= 0) finishTimer(); }, 1000);
 }
-function pauseTimer() { running = false; toggleBtn.textContent = "⚔ Train"; clearInterval(tick); }
+function pauseTimer() { running = false; toggleBtn.textContent = "⚔ Train"; clearInterval(tick); if (ringWrap) ringWrap.classList.remove("running"); }
 function finishTimer() {
   clearInterval(tick); running = false; toggleBtn.textContent = "⚔ Train";
+  if (ringWrap) ringWrap.classList.remove("running");
   if (soundWithTimer && soundWithTimer.checked) stopMusic();
   dingSound.currentTime = 0; dingSound.play().catch(() => {});
   const mins = Math.round(totalSec / 60);
