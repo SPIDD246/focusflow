@@ -293,6 +293,26 @@ function renderAvatar(level) {
     img.src = files[i];
   })();
 }
+// Rank Thợ Săn E→S suy từ level (kiểu Solo Leveling). Level càng cao rank càng hiếm.
+function rankFor(level) {
+  if (level >= 40) return { g: "S", cls: "r-s", label: "MONARCH" };
+  if (level >= 28) return { g: "A", cls: "r-a", label: "S-RANK GATE" };
+  if (level >= 18) return { g: "B", cls: "r-b", label: "ELITE HUNTER" };
+  if (level >= 10) return { g: "C", cls: "r-c", label: "HUNTER" };
+  if (level >= 4)  return { g: "D", cls: "r-d", label: "AWAKENED" };
+  return { g: "E", cls: "r-e", label: "E-RANK HUNTER" };
+}
+function updateRankBadge(level) {
+  const host = document.querySelector(".hero-card");
+  if (!host) return;
+  let b = host.querySelector(".rank-badge");
+  if (!b) { b = document.createElement("div"); b.className = "rank-badge"; host.appendChild(b); }
+  const r = rankFor(level);
+  b.className = "rank-badge " + r.cls;
+  b.innerHTML = `${r.g}<small>${r.label}</small>`;
+  b.title = `Rank ${r.g} · ${r.label}`;
+}
+
 function renderHero() {
   ensureRpg();
   const info = levelInfo(state.rpg.xp);
@@ -302,6 +322,7 @@ function renderHero() {
   set("heroTitle", t.title);
   set("heroLevel", info.level);
   set("xpText", `${info.into} / ${info.need} XP`);
+  updateRankBadge(info.level);
   const frame = document.getElementById("heroFrame");
   if (frame) { frame.style.setProperty("--tier", t.aura); frame.classList.toggle("glow-tier", !!t.glow); }
   const xf = document.getElementById("xpFill"); if (xf) xf.style.width = Math.min(100, (info.into / info.need) * 100) + "%";
@@ -1206,3 +1227,49 @@ document.getElementById("syncBtn").addEventListener("click", () => {
 paintTimer();
 syncReminderUI();
 render();
+
+/* ================================================================
+   SYSTEM HUD v39 — inject khung/glow + scanline overlay + cursor glow
+   Thêm lớp hình ảnh, không đụng logic. Tôn trọng reduced-motion.
+   ================================================================ */
+(function systemHud() {
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // 1) Scanline + grid overlay toàn màn
+  if (!reduce && !document.querySelector(".sys-overlay")) {
+    const ov = document.createElement("div");
+    ov.className = "sys-overlay";
+    ov.setAttribute("aria-hidden", "true");
+    document.body.appendChild(ov);
+  }
+
+  // 2) Chèn hud-frame (viền vát) + hud-glow (cursor) vào mọi .card
+  function decorate(card) {
+    if (card.querySelector(":scope > .hud-frame")) return;
+    const glow = document.createElement("div"); glow.className = "hud-glow"; glow.setAttribute("aria-hidden", "true");
+    const frame = document.createElement("div"); frame.className = "hud-frame"; frame.setAttribute("aria-hidden", "true");
+    card.prepend(glow);            // dưới nội dung
+    card.appendChild(frame);       // viền trên cùng
+  }
+  function decorateAll() { document.querySelectorAll(".card").forEach(decorate); }
+  decorateAll();
+  // card render lại động (badges/quests đổi) → observe để gắn viền cho card mới
+  new MutationObserver(decorateAll).observe(document.body, { childList: true, subtree: true });
+
+  // 3) Cursor-follow glow (desktop, không dùng React state, throttled bằng rAF)
+  const fine = window.matchMedia("(pointer: fine)").matches;
+  if (fine && !reduce) {
+    let pending = null;
+    document.addEventListener("pointermove", (e) => {
+      if (pending) return;
+      pending = requestAnimationFrame(() => {
+        pending = null;
+        const card = e.target.closest && e.target.closest(".card");
+        if (!card) return;
+        const r = card.getBoundingClientRect();
+        card.style.setProperty("--mx", (e.clientX - r.left) + "px");
+        card.style.setProperty("--my", (e.clientY - r.top) + "px");
+      });
+    }, { passive: true });
+  }
+})();

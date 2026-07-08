@@ -1220,3 +1220,150 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
 [data-theme="light"] .sys-title { color: #1a2440; }
 [data-theme="light"] .sys-line { color: #4a6080; }
 @media (prefers-reduced-motion: reduce) { .sys-head { animation: none; } .sys-panel { animation: none; } }
+
+/* ================================================================
+   38. SYSTEM HUD OVERHAUL — v39 (full Solo Leveling)
+   Layer bổ sung: khung vát góc, viền quét, scanline, rank, cursor glow.
+   Giữ 100% chức năng; chỉ thêm lớp hình ảnh.
+   ================================================================ */
+:root {
+  --hud-cut: 14px;              /* độ vát góc card */
+  --hud-line: rgba(139,92,246,0.55);
+  --hud-line-cy: rgba(79,214,255,0.5);
+  --scan-op: 0.05;
+}
+[data-theme="light"] { --hud-line: rgba(109,63,212,0.4); --hud-line-cy: rgba(60,120,210,0.35); --scan-op: 0.03; }
+
+/* ---- 38.1 Khung card vát góc HUD ---- */
+.card {
+  /* cắt 2 góc chéo (TL + BR) tạo dáng system-window */
+  clip-path: polygon(
+    var(--hud-cut) 0, 100% 0, 100% calc(100% - var(--hud-cut)),
+    calc(100% - var(--hud-cut)) 100%, 0 100%, 0 var(--hud-cut)
+  );
+  border: none;                /* thay border thẳng bằng viền vẽ tay bên dưới */
+}
+/* viền neon ôm theo dáng vát — dùng lớp phủ z trên cùng */
+.card > .hud-frame,
+.card::marker { }
+.card .hud-frame {
+  content: ""; position: absolute; inset: 0; z-index: 4; pointer-events: none;
+  clip-path: inherit;
+  border: 1.5px solid var(--hud-line);
+  mix-blend-mode: normal;
+  transition: border-color .3s, box-shadow .3s;
+}
+.card:hover .hud-frame { border-color: var(--card-brd-hi); box-shadow: inset 0 0 22px -6px var(--accent); }
+/* vệt sáng chạy dọc cạnh vát TL khi hover */
+.card::after {
+  content: ""; display: block; position: absolute; z-index: 5; pointer-events: none;
+  top: 0; left: 0; width: calc(var(--hud-cut) * 1.9); height: 2px;
+  background: linear-gradient(90deg, var(--accent-2), transparent);
+  transform: rotate(-45deg); transform-origin: left top;
+  translate: 1px 0; opacity: .8; box-shadow: 0 0 10px var(--accent-2);
+}
+
+/* ---- 38.2 System-window header (◆ TÊN ◆ + line quét) ---- */
+.card-title {
+  border-bottom: none;
+  padding-bottom: 14px; margin-bottom: 16px;
+}
+.card-title::after {         /* thanh gạch chân → line quét dài + gradient động */
+  width: 100%; height: 1.5px;
+  background: linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 22%, transparent 60%);
+  box-shadow: 0 0 8px rgba(79,214,255,0.4);
+}
+.card-title::before { content: "◆"; animation: hudDiamond 2.4s ease-in-out infinite; }
+@keyframes hudDiamond { 0%,100% { opacity:1; transform: rotate(0); } 50% { opacity:.4; transform: rotate(90deg); } }
+
+/* ---- 38.3 Scanline + grid overlay toàn màn ---- */
+.sys-overlay {
+  position: fixed; inset: 0; z-index: 2; pointer-events: none;
+  background:
+    repeating-linear-gradient(0deg, rgba(120,180,255,var(--scan-op)) 0 1px, transparent 1px 3px);
+  mix-blend-mode: screen; opacity: .9;
+}
+.sys-overlay::before {       /* lưới HUD mờ */
+  content: ""; position: absolute; inset: 0;
+  background:
+    linear-gradient(rgba(139,92,246,0.05) 1px, transparent 1px) 0 0 / 100% 46px,
+    linear-gradient(90deg, rgba(139,92,246,0.05) 1px, transparent 1px) 0 0 / 46px 100%;
+  mask-image: radial-gradient(120% 90% at 50% 0%, #000 30%, transparent 78%);
+}
+.sys-overlay::after {        /* vệt scan trôi chậm xuống */
+  content: ""; position: absolute; left: 0; right: 0; height: 180px;
+  background: linear-gradient(180deg, transparent, rgba(79,214,255,0.06), transparent);
+  animation: scanDrift 7s linear infinite;
+}
+@keyframes scanDrift { 0% { top: -180px; } 100% { top: 100%; } }
+
+/* ---- 38.4 Rank badge E→S ở hero ---- */
+.rank-badge {
+  --rk: var(--accent);
+  position: absolute; top: 14px; right: 14px; z-index: 6;
+  width: 46px; height: 52px; display: grid; place-items: center;
+  font-family: "Orbitron", sans-serif; font-weight: 900; font-size: 24px; color: #0a0a14;
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  background: linear-gradient(160deg, #fff, var(--rk));
+  box-shadow: 0 0 16px -2px var(--rk), 0 0 34px -6px var(--rk);
+  text-shadow: none; letter-spacing: 0;
+  animation: rankPulse 2.6s ease-in-out infinite;
+}
+.rank-badge small { position: absolute; bottom: -14px; left: 50%; translate: -50% 0;
+  font-size: 7px; letter-spacing: 2px; color: var(--rk); text-shadow: 0 0 8px var(--rk); white-space: nowrap; }
+.rank-badge.r-e { --rk: #7c8aa5; } .rank-badge.r-d { --rk: #4fd6ff; }
+.rank-badge.r-c { --rk: #46e5a0; } .rank-badge.r-b { --rk: #b48bff; }
+.rank-badge.r-a { --rk: #ff8a3d; } .rank-badge.r-s { --rk: #ffd24a; }
+@keyframes rankPulse { 0%,100% { box-shadow: 0 0 16px -2px var(--rk), 0 0 34px -6px var(--rk); } 50% { box-shadow: 0 0 22px 0 var(--rk), 0 0 48px -4px var(--rk); } }
+.hero-card { position: relative; }
+
+/* ---- 38.5 Cursor-follow glow trên card ---- */
+.card {
+  --mx: 50%; --my: 0%;
+}
+.card .hud-glow {
+  content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  clip-path: inherit; opacity: 0; transition: opacity .35s;
+  background: radial-gradient(220px circle at var(--mx) var(--my), rgba(139,92,246,0.18), transparent 60%);
+}
+.card:hover .hud-glow { opacity: 1; }
+
+/* ---- 38.6 Entry "system boot" stagger ---- */
+@media (prefers-reduced-motion: no-preference) {
+  .card { animation: sysBoot .55s var(--ease) both; }
+  .col.side  .card:nth-child(1) { animation-delay: .05s; }
+  .col.side  .card:nth-child(2) { animation-delay: .12s; }
+  .col.main  > *               { animation-delay: .1s; }
+  .col.side-right .card:nth-child(1) { animation-delay: .15s; }
+  .col.side-right .card:nth-child(2) { animation-delay: .22s; }
+  .col.side-right .card:nth-child(3) { animation-delay: .29s; }
+  @keyframes sysBoot {
+    from { opacity: 0; transform: translateY(18px); filter: brightness(1.8) saturate(0); clip-path: inset(0 0 100% 0); }
+    60%  { filter: brightness(1.2); }
+    to   { opacity: 1; transform: none; filter: none; }
+  }
+}
+
+/* ---- 38.7 Quest hoàn thành: system tick flash ---- */
+.quest.claimed { position: relative; }
+.quest.just-claimed::after {
+  content: "✓ SYSTEM"; position: absolute; inset: 0; z-index: 3;
+  display: grid; place-items: center; font-family: "Orbitron"; font-weight: 900;
+  font-size: 13px; letter-spacing: 3px; color: var(--accent-2);
+  background: rgba(8,8,20,0.55); text-shadow: 0 0 12px var(--accent-2);
+  animation: questTick .9s ease forwards; pointer-events: none;
+}
+@keyframes questTick { 0% { opacity: 0; transform: scale(1.3); } 25% { opacity: 1; transform: scale(1); } 75% { opacity: 1; } 100% { opacity: 0; } }
+
+/* ---- 38.8 Reduced-motion: tắt hết hiệu ứng nặng ---- */
+@media (prefers-reduced-motion: reduce) {
+  .sys-overlay::after, .card-title::before, .rank-badge, .card { animation: none !important; }
+  .sys-overlay { display: none; }
+}
+
+/* ---- 38.9 Mobile: giảm tải hiệu ứng ---- */
+@media (max-width: 760px) {
+  :root { --hud-cut: 10px; }
+  .card .hud-glow { display: none; }
+  .sys-overlay::before { display: none; }
+}
