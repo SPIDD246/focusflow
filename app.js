@@ -498,11 +498,11 @@ function claimQuest(key) {
 // A boss appears each week with HP measured in focus-minutes. Your weekly focus time is the
 // "damage"; hit HP and the boss is defeated (once per week) for a big XP reward.
 const BOSSES = [
-  { name: "The Procrasti-Sloth",  emoji: "🦥", hp: 120, reward: 60 },
-  { name: "Doomscroll Hydra",     emoji: "📱", hp: 180, reward: 90 },
-  { name: "Brain Fog Wraith",     emoji: "🌫️", hp: 240, reward: 120 },
-  { name: "The Distraction Void", emoji: "🕳️", hp: 210, reward: 110 },
-  { name: "Deadline Dragon",      emoji: "🐉", hp: 300, reward: 150 },
+  { name: "The Procrasti-Sloth",  emoji: "🦥", hp: 120, reward: 60,  tier: "COMMON",    title: "Kẻ Trì Hoãn" },
+  { name: "Doomscroll Hydra",     emoji: "📱", hp: 180, reward: 90,  tier: "RARE",      title: "Mãng Xà Lướt Vô Tận" },
+  { name: "The Distraction Void", emoji: "🕳️", hp: 210, reward: 110, tier: "EPIC",      title: "Hư Không Phân Tâm" },
+  { name: "Brain Fog Wraith",     emoji: "🌫️", hp: 240, reward: 120, tier: "EPIC",      title: "Bóng Ma Sương Mù" },
+  { name: "Deadline Dragon",      emoji: "🐉", hp: 300, reward: 150, tier: "LEGENDARY", title: "Ác Long Hạn Chót" },
 ];
 // Deterministic boss-of-the-week from the Monday date string (no randomness → stable across reloads).
 function bossFor(wk) { let h = 0; for (let i = 0; i < wk.length; i++) h = (h * 31 + wk.charCodeAt(i)) | 0; return BOSSES[Math.abs(h) % BOSSES.length]; }
@@ -531,16 +531,30 @@ function renderBoss() {
     const card = document.querySelector(".boss-card");
     if (card) { card.classList.add("boss-shake"); setTimeout(() => card.classList.remove("boss-shake"), 650); }
   }
+  const tier = (boss.tier || "COMMON").toLowerCase();
+  const hpPct = Math.round(pct);
   box.innerHTML = `
-    <div class="boss-head ${dead ? "dead" : ""}">
-      <span class="boss-emoji">${boss.emoji}</span>
-      <span class="boss-name">${escapeHtml(boss.name)}</span>
-      <span class="boss-hp-txt">${dead ? "DEFEATED" : remaining + " HP"}</span>
-    </div>
-    <div class="boss-bar"><span style="width:${pct}%"></span></div>
-    <div class="boss-foot">${dead
-      ? `🏆 Earned +${boss.reward} XP · a new boss arrives next week!`
-      : `Focus <b>${remaining} more min</b> this week to defeat it · reward <b>+${boss.reward} XP</b>`}</div>`;
+    <div class="tcard tier-${tier} ${dead ? "dead" : ""}">
+      <div class="tcard-foil"></div>
+      <div class="tcard-top">
+        <span class="tcard-cost">${boss.reward}</span>
+        <span class="tcard-tier">${boss.tier || "COMMON"}</span>
+      </div>
+      <div class="tcard-art">
+        <div class="tcard-glow"></div>
+        <span class="tcard-emoji">${boss.emoji}</span>
+        ${dead ? `<span class="tcard-slain">SLAIN</span>` : ""}
+      </div>
+      <div class="tcard-name">${escapeHtml(boss.name)}</div>
+      <div class="tcard-title">「${escapeHtml(boss.title || "Boss tuần")}」</div>
+      <div class="tcard-hpwrap">
+        <div class="tcard-hplabel"><span>HP</span><span>${dead ? "0" : remaining} / ${boss.hp}</span></div>
+        <div class="tcard-hpbar"><span style="width:${hpPct}%"></span></div>
+      </div>
+      <div class="tcard-foot">${dead
+        ? `🏆 Đã hạ gục · +${boss.reward} XP · boss mới xuất hiện tuần sau`
+        : `⚔️ Focus <b>${remaining} phút</b> nữa để hạ · thưởng <b>+${boss.reward} XP</b>`}</div>
+    </div>`;
 }
 
 // ---- Weekly bar chart ----
@@ -1078,16 +1092,15 @@ function systemPanel(title, lines = [], head = "SYSTEM") {
 
 // ---------- Seed demo (first run only) ----------
 if (state.sessions.length === 0 && !localStorage.getItem(STORE_KEY)) {
-  // Lịch Hè 2026 — các lớp học thêm (Nova set sẵn)
+  // Lịch mẫu trung tính — demo cho lần mở đầu (người dùng tự sửa)
   state.sessions = [
-    { id: uid(), subject: "Lớp Code",     day: "Mon", start: "20:00", duration: 60,  color: COLORS[4] },
-    { id: uid(), subject: "Lớp Toán",     day: "Tue", start: "08:30", duration: 120, color: COLORS[3] },
-    { id: uid(), subject: "Lớp Anh",      day: "Wed", start: "09:30", duration: 120, color: COLORS[0] },
-    { id: uid(), subject: "Lớp Anh",      day: "Thu", start: "17:45", duration: 195, color: COLORS[0] },
-    { id: uid(), subject: "Tiếng Trung",  day: "Sat", start: "10:30", duration: 90,  color: COLORS[5] },
-    { id: uid(), subject: "Lớp Toán",     day: "Sat", start: "13:30", duration: 120, color: COLORS[3] },
-    { id: uid(), subject: "⚡ Chuyên Lý",  day: "Sat", start: "17:30", duration: 210, color: COLORS[2] },
-    { id: uid(), subject: "Tiếng Trung",  day: "Sun", start: "10:30", duration: 90,  color: COLORS[5] },
+    { id: uid(), subject: "Deep Work",   day: "Mon", start: "20:00", duration: 60,  color: COLORS[4] },
+    { id: uid(), subject: "Study",       day: "Tue", start: "08:30", duration: 90,  color: COLORS[3] },
+    { id: uid(), subject: "Reading",     day: "Wed", start: "09:30", duration: 60,  color: COLORS[0] },
+    { id: uid(), subject: "Study",       day: "Thu", start: "17:45", duration: 90,  color: COLORS[3] },
+    { id: uid(), subject: "Language",    day: "Sat", start: "10:30", duration: 60,  color: COLORS[5] },
+    { id: uid(), subject: "Project",     day: "Sat", start: "13:30", duration: 120, color: COLORS[2] },
+    { id: uid(), subject: "Review",      day: "Sun", start: "10:30", duration: 60,  color: COLORS[1] },
   ];
 }
 
