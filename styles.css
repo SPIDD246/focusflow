@@ -1379,12 +1379,14 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
   padding: 4px;
   background: linear-gradient(160deg, rgba(139,92,246,0.35), rgba(79,214,255,0.12), transparent);
   border-radius: 20px;
-  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+  overflow: visible;                 /* để badge level tràn ra không bị cắt */
 }
 .hero-avatar {
   clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
   box-shadow: 0 0 0 1.5px var(--accent), inset 0 0 22px -6px rgba(0,0,0,0.7);
 }
+/* badge level nổi trên cùng, không bị khung/aura che */
+.hero-lv-badge { z-index: 3; }
 /* vòng aura xoay quanh portrait */
 .hero-avatar-frame::after {
   content: ""; position: absolute; inset: -3px; z-index: -1; border-radius: 22px;
@@ -1466,7 +1468,13 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
 .ring-fg { filter: drop-shadow(0 0 6px var(--accent)); }
 .timer-ring.running .ring-fg { animation: ringGlow 1.6s ease-in-out infinite; }
 @keyframes ringGlow { 0%,100% { filter: drop-shadow(0 0 5px var(--accent)); } 50% { filter: drop-shadow(0 0 14px var(--accent-2)); } }
-.timer-display { text-shadow: 0 0 16px rgba(139,92,246,0.5); }
+/* timer số: co chữ cho vừa trong vòng, glow nhẹ (tránh tràn mép) */
+.timer-display {
+  font-size: clamp(28px, 22%, 40px);
+  letter-spacing: -1px;
+  padding: 0 10px;
+  text-shadow: 0 0 10px rgba(139,92,246,0.45);
+}
 
 /* ---- 39.8 Week schedule: ô ngày HUD + hôm nay nổi bật ---- */
 .day-col {
@@ -1501,8 +1509,8 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
 .btn.primary { box-shadow: 0 6px 18px -8px var(--accent), inset 0 1px 0 rgba(255,255,255,0.25); }
 .btn.primary:hover { filter: brightness(1.08); box-shadow: var(--neon-glow), 0 8px 22px -8px var(--accent); }
 
-/* ---- 39.11 Section head "+ New Quest" cũng game-hoá ---- */
-.section-head h2 { text-shadow: 0 0 14px rgba(139,92,246,0.4); }
+/* ---- 39.11 Section head: tăng độ nét (gradient text nên KHÔNG dùng text-shadow) ---- */
+.section-head h2 { filter: drop-shadow(0 0 8px rgba(139,92,246,0.45)); }
 
 /* ---- 39.12 Reduced-motion & light tinh chỉnh ---- */
 @media (prefers-reduced-motion: reduce) {
