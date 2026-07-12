@@ -172,26 +172,37 @@ function ensureRpg() {
 // The stat you chose to "train" this session gets the full points; Focus tracks all
 // focus time, Discipline rewards not pausing, Strength grows with your streak.
 // Unlocked skill-tree perks (see PERKS) boost the XP/stat gain.
-function gainFocus(mins, paused) {
-  ensureRpg();
-  const target = STAT_DEFS.some((s) => s.key === state.rpg.train) ? state.rpg.train : "int";
-  const before = levelInfo(state.rpg.xp).level;
-  const perks = unlockedPerks(before);
+// Multiplier from unlocked perks for the stat you're currently training.
+function focusMult(target) {
+  const perks = unlockedPerks(levelInfo(state.rpg.xp).level);
   let mult = 1;
   if (perks.has("focused")) mult += 0.10;                 // Deep Focus: +10% always
   if (perks.has("scholar") && target === "int") mult += 0.15; // Scholar's Mind: +15% training INT
   if (perks.has("unstoppable")) mult += 0.25;             // Unstoppable: +25% always
   if (perks.has("weekend")) { const wd = new Date().getDay(); if (wd === 0 || wd === 6) mult += 1; } // ×2 Sat/Sun
-  const gain = Math.max(1, Math.round(mins * mult));
+  return mult;
+}
+// Live XP: every full minute the clock runs grants a small trickle of XP (+ the stat you train + Focus,
+// and Discipline while the session hasn't been paused). Stopping early still keeps the minutes you did.
+function accrueMinute(paused) {
+  ensureRpg();
+  const target = STAT_DEFS.some((s) => s.key === state.rpg.train) ? state.rpg.train : "int";
+  const before = levelInfo(state.rpg.xp).level;
+  const gain = Math.max(1, Math.round(focusMult(target))); // ~1 XP per minute (× perks)
   const add = (k, v) => { state.rpg.stats[k] += v; };
   state.rpg.xp += gain;
   add(target, gain);                                   // the stat you trained
   if (target !== "foc") add("foc", gain);              // Focus = all time focused
-  if (!paused && target !== "dis") add("dis", gain);   // Discipline: finish without pausing
-  add("str", Math.max(1, streak()) * (perks.has("grit") ? 2 : 1)); // Grit doubles Strength gains
-  state.rpg.totalSessions += 1;
+  if (!paused && target !== "dis") add("dis", gain);   // Discipline: while not paused
   const after = levelInfo(state.rpg.xp).level;
   return { gain, levels: after - before };
+}
+// One-time reward when a full session completes: Strength (streak-based) + session count for quests.
+function sessionComplete() {
+  ensureRpg();
+  const perks = unlockedPerks(levelInfo(state.rpg.xp).level);
+  state.rpg.stats.str += Math.max(1, streak()) * (perks.has("grit") ? 2 : 1); // Grit doubles Strength
+  state.rpg.totalSessions += 1;
 }
 // Grant a flat XP reward (quests, boss). Optionally credits one stat too. Returns levels gained.
 function grantXp(amount, statKey) {
@@ -451,7 +462,7 @@ function buildTrainChips() {
 // ---------- Study RPG (Phase 3): quests · boss · skill tree ----------
 
 // ---- Skill tree / perks ----
-// Auto-unlock by character level. Each perk is a passive bonus applied in gainFocus().
+// Auto-unlock by character level. Each perk is a passive bonus applied in accrueMinute().
 const PERKS = [
   { key: "focused",     lv: 3,  icon: "🎯", name: "Deep Focus",      desc: "+10% XP every session" },
   { key: "grit",        lv: 6,  icon: "💪", name: "Iron Will",       desc: "STR gains are doubled" },
@@ -788,6 +799,8 @@ const display = document.getElementById("timerDisplay");
 const toggleBtn = document.getElementById("timerToggle");
 let totalSec = 25 * 60, remaining = totalSec, running = false, tick = null;
 let sessionPaused = false; // did the user pause during this session? (affects Discipline XP)
+let secAccrued = 0;        // seconds elapsed since we last granted a minute of live XP
+let minsThisSession = 0;   // minutes of live XP already credited this session (for the finish toast)
 const dingSound = new Audio("music/churchbell.mp3");
 dingSound.volume = 0.7;
 
@@ -801,7 +814,23 @@ function startTimer() {
   running = true; toggleBtn.textContent = "❚❚ Pause";
   if (ringWrap) ringWrap.classList.add("running");
   if (soundWithTimer && soundWithTimer.checked && currentTrack === "off") playMusic(MUSIC_DEFAULT);
-  tick = setInterval(() => { remaining--; paintTimer(); if (remaining <= 0) finishTimer(); }, 1000);
+  tick = setInterval(() => {
+    remaining--; secAccrued++;
+    // Every full minute studied → trickle a little live XP (kept even if you stop early).
+    if (secAccrued >= 60) {
+      secAccrued -= 60;
+      minsThisSession++;
+      const day = isoDay(new Date());
+      state.focusMinutes += 1;
+      state.focusByDay[day] = (state.focusByDay[day] || 0) + 1;
+      if (!state.focusLog.includes(day)) state.focusLog.push(day);
+      const { gain, levels } = accrueMinute(sessionPaused);
+      save(); render();
+      if (levels > 0) celebrateLevels(levels);
+    }
+    paintTimer();
+    if (remaining <= 0) finishTimer();
+  }, 1000);
 }
 function pauseTimer() { running = false; toggleBtn.textContent = "⚔ Train"; clearInterval(tick); if (ringWrap) ringWrap.classList.remove("running"); }
 function finishTimer() {
@@ -809,28 +838,23 @@ function finishTimer() {
   if (ringWrap) ringWrap.classList.remove("running");
   if (soundWithTimer && soundWithTimer.checked) stopMusic();
   dingSound.currentTime = 0; dingSound.play().catch(() => {});
-  const mins = Math.round(totalSec / 60);
-  const day = isoDay(new Date());
-  state.focusMinutes += mins;
-  state.focusByDay[day] = (state.focusByDay[day] || 0) + mins;
-  if (!state.focusLog.includes(day)) state.focusLog.push(day);
-  const trained = STAT_DEFS.find((s) => s.key === (state.rpg && state.rpg.train)) || STAT_DEFS[0];
+  const mins = minsThisSession;                           // minutes actually credited this session
   ensureQuests(); state.quests.sessions += 1;             // counts toward daily quests
-  const { gain, levels } = gainFocus(mins, sessionPaused); // Study RPG: XP + stats (+ perk bonuses)
+  sessionComplete();                                      // one-time Strength + session count
   save(); render();
+  secAccrued = 0; minsThisSession = 0;
   remaining = totalSec; sessionPaused = false; paintTimer();
   burst(window.innerWidth / 2, window.innerHeight / 2);
-  toast(`+${gain} XP · +${gain} ${trained.abbr} 🎉`);
+  toast(`⏱️ Hoàn thành ${mins} phút · phiên ghi nhận 🎉`);
   notify("⏱️ Focus complete!", `You trained for ${mins} minutes. Keep it up!`);
-  celebrateLevels(levels);
 }
 toggleBtn.addEventListener("click", () => { if (running) { sessionPaused = true; pauseTimer(); } else startTimer(); });
-document.getElementById("timerReset").addEventListener("click", () => { pauseTimer(); remaining = totalSec; sessionPaused = false; paintTimer(); });
+document.getElementById("timerReset").addEventListener("click", () => { pauseTimer(); remaining = totalSec; sessionPaused = false; secAccrued = 0; minsThisSession = 0; paintTimer(); });
 function setDuration(mins, activeChip) {
   mins = Math.max(1, Math.min(180, Math.round(mins)));
   document.querySelectorAll(".timer-presets .chip").forEach((c) => c.classList.remove("active"));
   if (activeChip) activeChip.classList.add("active");
-  totalSec = mins * 60; remaining = totalSec; sessionPaused = false; pauseTimer(); paintTimer();
+  totalSec = mins * 60; remaining = totalSec; sessionPaused = false; secAccrued = 0; minsThisSession = 0; pauseTimer(); paintTimer();
   return mins;
 }
 document.querySelectorAll(".timer-presets .chip[data-min]").forEach((chip) => {
