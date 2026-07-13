@@ -1332,7 +1332,13 @@ window.FF = {
       }
     }
     else if (kind === "syncing") { label.textContent = "Đang đồng bộ…"; }
-    else if (kind === "ok") { label.textContent = "Đã đồng bộ ✓"; setTimeout(() => { if (window.FFSync && window.FFSync.user) label.textContent = "Đã đăng nhập"; }, 2000); }
+    else if (kind === "link") {
+      // Chế độ link riêng: dữ liệu theo mã trong URL, ẩn nút login cho gọn.
+      label.textContent = "Link riêng"; btn.classList.remove("pulse-hint"); btn.title = "Đang xem qua link riêng (mã trong URL)";
+      btn.hidden = true;                       // không cần login khi đã có link
+      const lb = document.getElementById("linkBtn"); if (lb) { lb.dataset.state = "on"; lb.title = "Đang ở chế độ link riêng"; }
+    }
+    else if (kind === "ok") { label.textContent = "Đã đồng bộ ✓"; setTimeout(() => { if (window.FFSync && (window.FFSync.user || window.FFSync.linkMode)) label.textContent = window.FFSync.linkMode ? "Link riêng" : "Đã đăng nhập"; }, 2000); }
     else if (kind === "error") { label.textContent = "Lỗi đồng bộ"; btn.title = text; }
   },
 };
@@ -1344,6 +1350,27 @@ document.getElementById("syncBtn").addEventListener("click", () => {
   } else {
     window.FFSync.login();
   }
+});
+// Nút "Link riêng": tạo link chứa mã bí mật → mở ở máy nào cũng tự hiện tiến trình + lịch (không cần login).
+document.getElementById("linkBtn").addEventListener("click", async () => {
+  if (!window.FFSync) { toast("Đang tải Firebase…"); return; }
+  if (window.FFSync.linkMode) {
+    // Đang ở chế độ link → hiện lại link hiện tại để copy
+    const url = location.href;
+    try { await navigator.clipboard.writeText(url); toast("🔗 Đã copy link riêng"); } catch (_) { prompt("Link riêng của bạn:", url); }
+    return;
+  }
+  if (!confirm("Tạo LINK RIÊNG?\n\nAi có ĐÚNG link này (gồm mã bí mật) đều xem & sửa được tiến trình của bạn — nên đừng chia sẻ. Tiếp tục?")) return;
+  try {
+    toast("Đang tạo link riêng…");
+    const url = await window.FFSync.createPrivateLink();
+    try { await navigator.clipboard.writeText(url); } catch (_) {}
+    if (typeof openInfo === "function") {
+      openInfo("🔗 Link riêng của bạn", `Mở link này ở bất kỳ máy nào là tự hiện tiến trình + lịch (không cần đăng nhập).<br><br><b>Đã copy vào clipboard.</b><br><br><code style="word-break:break-all;font-size:11px">${url}</code><br><br>⚠️ Giữ kín — ai có link đều xem & sửa được.`);
+    } else {
+      prompt("Link riêng (đã copy):", url);
+    }
+  } catch (e) { toast("Tạo link thất bại — kiểm tra kết nối/Firebase rules"); }
 });
 
 paintTimer();

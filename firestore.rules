@@ -1,0 +1,17 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Bản sao lưu gắn với tài khoản Google (đăng nhập). Chỉ chủ sở hữu đọc/ghi.
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Link riêng: doc id = mã bí mật dài (≥ 24 ký tự) nằm trong URL (#k=...).
+    // Mã dài đóng vai như mật khẩu → ai có ĐÚNG mã mới đọc/ghi được.
+    // Chặn doc id ngắn để không thể liệt kê / brute-force.
+    match /links/{key} {
+      allow read, write: if key.size() >= 24;
+    }
+  }
+}

@@ -97,6 +97,8 @@ async function pushToCloud(user) {
 
 // app.js gọi hàm này mỗi khi save() — debounce để đỡ tốn quota
 function scheduleSync() {
+  // Chế độ link riêng: ghi lên links/{key} thay vì users/{uid}
+  if (linkKey) { scheduleKeyPush(); return; }
   if (!currentUser) return;
   clearTimeout(saveTimer);
   saveTimer = setTimeout(async () => {
@@ -105,8 +107,107 @@ function scheduleSync() {
   }, 2000);
 }
 
-// ---- Theo dõi trạng thái đăng nhập ----
+// ================= CHẾ ĐỘ LINK RIÊNG (mã bí mật trong URL #k=) =================
+// Doc id = mã bí mật dài. Ai có đúng mã trong link đều tự tải/ghi được, không cần login.
+let linkKey = readLinkKey();
+
+function readLinkKey() {
+  try {
+    const m = (location.hash || "").match(/[#&]k=([A-Za-z0-9_-]{24,})/);
+    return m ? m[1] : null;
+  } catch (_) { return null; }
+}
+
+// Tạo mã ngẫu nhiên 32 ký tự (an toàn về entropy).
+function makeKey() {
+  const bytes = new Uint8Array(24);
+  crypto.getRandomValues(bytes);
+  return btoa(String.fromCharCode(...bytes)).replace(/[+/=]/g, (c) => ({ "+": "-", "/": "_", "=": "" }[c])).slice(0, 32);
+}
+
+async function pushToKey(key) {
+  const st = FF().getState ? FF().getState() : null;
+  if (!st) return;
+  const ref = doc(db, "links", key);
+  await setDoc(ref, { state: JSON.stringify(st), updatedAt: st.updatedAt || Date.now(), syncedAt: Date.now() });
+}
+
+async function pullFromKey(key) {
+  const st = FF().getState ? FF().getState() : null;
+  const localUpdatedAt = (st && st.updatedAt) || 0;
+  const ref = doc(db, "links", key);
+  const snap = await getDoc(ref);
+  if (snap.exists()) {
+    const cloud = snap.data();
+    if ((cloud.updatedAt || 0) > localUpdatedAt && cloud.state) {
+      FF().setState && FF().setState(JSON.parse(cloud.state));
+      status("Đã tải tiến trình từ link riêng", "ok");
+    } else {
+      await pushToKey(key);
+      status("Đã đồng bộ link riêng", "ok");
+    }
+  } else {
+    await pushToKey(key);
+    status("Đã tạo link riêng", "ok");
+  }
+}
+
+function scheduleKeyPush() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async () => {
+    try { await pushToKey(linkKey); status("Đã lưu lên link riêng", "ok"); }
+    catch (e) { console.warn(e); status("Lỗi lưu link riêng", "error"); }
+  }, 2000);
+}
+
+// app.js gọi để tạo link riêng mới: sinh key, đẩy state hiện tại lên, trả link đầy đủ.
+async function createPrivateLink() {
+  const key = makeKey();
+  try {
+    linkKey = key;
+    await pushToKey(key);
+    const url = location.origin + location.pathname + "#k=" + key;
+    status("Đã bật link riêng", "ok");
+    startKeyPolling();
+    return url;
+  } catch (e) {
+    console.warn("createPrivateLink", e);
+    linkKey = null;
+    throw e;
+  }
+}
+
+// Đồng bộ định kỳ khi ở chế độ link (để nhiều thiết bị mở cùng link thấy cập nhật).
+let pollTimer = null;
+function startKeyPolling() {
+  if (!linkKey || pollTimer) return;
+  pollTimer = setInterval(async () => {
+    try {
+      const st = FF().getState ? FF().getState() : null;
+      const localUpdatedAt = (st && st.updatedAt) || 0;
+      const snap = await getDoc(doc(db, "links", linkKey));
+      if (snap.exists()) {
+        const cloud = snap.data();
+        if ((cloud.updatedAt || 0) > localUpdatedAt && cloud.state) {
+          FF().setState && FF().setState(JSON.parse(cloud.state));
+        }
+      }
+    } catch (_) {}
+  }, 20000);
+}
+
+// Nếu mở link đã có #k= → vào thẳng chế độ link riêng (bỏ qua login).
+if (linkKey) {
+  status("🔗 Chế độ link riêng", "link");
+  pullFromKey(linkKey).then(startKeyPolling).catch((e) => {
+    console.warn("pullFromKey", e);
+    status("Lỗi tải link riêng (kiểm tra rules)", "error");
+  });
+}
+
+// ---- Theo dõi trạng thái đăng nhập (bỏ qua khi đang ở chế độ link riêng) ----
 onAuthStateChanged(auth, async (user) => {
+  if (linkKey) return; // chế độ link riêng không dùng auth
   currentUser = user;
   if (user) {
     status(`✓ ${user.displayName || user.email}`, "signed-in");
@@ -117,7 +218,7 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 // Expose cho app.js gọi
-window.FFSync = { login, logout, scheduleSync, get user() { return currentUser; } };
+window.FFSync = { login, logout, scheduleSync, createPrivateLink, get user() { return currentUser; }, get linkMode() { return !!linkKey; } };
 
 // Báo cho app.js biết sync đã sẵn sàng
 if (typeof window.onFFSyncReady === "function") window.onFFSyncReady();
