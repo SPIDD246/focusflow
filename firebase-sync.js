@@ -109,13 +109,17 @@ function scheduleSync() {
 
 // ================= CHẾ ĐỘ LINK RIÊNG (mã bí mật trong URL #k=) =================
 // Doc id = mã bí mật dài. Ai có đúng mã trong link đều tự tải/ghi được, không cần login.
+// Mã CỐ ĐỊNH: khi mở link gốc (không có #k=) thì tự dùng mã này → ấn link base là hiện tiến trình.
+// (Khang chấp nhận: ai mở link gốc cũng dùng chung kho dữ liệu này.)
+const DEFAULT_KEY = "cekak3W-TgwjLrT3KBrCcP1zVARK6Hpa";
 let linkKey = readLinkKey();
+let pullDone = false;   // chặn mọi push lên cloud cho tới khi pull lần đầu hoàn tất (tránh state rỗng đè data)
 
 function readLinkKey() {
   try {
     const m = (location.hash || "").match(/[#&]k=([A-Za-z0-9_-]{24,})/);
-    return m ? m[1] : null;
-  } catch (_) { return null; }
+    return m ? m[1] : DEFAULT_KEY;   // không có mã trong URL → dùng mã cố định
+  } catch (_) { return DEFAULT_KEY; }
 }
 
 // Tạo mã ngẫu nhiên 32 ký tự (an toàn về entropy).
@@ -132,6 +136,16 @@ async function pushToKey(key) {
   await setDoc(ref, { state: JSON.stringify(st), updatedAt: st.updatedAt || Date.now(), syncedAt: Date.now() });
 }
 
+// Local có được coi là "trống" (chưa có tiến trình thực) không?
+// Nếu trống mà cloud có data → luôn nạp cloud (tránh state rỗng mới tạo đè lên cloud).
+function isLocalEmpty(st) {
+  if (!st) return true;
+  const xp = (st.rpg && st.rpg.xp) || 0;
+  const sess = (st.sessions && st.sessions.length) || 0;
+  const fm = st.focusMinutes || 0;
+  return xp === 0 && sess === 0 && fm === 0;
+}
+
 async function pullFromKey(key) {
   const st = FF().getState ? FF().getState() : null;
   const localUpdatedAt = (st && st.updatedAt) || 0;
@@ -139,20 +153,25 @@ async function pullFromKey(key) {
   const snap = await getDoc(ref);
   if (snap.exists()) {
     const cloud = snap.data();
-    if ((cloud.updatedAt || 0) > localUpdatedAt && cloud.state) {
+    // Nạp cloud nếu: cloud mới hơn, HOẶC local đang trống (mới xoá cache / máy mới).
+    if (cloud.state && ((cloud.updatedAt || 0) > localUpdatedAt || isLocalEmpty(st))) {
       FF().setState && FF().setState(JSON.parse(cloud.state));
+      pullDone = true;
       status("Đã tải tiến trình từ link riêng", "ok");
     } else {
+      pullDone = true;
       await pushToKey(key);
       status("Đã đồng bộ link riêng", "ok");
     }
   } else {
+    pullDone = true;
     await pushToKey(key);
     status("Đã tạo link riêng", "ok");
   }
 }
 
 function scheduleKeyPush() {
+  if (!pullDone) return;   // chưa pull xong → không ghi đè cloud
   clearTimeout(saveTimer);
   saveTimer = setTimeout(async () => {
     try { await pushToKey(linkKey); status("Đã lưu lên link riêng", "ok"); }
@@ -165,6 +184,7 @@ async function createPrivateLink() {
   const key = makeKey();
   try {
     linkKey = key;
+    pullDone = true;
     await pushToKey(key);
     const url = location.origin + location.pathname + "#k=" + key;
     status("Đã bật link riêng", "ok");
