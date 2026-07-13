@@ -129,10 +129,35 @@ function makeKey() {
   return btoa(String.fromCharCode(...bytes)).replace(/[+/=]/g, (c) => ({ "+": "-", "/": "_", "=": "" }[c])).slice(0, 32);
 }
 
+// "Trọng lượng" dữ liệu: dùng để chặn ghi đè khi bản mới nghèo hơn hẳn bản cloud.
+function stateWeight(st) {
+  if (!st) return 0;
+  const xp = (st.rpg && st.rpg.xp) || 0;
+  const sess = (st.sessions && st.sessions.length) || 0;
+  const fm = st.focusMinutes || 0;
+  return xp + fm + sess * 100;
+}
+
 async function pushToKey(key) {
   const st = FF().getState ? FF().getState() : null;
   if (!st) return;
+  if (!pullDone) return;                 // an toàn: chưa pull xong thì không ghi
   const ref = doc(db, "links", key);
+  // CHỐNG MẤT DATA: đọc cloud trước; nếu bản đang ghi trống/nghèo hơn HẲN bản cloud → KHÔNG ghi đè.
+  try {
+    const snap = await getDoc(ref);
+    if (snap.exists() && snap.data().state) {
+      const cloud = JSON.parse(snap.data().state);
+      const wNew = stateWeight(st), wCloud = stateWeight(cloud);
+      // Bản mới trống nhưng cloud có data → chặn hẳn (đây chính là lỗi đã gây mất data).
+      if (isLocalEmpty(st) && wCloud > 0) { console.warn("push bị chặn: local trống, cloud có data"); return; }
+      // Bản mới nghèo hơn cloud >30% và cloud không cũ hơn → nghi ngờ, giữ backup rồi mới ghi.
+      if (wNew < wCloud * 0.7) {
+        await setDoc(doc(db, "links", key + "__bak"), { state: snap.data().state, updatedAt: snap.data().updatedAt || Date.now(), syncedAt: Date.now() }).catch(() => {});
+        console.warn("push nghi ngờ (nghèo hơn cloud) — đã giữ backup cloud cũ vào __bak");
+      }
+    }
+  } catch (_) {}
   await setDoc(ref, { state: JSON.stringify(st), updatedAt: st.updatedAt || Date.now(), syncedAt: Date.now() });
 }
 
