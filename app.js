@@ -1319,8 +1319,18 @@ window.FF = {
     const btn = document.getElementById("syncBtn");
     if (!label || !btn) return;
     btn.dataset.state = kind || "";
-    if (kind === "signed-in") { label.textContent = "Đã đăng nhập"; btn.title = text + " · bấm để đăng xuất"; }
-    else if (kind === "signed-out") { label.textContent = "Đăng nhập"; btn.title = "Đăng nhập để lưu tiến trình lên cloud"; }
+    if (kind === "signed-in") {
+      label.textContent = "Đã đăng nhập"; btn.title = text + " · bấm để đăng xuất";
+      localStorage.setItem("ff_signed_in_once", "1"); btn.classList.remove("pulse-hint");
+    }
+    else if (kind === "signed-out") {
+      label.textContent = "Đăng nhập"; btn.title = "Đăng nhập để lưu & tự tải tiến trình ở mọi máy";
+      // Lần đầu (chưa từng đăng nhập trên trình duyệt này) → nhắc nhẹ + làm nút nổi bật.
+      if (!localStorage.getItem("ff_signed_in_once")) {
+        btn.classList.add("pulse-hint");
+        setTimeout(() => toast("💡 Đăng nhập ☁️ để tiến trình tự hiện ở mọi máy"), 900);
+      }
+    }
     else if (kind === "syncing") { label.textContent = "Đang đồng bộ…"; }
     else if (kind === "ok") { label.textContent = "Đã đồng bộ ✓"; setTimeout(() => { if (window.FFSync && window.FFSync.user) label.textContent = "Đã đăng nhập"; }, 2000); }
     else if (kind === "error") { label.textContent = "Lỗi đồng bộ"; btn.title = text; }

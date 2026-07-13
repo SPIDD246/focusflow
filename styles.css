@@ -210,6 +210,10 @@ h1, h2, .stat-num, .timer-display, .badge-num { font-family: "Quicksand", "Nunit
 .sync-btn[data-state="syncing"] { opacity: .7; }
 .sync-btn[data-state="error"] { border-color: var(--pink); color: var(--pink); }
 @media (max-width: 560px) { .sync-btn { padding: 8px 10px; } .sync-btn #syncLabel { display: none; } }
+/* Nhắc đăng nhập lần đầu: nút sync nhấp nháy nhẹ để mời 1 chạm đồng bộ */
+.sync-btn.pulse-hint { border-color: var(--accent); color: var(--accent); animation: syncPulse 2s ease-in-out infinite; }
+@keyframes syncPulse { 0%,100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 45%, transparent); } 50% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent) 0%, transparent); } }
+@media (prefers-reduced-motion: reduce) { .sync-btn.pulse-hint { animation: none; } }
 
 /* D-day countdown tới kỳ thi */
 .dday {

@@ -25,6 +25,10 @@ const provider = new GoogleAuthProvider();
 let currentUser = null;
 let saveTimer = null;
 
+// Set persistence ngay khi khởi tạo (trước onAuthStateChanged) để phiên đăng nhập BỀN qua các lần mở link.
+// Nhờ vậy: login 1 lần trên trình duyệt → lần sau ấn link là tự nhận diện + tự tải progress, không cần bấm ☁️ lại.
+const persistenceReady = setPersistence(auth, browserLocalPersistence).catch((e) => console.warn("persistence", e));
+
 // Bridge tới app.js: app.js định nghĩa window.FF = { getState, setState, onSyncStatus }
 const FF = () => window.FF || {};
 
@@ -37,7 +41,7 @@ function status(text, state) {
 async function login() {
   try {
     status("Đang đăng nhập…", "syncing");
-    await setPersistence(auth, browserLocalPersistence);
+    await persistenceReady;
     await signInWithPopup(auth, provider);
   } catch (e) {
     console.warn("login error", e);
