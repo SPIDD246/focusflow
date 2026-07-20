@@ -140,17 +140,25 @@
   window.FF_DEMO_RESET = () => { seed(); location.reload(); };
 
   // ---------------- Giao diện demo: banner + tour ----------------
+
+  // Ẩn các panel phụ trong demo → view gọn, chỉ còn tính năng cốt lõi.
+  // (Muốn hiện/ẩn thêm panel nào thì sửa danh sách này.)
+  function hidePanels() {
+    document.querySelectorAll(".boss-card, .reminders-card").forEach((el) => { el.style.display = "none"; });
+    ["perkTree", "soundGrid"].forEach((id) => {
+      const card = document.getElementById(id) && document.getElementById(id).closest(".card");
+      if (card) card.style.display = "none";
+    });
+  }
+
+  // Tour chỉ đi qua các panel CÒN HIỆN trong demo gọn (khớp với hidePanels ở trên).
   const TOUR = [
     { sel: ".hero-card",     title: "Nhân vật của bạn",   body: "Mỗi phút học = 1 XP. XP lên level, mở danh hiệu và chỉ số INT / DIS / FOC / STR trên radar." },
-    { sel: "#perkTree",      title: "Cây kỹ năng",        body: "Lên level là tự mở skill thụ động — cộng thêm % XP mỗi phiên học." },
     { sel: "#week",          title: "Bảng nhiệm vụ tuần", body: "Thời khoá biểu cả tuần. Bấm “+ New Quest” để thêm buổi học, bấm vào buổi để đánh dấu hoàn thành." },
     { sel: ".timer-card",    title: "Đồng hồ Train",      body: "Hẹn giờ tập trung (25/45/15 phút). Chạy tới đâu cộng XP tới đó — chọn chỉ số muốn luyện ở hàng TRAIN." },
     { sel: "#questList",     title: "Nhiệm vụ hằng ngày", body: "Mỗi ngày bốc 4 nhiệm vụ mới. Xong thì bấm CLAIM để nhận XP thưởng — thử ngay, có cái claim được đấy!" },
-    { sel: "#bossCard",      title: "Boss của tuần",      body: "Số phút học trong tuần chính là sát thương lên boss. Hạ boss để nhận XP lớn." },
     { sel: ".card.glow",     title: "Nhật ký tuần",       body: "Nhiệm vụ, số buổi hoàn thành, giờ đã học, và chuỗi ngày liên tiếp 🔥." },
     { sel: "#barChart",      title: "Biểu đồ tập trung",  body: "Số phút học từng ngày trong tuần." },
-    { sel: "#soundGrid",     title: "Nhạc tập trung",     body: "Nhạc nền khi học — bật tự phát cùng đồng hồ Train, hoặc thêm nhạc của bạn." },
-    { sel: ".reminders-card",title: "Nhắc học & dữ liệu", body: "Nhắc trước giờ học, xuất/nhập dữ liệu, và xuất lịch sang Google/Apple Calendar." },
   ];
 
   const css = `
@@ -229,7 +237,7 @@
     step = i;
     const s = TOUR[step];
     const el = document.querySelector(s.sel);
-    if (!el) { go(i + 1); return; }   // phần tử không có (ẩn/đổi layout) → bỏ qua bước
+    if (!el || el.offsetParent === null) { go(i + 1); return; }   // không có / đang ẩn → bỏ qua bước
 
     tip.innerHTML = `
       <div class="ffd-step">BƯỚC ${step + 1} / ${TOUR.length}</div>
@@ -270,6 +278,11 @@
 
     // Demo không có cloud → giấu nút Đăng nhập / Link riêng cho khỏi gây hiểu nhầm.
     ["syncBtn", "linkBtn"].forEach((id) => { const b = document.getElementById(id); if (b) b.hidden = true; });
+
+    // Demo GỌN: ẩn các panel phụ để người xem chỉ tập trung vào tính năng cốt lõi.
+    // Giữ lại: Nhân vật/XP · Lịch tuần · Đồng hồ Train · Nhiệm vụ ngày · Nhật ký tuần · Biểu đồ.
+    // Ẩn đi:   Cây kỹ năng · Boss tuần · Nhạc tập trung · Nhắc học & dữ liệu.
+    hidePanels();
 
     const bar = document.createElement("div");
     bar.className = "ffd-bar";

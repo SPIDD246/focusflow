@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Orbitron:wght@400;500;600;700;800;900&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=49" />
+  <link rel="stylesheet" href="styles.css?v=50" />
 </head>
 <body>
   <div class="aurora"></div>
@@ -267,13 +267,13 @@
   <div class="toast" id="toast" hidden></div>
 
   <!-- demo.js phải chạy TRƯỚC app.js: nó bật cờ FF_DEMO để app.js chọn key lưu trữ riêng. -->
-  <script src="demo.js?v=49"></script>
-  <script src="app.js?v=49"></script>
+  <script src="demo.js?v=50"></script>
+  <script src="app.js?v=50"></script>
   <!-- Ở chế độ demo KHÔNG nạp Firebase: không đăng nhập, không đọc/ghi cloud. -->
   <script>
     if (!window.FF_DEMO) {
       const s = document.createElement("script");
-      s.type = "module"; s.src = "firebase-sync.js?v=49";
+      s.type = "module"; s.src = "firebase-sync.js?v=50";
       document.body.appendChild(s);
     }
   </script>
