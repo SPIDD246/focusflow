@@ -151,6 +151,32 @@
     });
   }
 
+  // ĐĂNG NHẬP GIẢ (demo): mô phỏng đăng nhập Google để khoe tính năng "tài khoản",
+  // nhưng KHÔNG đụng Firebase / tài khoản thật. Tận dụng luôn UI có sẵn của app.js:
+  // app.js gọi window.FFSync.login()/logout() và cập nhật nhãn qua window.FF.onSyncStatus.
+  function setupFakeLogin() {
+    const say = (text, kind, user) => { if (window.FF && window.FF.onSyncStatus) window.FF.onSyncStatus(text, kind, user); };
+    window.FFSync = {
+      user: null,
+      login() {
+        say("Đang đăng nhập…", "syncing");                 // giả cảm giác popup Google đang xử lý
+        setTimeout(() => {
+          this.user = { displayName: "Demo User", email: "demo@focusflow.app" };
+          say("✓ Demo User", "signed-in", this.user);
+          if (window.toast) window.toast("✓ Đã đăng nhập (demo) — tài khoản mẫu, không có dữ liệu thật");
+        }, 650);
+      },
+      logout() {
+        this.user = null;
+        say("Chưa đăng nhập", "signed-out");
+        if (window.toast) window.toast("Đã đăng xuất (demo)");
+      },
+      scheduleSync() {},                                    // demo không đẩy gì lên cloud
+      createPrivateLink() { return Promise.reject(new Error("demo")); },
+      get linkMode() { return false; },
+    };
+  }
+
   // Tour chỉ đi qua các panel CÒN HIỆN trong demo gọn (khớp với hidePanels ở trên).
   const TOUR = [
     { sel: ".hero-card",     title: "Nhân vật của bạn",   body: "Mỗi phút học = 1 XP. XP lên level, mở danh hiệu và chỉ số INT / DIS / FOC / STR trên radar." },
@@ -159,6 +185,7 @@
     { sel: "#questList",     title: "Nhiệm vụ hằng ngày", body: "Mỗi ngày bốc 4 nhiệm vụ mới. Xong thì bấm CLAIM để nhận XP thưởng — thử ngay, có cái claim được đấy!" },
     { sel: ".card.glow",     title: "Nhật ký tuần",       body: "Nhiệm vụ, số buổi hoàn thành, giờ đã học, và chuỗi ngày liên tiếp 🔥." },
     { sel: "#barChart",      title: "Biểu đồ tập trung",  body: "Số phút học từng ngày trong tuần." },
+    { sel: "#syncBtn",       title: "Tài khoản của bạn",  body: "Đăng nhập Google để lưu tiến trình lên cloud, tự hiện ở mọi máy. Bấm thử ngay — bản demo mô phỏng, không cần tài khoản thật." },
   ];
 
   const css = `
@@ -276,8 +303,9 @@
     style.textContent = css;
     document.head.appendChild(style);
 
-    // Demo không có cloud → giấu nút Đăng nhập / Link riêng cho khỏi gây hiểu nhầm.
-    ["syncBtn", "linkBtn"].forEach((id) => { const b = document.getElementById(id); if (b) b.hidden = true; });
+    // Demo: ẩn "Link riêng" (không hợp trong demo), NHƯNG giữ nút Đăng nhập để MÔ PHỎNG tài khoản.
+    const linkB = document.getElementById("linkBtn"); if (linkB) linkB.hidden = true;
+    setupFakeLogin();
 
     // Demo GỌN: ẩn các panel phụ để người xem chỉ tập trung vào tính năng cốt lõi.
     // Giữ lại: Nhân vật/XP · Lịch tuần · Đồng hồ Train · Nhiệm vụ ngày · Nhật ký tuần · Biểu đồ.
