@@ -2,8 +2,13 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Bản sao lưu gắn với tài khoản Google (đăng nhập). Chỉ chủ sở hữu đọc/ghi.
+    // HỒ SƠ TÀI KHOẢN (tên, email, ảnh, ngày tạo, tóm tắt tiến trình). Chỉ chủ sở hữu đọc/ghi.
     match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // DỮ LIỆU HỌC của từng tài khoản (lịch, focus, RPG, quest…). Chỉ chủ sở hữu đọc/ghi.
+    match /data/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
 

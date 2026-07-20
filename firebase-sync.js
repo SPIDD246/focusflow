@@ -52,30 +52,59 @@ async function logout() {
   try { await signOut(auth); } catch (_) {}
 }
 
-// ---- Đồng bộ ----
-// Merge: bản có updatedAt lớn hơn thắng. Nếu cloud mới hơn → nạp về local; ngược lại → đẩy lên.
+// ---- Đồng bộ (chế độ TÀI KHOẢN) ----
+// Hai kho tách biệt cho mỗi người dùng đã đăng nhập:
+//   users/{uid} = HỒ SƠ TÀI KHOẢN (tên, email, ảnh, ngày tạo, tóm tắt tiến trình)  ~ "users.json"
+//   data/{uid}  = DỮ LIỆU HỌC (toàn bộ state: lịch, focus, RPG, quest…)              ~ "data.json"
+const userRef = (uid) => doc(db, "users", uid);
+const dataRef = (uid) => doc(db, "data", uid);
+
+// Tóm tắt tiến trình nhét kèm hồ sơ → sau này làm bảng xếp hạng / xem nhanh mà không phải tải cả data.
+function progressSummary(st) {
+  if (!st) return { xp: 0, sessions: 0, focusMinutes: 0 };
+  return {
+    xp: (st.rpg && st.rpg.xp) || 0,
+    sessions: (st.sessions && st.sessions.length) || 0,
+    focusMinutes: st.focusMinutes || 0,
+  };
+}
+
+// Merge dữ liệu: bản có updatedAt lớn hơn thắng. Local trống → luôn nạp cloud (chống đè mất data).
 async function syncOnLogin(user) {
   const st = FF().getState ? FF().getState() : null;
   const localUpdatedAt = (st && st.updatedAt) || 0;
   try {
-    const ref = doc(db, "users", user.uid);
-    const snap = await getDoc(ref);
-    if (snap.exists()) {
-      const cloud = snap.data();
-      const cloudUpdatedAt = cloud.updatedAt || 0;
-      if (cloudUpdatedAt > localUpdatedAt && cloud.state) {
-        // Cloud mới hơn → nạp về máy
-        FF().setState && FF().setState(JSON.parse(cloud.state));
-        status("Đã tải tiến trình từ cloud", "ok");
-      } else {
-        // Local mới hơn (hoặc bằng) → đẩy lên
-        await pushToCloud(user);
-        status("Đã đồng bộ lên cloud", "ok");
-      }
+    // 1) Ghi/cập nhật HỒ SƠ TÀI KHOẢN → users/{uid} (merge để giữ createdAt của lần đầu).
+    const uSnap = await getDoc(userRef(user.uid));
+    await setDoc(userRef(user.uid), {
+      uid: user.uid,
+      name: user.displayName || "",
+      email: user.email || "",
+      photo: user.photoURL || "",
+      lastLoginAt: Date.now(),
+      progress: progressSummary(st),
+      ...(uSnap.exists() && uSnap.data().createdAt ? {} : { createdAt: Date.now() }),
+    }, { merge: true });
+
+    // 2) Đồng bộ DỮ LIỆU HỌC → data/{uid}.
+    let dSnap = await getDoc(dataRef(user.uid));
+    // Di trú 1 lần: dữ liệu cũ (nếu có) từng nằm chung trong users/{uid}.state → dời sang data/{uid}.
+    if (!dSnap.exists() && uSnap.exists() && uSnap.data().state) {
+      await setDoc(dataRef(user.uid), {
+        state: uSnap.data().state,
+        updatedAt: uSnap.data().updatedAt || 0,
+        syncedAt: Date.now(),
+      });
+      dSnap = await getDoc(dataRef(user.uid));
+    }
+    const cloudHasData = dSnap.exists() && dSnap.data().state;
+    const cloudUpdatedAt = cloudHasData ? (dSnap.data().updatedAt || 0) : 0;
+    if (cloudHasData && (cloudUpdatedAt > localUpdatedAt || isLocalEmpty(st))) {
+      FF().setState && FF().setState(JSON.parse(dSnap.data().state));   // cloud mới hơn / local trống → nạp cloud
+      status("Đã tải tiến trình từ cloud", "ok");
     } else {
-      // Chưa có doc → tạo mới từ local
-      await pushToCloud(user);
-      status("Đã tạo bản sao lưu cloud", "ok");
+      await pushToCloud(user);                                          // local mới hơn / cloud trống → đẩy lên
+      status(cloudHasData ? "Đã đồng bộ lên cloud" : "Đã tạo tài khoản + sao lưu", "ok");
     }
   } catch (e) {
     console.warn("sync error", e);
@@ -86,13 +115,23 @@ async function syncOnLogin(user) {
 async function pushToCloud(user) {
   const st = FF().getState ? FF().getState() : null;
   if (!st) return;
-  const ref = doc(db, "users", user.uid);
-  await setDoc(ref, {
+  // CHỐNG MẤT DATA: local đang trống mà cloud đã có tiến trình → KHÔNG ghi đè.
+  try {
+    const snap = await getDoc(dataRef(user.uid));
+    if (snap.exists() && snap.data().state) {
+      const cloud = JSON.parse(snap.data().state);
+      if (isLocalEmpty(st) && stateWeight(cloud) > 0) { console.warn("push chặn: local trống, cloud có data"); return; }
+    }
+  } catch (_) {}
+  await setDoc(dataRef(user.uid), {                        // DỮ LIỆU → data/{uid}
     state: JSON.stringify(st),
     updatedAt: st.updatedAt || Date.now(),
-    email: user.email || "",
     syncedAt: Date.now(),
   });
+  await setDoc(userRef(user.uid), {                        // cập nhật tóm tắt trong HỒ SƠ
+    progress: progressSummary(st),
+    lastSyncAt: Date.now(),
+  }, { merge: true });
 }
 
 // app.js gọi hàm này mỗi khi save() — debounce để đỡ tốn quota
@@ -109,17 +148,17 @@ function scheduleSync() {
 
 // ================= CHẾ ĐỘ LINK RIÊNG (mã bí mật trong URL #k=) =================
 // Doc id = mã bí mật dài. Ai có đúng mã trong link đều tự tải/ghi được, không cần login.
-// Mã CỐ ĐỊNH: khi mở link gốc (không có #k=) thì tự dùng mã này → ấn link base là hiện tiến trình.
-// (Khang chấp nhận: ai mở link gốc cũng dùng chung kho dữ liệu này.)
-const DEFAULT_KEY = "cekak3W-TgwjLrT3KBrCcP1zVARK6Hpa";
+// KHÔNG còn mã cố định: mở link gốc (không có #k=) → chạy chế độ TÀI KHOẢN (đăng nhập Google),
+// mỗi người có kho riêng users/{uid} + data/{uid}. Link riêng (#k=) chỉ dùng khi chủ động tạo để chia sẻ.
+// (Khôi phục kho chia sẻ cũ: mở URL kèm #k=cekak3W-TgwjLrT3KBrCcP1zVARK6Hpa.)
 let linkKey = readLinkKey();
 let pullDone = false;   // chặn mọi push lên cloud cho tới khi pull lần đầu hoàn tất (tránh state rỗng đè data)
 
 function readLinkKey() {
   try {
     const m = (location.hash || "").match(/[#&]k=([A-Za-z0-9_-]{24,})/);
-    return m ? m[1] : DEFAULT_KEY;   // không có mã trong URL → dùng mã cố định
-  } catch (_) { return DEFAULT_KEY; }
+    return m ? m[1] : null;   // không có mã trong URL → null → dùng chế độ tài khoản (đăng nhập)
+  } catch (_) { return null; }
 }
 
 // Tạo mã ngẫu nhiên 32 ký tự (an toàn về entropy).
