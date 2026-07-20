@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>FocusFlow · Learning & Schedule Manager</title>
-  <meta name="description" content="Plan your week and track your study focus, beautifully." />
+  <meta name="description" content="FocusFlow — biến việc học thành game nhập vai: lên lịch tuần, tập trung kiếm XP, lên cấp, làm nhiệm vụ hằng ngày và hạ boss tuần." />
   <meta name="theme-color" content="#eef4e8" id="themeColorMeta" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Orbitron:wght@400;500;600;700;800;900&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=52" />
+  <link rel="stylesheet" href="styles.css?v=53" />
 </head>
 <body>
   <div class="aurora"></div>
@@ -44,6 +44,7 @@
     <div class="top-actions">
       <button class="btn ghost sync-btn" id="syncBtn" title="Đăng nhập để lưu tiến trình lên cloud">☁️ <span id="syncLabel">Đăng nhập</span></button>
       <button class="btn ghost sync-btn" id="linkBtn" title="Tạo link riêng: mở ở máy nào cũng tự hiện tiến trình">🔗 <span>Link riêng</span></button>
+      <button class="icon-btn" id="aboutBtn" title="Giới thiệu FocusFlow">ℹ️</button>
       <button class="icon-btn" id="themeToggle" title="Toggle light / dark">🌙</button>
       <button class="btn install" id="installBtn" hidden>⬇️ Install</button>
       <div class="dday" id="dday" title="Đếm ngược tới kỳ thi vào 10 chuyên Lý LHP">
@@ -267,13 +268,13 @@
   <div class="toast" id="toast" hidden></div>
 
   <!-- demo.js phải chạy TRƯỚC app.js: nó bật cờ FF_DEMO để app.js chọn key lưu trữ riêng. -->
-  <script src="demo.js?v=52"></script>
-  <script src="app.js?v=52"></script>
+  <script src="demo.js?v=53"></script>
+  <script src="app.js?v=53"></script>
   <!-- Ở chế độ demo KHÔNG nạp Firebase: không đăng nhập, không đọc/ghi cloud. -->
   <script>
     if (!window.FF_DEMO) {
       const s = document.createElement("script");
-      s.type = "module"; s.src = "firebase-sync.js?v=52";
+      s.type = "module"; s.src = "firebase-sync.js?v=53";
       document.body.appendChild(s);
     }
   </script>

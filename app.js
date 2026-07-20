@@ -1280,6 +1280,30 @@ function openInfo(title, html) {
   back.addEventListener("click", (e) => { if (e.target === back) close(); });
   back.querySelector("button").addEventListener("click", close);
 }
+
+// Nút ℹ️ "Giới thiệu": hiện thông tin FocusFlow ngay trong app (nội dung lấy từ README).
+(function aboutButton() {
+  const btn = document.getElementById("aboutBtn");
+  if (!btn) return;
+  const html = `<div style="max-height:56vh;overflow-y:auto;padding-right:4px;line-height:1.6">
+    <p><b>FocusFlow</b> biến việc học thành một cuộc phiêu lưu nhập vai. Lên lịch tuần, chạy phiên tập trung —
+      <b>mỗi phút học là XP</b> để lên cấp nhân vật, mở kỹ năng, dọn nhiệm vụ và hạ boss tuần.
+      Học đều đặn mà vui như chơi game.</p>
+    <p style="margin:.8em 0 .3em"><b>Tính năng chính</b></p>
+    <ul style="margin:0;padding-left:1.15em">
+      <li>🗓️ <b>Lịch tuần</b> (Quest Board) + ⏱️ <b>Đồng hồ tập trung</b> (Training) — mỗi phút học = XP</li>
+      <li>🧙 <b>Nhân vật &amp; cấp độ</b>, 🧠 4 chỉ số INT/DIS/FOC/STR, 🌳 <b>cây kỹ năng</b></li>
+      <li>🗡️ <b>Nhiệm vụ hằng ngày</b>, 👹 <b>boss tuần</b>, 🏆 thành tựu</li>
+      <li>📊 <b>Nhật ký tuần</b> + streak 🔥, 📈 biểu đồ tập trung</li>
+      <li>🔔 Nhắc học · 📅 xuất lịch (.ics) · 🎵 nhạc tập trung · 🎨 sáng/tối</li>
+      <li>📲 <b>Cài như app</b> (PWA, chạy offline) · ☁️ <b>đồng bộ</b> khi đăng nhập Google</li>
+    </ul>
+    <p style="margin:.9em 0 0;font-size:13px;opacity:.85">🔗
+      <a href="https://spidd246.github.io/focusflow/demo.html" target="_blank" rel="noopener">Bản demo</a> &nbsp;·&nbsp;
+      <a href="https://github.com/SPIDD246/focusflow" target="_blank" rel="noopener">Mã nguồn GitHub</a></p>
+  </div>`;
+  btn.addEventListener("click", () => openInfo("✦ FocusFlow — Your Learning Adventure", html));
+})();
 function showInstallHelp() {
   const ua = navigator.userAgent;
   const ios = /iphone|ipad|ipod/i.test(ua) || (/mac/i.test(ua) && "ontouchend" in document);
