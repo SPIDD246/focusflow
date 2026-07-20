@@ -3,7 +3,8 @@ const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const COLORS = ["#6fae7c", "#3f9d7f", "#e6b25f", "#6aa7c4", "#b490d4", "#ef7d5d"];
 const WEEKLY_GOAL_H = 14;   // ~2h/ngày theo roadmap ôn thi
 const DAILY_GOAL_MIN = 120; // mục tiêu 120 phút học mỗi ngày
-const STORE_KEY = "focusflow.v1";
+// Demo mode (?demo) chạy trên một key riêng → không bao giờ đọc/ghi dữ liệu thật. Xem demo.js.
+const STORE_KEY = window.FF_DEMO ? (window.FF_DEMO_KEY || "focusflow.demo") : "focusflow.v1";
 
 // ---------- State ----------
 const DEFAULTS = () => ({
