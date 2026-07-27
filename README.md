@@ -6,14 +6,6 @@ The goal is simple: **make consistent studying feel rewarding**.
 
 ---
 
-## Live App
-
-- **Main app:** https://spidd246.github.io/focusflow/
-- **Demo mode:** https://spidd246.github.io/focusflow/?demo=1
-- **Source code:** https://github.com/SPIDD246/focusflow
-
-> Use the main app for real progress. Use demo mode if you only want to explore the features with sample data.
-
 ---
 
 ## What FocusFlow Is For
