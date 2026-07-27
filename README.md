@@ -1,270 +1,58 @@
 # FocusFlow
 
-**FocusFlow** is a gamified study planner and focus timer. It helps you plan your weekly learning schedule, track every focused minute, and stay motivated through XP, levels, quests, achievements, and a weekly boss battle.
+**FocusFlow** is a gamified study planner and focus timer. It helps students organize their weekly study schedule, track focused learning time, and stay motivated through XP, levels, quests, achievements, and a weekly boss battle.
 
-The goal is simple: **make consistent studying feel rewarding**.
-
----
+The purpose of this project is to make studying feel more visible and rewarding: every focused minute becomes progress.
 
 ---
 
-## What FocusFlow Is For
+## 1. Project Structure
 
-FocusFlow is designed for students who want to:
+```text
+focusflow/
+├── index.html          Main app page and layout
+├── app.js              Core app logic: schedule, timer, RPG system, quests, boss, UI
+├── styles.css          Main styling, responsive layout, dark/light theme, game UI
+├── firebase-sync.js    Firebase login and Firestore cloud sync
+├── demo.html           Demo entry page
+├── demo.js             Demo-mode logic and sample behavior
+├── app_data.json       App data / backup data
+├── firestore.rules     Firestore security rules
+├── firebase.json       Firebase project configuration
+├── sw.js               Service worker for PWA cache and offline support
+├── manifest.json       PWA manifest
+├── icon.svg            App icon
+├── avatars/            Avatar images and character assets
+├── music/              Focus music files
+└── docs/               Extra documents, screenshots, and reference files
+```
 
-- Organize their weekly study schedule
-- Track focused study time
-- Build a study streak
-- Turn learning progress into XP and levels
-- Make daily study feel more like a game
-- Use one app across different devices
+### Important files
 
-Instead of only showing a boring timer, FocusFlow turns your learning into an RPG-style system:
+- **`index.html`** — the main page users open.
+- **`app.js`** — contains most of the app behavior: weekly schedule, timer, XP, stats, quests, boss fight, achievements, and rendering.
+- **`styles.css`** — controls the full visual design, including the game-like HUD style.
+- **`firebase-sync.js`** — handles Google login and cloud sync with Firebase.
+- **`demo.html` / `demo.js`** — lets users try the app with demo data.
+- **`app_data.json`** — stores app data used for backup/default data.
+- **`sw.js`** — service worker used for PWA caching and offline behavior.
+- **`docs/screenshot.png`** — screenshot used for showing the app interface.
 
-- Study sessions become **training**
-- Tasks become **quests**
-- Weekly effort becomes **boss damage**
-- Progress becomes **XP, levels, stats, and achievements**
+### Main technologies
 
----
-
-## Main Features
-
-### 1. Weekly Study Schedule
-
-Plan your week by adding study sessions.
-
-Each session can include:
-
-- Subject name
-- Day of the week
-- Start time
-- Duration
-- Color label
-
-You can use this as your main weekly learning timetable.
-
----
-
-### 2. Focus Timer
-
-Use the built-in timer when you start studying.
-
-The timer supports:
-
-- Preset study lengths
-- Custom minutes
-- Pause and reset
-- Focus music
-- XP gain while studying
-
-Every completed minute adds a small amount of XP, so progress grows while you study — not only after finishing a big task.
+- HTML
+- CSS
+- Vanilla JavaScript
+- Firebase Authentication
+- Firebase Firestore
+- Service Worker / PWA
+- GitHub Pages
 
 ---
 
-### 3. RPG Progress System
+## 2. Setup, Installation, and Use Guide
 
-FocusFlow turns your learning into character progress.
-
-You can earn:
-
-- **XP** from studying, quests, and bosses
-- **Levels** as your XP increases
-- **Stats** based on how you train
-- **Skill tree perks** as you level up
-- **Achievements** for milestones
-
-The main stats are:
-
-- **INT** — Intelligence
-- **DIS** — Discipline
-- **FOC** — Focus
-- **STR** — Strength
-
-These stats give a quick visual summary of your learning style and consistency.
-
----
-
-### 4. Daily Quests
-
-Each day, FocusFlow gives you study-related quests.
-
-Examples:
-
-- Study for a certain number of minutes
-- Complete multiple focus sessions
-- Keep your training consistent
-
-Finishing quests gives bonus XP and makes your daily work feel more rewarding.
-
----
-
-### 5. Weekly Boss
-
-The weekly boss is a larger challenge based on your study effort.
-
-Your focus minutes deal damage to the boss. If you study enough during the week, you can defeat it and earn a bigger reward.
-
-This gives you a clear weekly goal instead of only tracking day-by-day progress.
-
----
-
-### 6. Achievements and Badges
-
-FocusFlow includes achievement badges for progress milestones, such as:
-
-- Level milestones
-- Study streaks
-- Focus time milestones
-- Quest progress
-- Boss defeats
-
-Badges help you see how far you have come.
-
----
-
-### 7. Cloud Sync
-
-FocusFlow can save progress so it works across devices.
-
-The app supports:
-
-- Browser local saving
-- Firebase cloud sync
-- Google account login
-- Shared progress loading from the main link
-
-This means your schedule and study progress can appear again when you open the app from another device.
-
----
-
-## How to Use the App
-
-### Step 1: Open FocusFlow
-
-Go to:
-
-https://spidd246.github.io/focusflow/
-
-Wait for the app to load your saved progress.
-
----
-
-### Step 2: Check Your Weekly Schedule
-
-Your weekly schedule appears on the main board.
-
-Use it to see:
-
-- What subjects you need to study
-- Which day each session happens
-- The time and length of each study block
-
----
-
-### Step 3: Start a Training Session
-
-When you begin studying:
-
-1. Choose the stat you want to train
-2. Set the timer length
-3. Press the train/start button
-4. Study until the timer ends, or stop when needed
-
-Your XP increases gradually as you study.
-
----
-
-### Step 4: Complete Quests
-
-After studying, check the quest board.
-
-If a quest is ready, claim it to receive extra XP.
-
----
-
-### Step 5: Track Your Progress
-
-Use the dashboard to check:
-
-- Level
-- XP bar
-- Stats
-- Streak
-- Weekly study minutes
-- Achievements
-- Boss progress
-
-This helps you understand whether you are staying consistent.
-
----
-
-### Step 6: Use It on Another Device
-
-Open the same link on another device:
-
-https://spidd246.github.io/focusflow/
-
-Your progress should load from cloud sync.
-
-If the app looks outdated or progress does not appear, refresh the page or clear the browser cache.
-
----
-
-## Demo Mode
-
-Demo mode is for testing the app without using real study data.
-
-Open:
-
-https://spidd246.github.io/focusflow/?demo=1
-
-Use demo mode when you want to:
-
-- Explore the interface
-- Try the RPG features
-- Show the app to someone else
-- Test without changing real progress
-
----
-
-## Data and Privacy Notes
-
-FocusFlow stores learning data such as:
-
-- Weekly schedule
-- XP and levels
-- Study minutes
-- Quest progress
-- Boss progress
-- Achievement progress
-
-Depending on the mode, data may be saved in:
-
-- The browser's local storage
-- Firebase Firestore cloud storage
-
-Do not share private links or project credentials with people you do not trust.
-
----
-
-## Tech Stack
-
-FocusFlow is built as a simple static web app.
-
-- **HTML** — app structure
-- **CSS** — visual design and responsive layout
-- **Vanilla JavaScript** — app logic
-- **Firebase Auth** — Google login
-- **Firebase Firestore** — cloud sync
-- **Service Worker** — offline support and caching
-- **GitHub Pages** — hosting
-
-No build step is required.
-
----
-
-## Run Locally
+### Run the project locally
 
 Clone the repository:
 
@@ -279,57 +67,189 @@ Start a local web server:
 python3 -m http.server 8000
 ```
 
-Open:
+Open the app in your browser:
 
 ```text
 http://localhost:8000/
 ```
 
-For demo mode:
+Open demo mode locally:
 
 ```text
 http://localhost:8000/?demo=1
 ```
 
-> Google login may only work on authorized Firebase domains. Demo mode is best for local testing.
+> The project is a static web app, so there is no build step required.
 
 ---
 
-## Project Structure
+### Install as an app
+
+FocusFlow can be installed as a PWA.
+
+On desktop Chrome / Edge:
+
+1. Open the FocusFlow website.
+2. Click the install icon in the address bar, or open the browser menu.
+3. Choose **Install FocusFlow**.
+
+On Android:
+
+1. Open the website in Chrome.
+2. Tap the three-dot menu.
+3. Choose **Add to Home screen** or **Install app**.
+
+After installation, FocusFlow can be opened like a normal app.
+
+---
+
+### How to use FocusFlow
+
+#### Step 1: Plan your week
+
+Use the weekly schedule board to add study sessions.
+
+Each session can include:
+
+- Subject name
+- Day of the week
+- Start time
+- Duration
+- Color
+
+This gives you a clear weekly study plan.
+
+#### Step 2: Start a focus session
+
+Use the focus timer when you begin studying.
+
+You can:
+
+- Choose a preset timer length
+- Enter a custom length
+- Pause or reset the timer
+- Play focus music
+- Choose which stat to train
+
+Every focused minute adds a small amount of XP.
+
+#### Step 3: Gain XP and level up
+
+Studying gives progress in the RPG system.
+
+You can earn:
+
+- XP
+- Levels
+- Stat progress
+- Skill tree unlocks
+- Achievement badges
+
+The main stats are:
+
+- **INT** — Intelligence
+- **DIS** — Discipline
+- **FOC** — Focus
+- **STR** — Strength
+
+#### Step 4: Complete daily quests
+
+Daily quests give extra motivation.
+
+When a quest is ready, claim it to receive bonus XP.
+
+#### Step 5: Fight the weekly boss
+
+Your study minutes deal damage to the weekly boss.
+
+If you study enough during the week, you can defeat the boss and receive a bigger reward.
+
+#### Step 6: Track your progress
+
+The dashboard shows:
+
+- Level
+- XP bar
+- Stats
+- Streak
+- Weekly study time
+- Quests
+- Boss progress
+- Achievements
+
+Use this to understand how consistent your learning has been.
+
+---
+
+### Cloud sync
+
+FocusFlow supports cloud sync with Firebase.
+
+Depending on the setup, data can be saved in:
+
+- Browser local storage
+- Firebase Firestore
+- Google account sync
+
+Cloud sync helps your schedule and progress appear again when you open the app on another device.
+
+---
+
+### If the app shows old data
+
+Because FocusFlow uses a service worker, the browser may sometimes keep an old cached version.
+
+If the app looks outdated:
+
+1. Close all FocusFlow tabs.
+2. Reopen the page.
+3. Hard refresh with **Ctrl + Shift + R**.
+4. If needed, clear site data from browser settings.
+
+---
+
+## 3. Demo and Image
+
+### Demo mode
+
+Demo mode lets users try FocusFlow without changing real study data.
+
+Open demo mode:
 
 ```text
-index.html          Main app page
-app.js              Core app logic: schedule, timer, RPG system, quests, boss, UI
-styles.css          App styling, themes, responsive layout, game UI
-firebase-sync.js    Firebase login and cloud sync
-demo.js             Demo-mode data and behavior
-demo.html           Demo entry page
-app_data.json       Saved/default app data
-firestore.rules     Firestore security rules
-sw.js               Service worker for caching and offline support
-manifest.json       PWA manifest
-music/              Focus music files
-avatars/            Avatar assets
-docs/               Extra documentation and images
+https://spidd246.github.io/focusflow/?demo=1
 ```
 
----
+Demo mode is useful for:
 
-## Why This App Exists
-
-Studying consistently is hard because progress often feels invisible.
-
-FocusFlow makes progress visible by turning small actions into rewards:
-
-- One minute studied becomes XP
-- A finished session becomes progress
-- A day of effort becomes quests completed
-- A week of effort becomes a boss battle
-
-The app is meant to help you keep going, one focused minute at a time.
+- Testing the interface
+- Showing the project to other people
+- Trying the RPG features
+- Exploring the app without using real progress
 
 ---
 
-## License
+### App screenshot
 
-This project is personal/educational unless a license is added later.
+![FocusFlow dashboard](docs/screenshot.png)
+
+---
+
+### What users can see in the demo
+
+The demo shows the main parts of FocusFlow:
+
+- Weekly schedule
+- Focus timer
+- XP and level system
+- Character stats
+- Daily quests
+- Weekly boss
+- Achievements
+- Game-style dashboard UI
+
+---
+
+### Final note
+
+FocusFlow is built to help students study more consistently by making progress visible. It combines planning, time tracking, and game mechanics so that every study session feels like a step forward.
