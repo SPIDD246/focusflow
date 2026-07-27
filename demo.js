@@ -139,6 +139,30 @@
 
   window.FF_DEMO_RESET = () => { seed(); location.reload(); };
 
+
+  // Demo-only helper: instantly grant enough XP to reach the next level.
+  function demoLevelUp() {
+    const xpToNext = (level) => Math.floor(15 * Math.pow(level, 1.7));
+    const levelInfo = (xp) => {
+      let lv = 1, rem = Math.max(0, Math.floor(xp || 0));
+      while (rem >= xpToNext(lv)) { rem -= xpToNext(lv); lv++; }
+      return { level: lv, into: rem, need: xpToNext(lv) };
+    };
+    const st = JSON.parse(localStorage.getItem(KEY) || "null") || buildDemoState();
+    st.rpg = st.rpg || { xp: 0, stats: {}, seeded: true };
+    st.rpg.stats = st.rpg.stats || {};
+    const info = levelInfo(st.rpg.xp || 0);
+    const gain = Math.max(1, info.need - info.into);
+    st.rpg.xp = (st.rpg.xp || 0) + gain;
+    st.focusMinutes = Math.max(st.focusMinutes || 0, st.rpg.xp);
+    st.rpg.stats.foc = (st.rpg.stats.foc || 0) + gain;
+    st.rpg.stats.int = (st.rpg.stats.int || 0) + gain;
+    st.updatedAt = Date.now();
+    localStorage.setItem(KEY, JSON.stringify(st));
+    sessionStorage.setItem("ff_demo_levelup", String(info.level + 1));
+    location.reload();
+  }
+
   // ---------------- Giao diện demo: banner + tour ----------------
 
   // Ẩn các panel phụ trong demo → view gọn, chỉ còn tính năng cốt lõi.
@@ -397,14 +421,20 @@
       <span class="ffd-tag">DEMO</span>
       <span class="ffd-txt">Sample data · not saved to any account</span>
       <button class="pri ffd-tour">▶ Start tour</button>
+      <button class="ffd-level">⬆ Level Up</button>
       <button class="ffd-reset">↺ Reset</button>
       <button class="ffd-exit">Exit</button>`;
     document.body.appendChild(bar);
     bar.querySelector(".ffd-tour").onclick = startTour;
+    bar.querySelector(".ffd-level").onclick = demoLevelUp;
     bar.querySelector(".ffd-reset").onclick = () => window.FF_DEMO_RESET();
     bar.querySelector(".ffd-exit").onclick = () => { location.href = location.pathname; };
 
     document.body.style.paddingBottom = "72px";
+    try {
+      const lv = sessionStorage.getItem("ff_demo_levelup");
+      if (lv) { sessionStorage.removeItem("ff_demo_levelup"); setTimeout(() => window.toast && window.toast(`Demo level up → Level ${lv}!`), 450); }
+    } catch (_) {}
 
     // Lần đầu vào trong phiên này → tự chạy tour (đợi hiệu ứng khởi động của app xong).
     try {
