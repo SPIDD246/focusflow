@@ -151,30 +151,77 @@
     });
   }
 
-  // ĐĂNG NHẬP GIẢ (demo): mô phỏng đăng nhập Google để khoe tính năng "tài khoản",
-  // nhưng KHÔNG đụng Firebase / tài khoản thật. Tận dụng luôn UI có sẵn của app.js:
-  // app.js gọi window.FFSync.login()/logout() và cập nhật nhãn qua window.FF.onSyncStatus.
+  // DEMO LOGIN GATE: account-style login screen for demo mode.
+  // Safety: this is NOT Google, does NOT use Google branding, and never stores/sends passwords.
   function setupFakeLogin() {
+    const AUTH_KEY = "ff_demo_auth";
+    const USER_KEY = "ff_demo_user";
     const say = (text, kind, user) => { if (window.FF && window.FF.onSyncStatus) window.FF.onSyncStatus(text, kind, user); };
+    const isAuthed = () => sessionStorage.getItem(AUTH_KEY) === "1";
+    const savedUser = () => {
+      try { return JSON.parse(sessionStorage.getItem(USER_KEY) || "null"); }
+      catch (_) { return null; }
+    };
+
+    function ensureLoginScreen() {
+      if (document.getElementById("ffdLogin")) return;
+      const wrap = document.createElement("div");
+      wrap.id = "ffdLogin";
+      wrap.className = "ffd-login";
+      wrap.innerHTML = `
+        <form class="ffd-login-card" id="ffdLoginForm" autocomplete="off">
+          <div class="ffd-login-mark">⚔️</div>
+          <div class="ffd-login-kicker">FocusFlow Demo</div>
+          <h2>Sign in to continue</h2>
+          <p>This is a demo login only. Do not enter any real password.</p>
+          <label>Email or username</label>
+          <input id="ffdLoginEmail" type="text" placeholder="demo@focusflow.app" autocomplete="username" required />
+          <label>Password</label>
+          <input id="ffdLoginPass" type="password" placeholder="Any demo password" autocomplete="new-password" required />
+          <button class="ffd-login-btn" type="submit">Log in</button>
+          <div class="ffd-login-note">Password is never saved or sent. Any non-empty password works.</div>
+        </form>`;
+      document.body.appendChild(wrap);
+      wrap.querySelector("#ffdLoginForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const email = wrap.querySelector("#ffdLoginEmail").value.trim() || "demo@focusflow.app";
+        const pass = wrap.querySelector("#ffdLoginPass").value;
+        if (!pass.trim()) return;
+        sessionStorage.setItem(AUTH_KEY, "1");
+        sessionStorage.setItem(USER_KEY, JSON.stringify({ displayName: email.split("@")[0] || "Demo User", email }));
+        wrap.classList.add("hide");
+        setTimeout(() => wrap.remove(), 220);
+        const user = savedUser();
+        window.FFSync.user = user;
+        say(`✓ ${user.displayName}`, "signed-in", user);
+        if (window.toast) window.toast("✓ Demo login successful");
+      });
+    }
+
+    function showLoginScreen() {
+      ensureLoginScreen();
+      const el = document.getElementById("ffdLogin");
+      if (el) el.classList.remove("hide");
+      say("Chưa đăng nhập", "signed-out");
+    }
+
     window.FFSync = {
-      user: null,
-      login() {
-        say("Đang đăng nhập…", "syncing");                 // giả cảm giác popup Google đang xử lý
-        setTimeout(() => {
-          this.user = { displayName: "Demo User", email: "demo@focusflow.app" };
-          say("✓ Demo User", "signed-in", this.user);
-          if (window.toast) window.toast("✓ Đã đăng nhập (demo) — tài khoản mẫu, không có dữ liệu thật");
-        }, 650);
-      },
+      user: isAuthed() ? (savedUser() || { displayName: "Demo User", email: "demo@focusflow.app" }) : null,
+      login() { showLoginScreen(); },
       logout() {
         this.user = null;
-        say("Chưa đăng nhập", "signed-out");
-        if (window.toast) window.toast("Đã đăng xuất (demo)");
+        sessionStorage.removeItem(AUTH_KEY);
+        sessionStorage.removeItem(USER_KEY);
+        if (window.toast) window.toast("Logged out of demo");
+        showLoginScreen();
       },
-      scheduleSync() {},                                    // demo không đẩy gì lên cloud
+      scheduleSync() {},
       createPrivateLink() { return Promise.reject(new Error("demo")); },
       get linkMode() { return false; },
     };
+
+    if (window.FFSync.user) say(`✓ ${window.FFSync.user.displayName}`, "signed-in", window.FFSync.user);
+    else setTimeout(showLoginScreen, 250);
   }
 
   // Tour chỉ đi qua các panel CÒN HIỆN trong demo gọn (khớp với hidePanels ở trên).
@@ -185,10 +232,29 @@
     { sel: "#questList",     title: "Nhiệm vụ hằng ngày", body: "Mỗi ngày bốc 4 nhiệm vụ mới. Xong thì bấm CLAIM để nhận XP thưởng — thử ngay, có cái claim được đấy!" },
     { sel: ".card.glow",     title: "Nhật ký tuần",       body: "Nhiệm vụ, số buổi hoàn thành, giờ đã học, và chuỗi ngày liên tiếp 🔥." },
     { sel: "#barChart",      title: "Biểu đồ tập trung",  body: "Số phút học từng ngày trong tuần." },
-    { sel: "#syncBtn",       title: "Tài khoản của bạn",  body: "Đăng nhập Google để lưu tiến trình lên cloud, tự hiện ở mọi máy. Bấm thử ngay — bản demo mô phỏng, không cần tài khoản thật." },
+    { sel: "#syncBtn",       title: "Tài khoản demo",  body: "Bấm để mở màn hình đăng nhập demo. Đây chỉ là mô phỏng an toàn, không cần tài khoản thật và không lưu mật khẩu." },
   ];
 
   const css = `
+  .ffd-login{position:fixed;inset:0;z-index:12000;display:grid;place-items:center;padding:24px;
+    background:radial-gradient(circle at 20% 10%,rgba(139,92,246,.24),transparent 30%),
+    radial-gradient(circle at 80% 0,rgba(79,214,255,.18),transparent 32%),rgba(8,8,15,.92);
+    backdrop-filter:blur(12px);font-family:Nunito,system-ui,sans-serif;transition:opacity .22s ease,transform .22s ease}
+  .ffd-login.hide{opacity:0;transform:scale(.985);pointer-events:none}
+  .ffd-login-card{width:min(410px,100%);padding:28px;border-radius:24px;background:#fff;color:#1f2937;
+    border:1px solid rgba(148,163,184,.35);box-shadow:0 24px 90px rgba(0,0,0,.45);display:flex;flex-direction:column;gap:10px}
+  .ffd-login-mark{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;font-size:24px;
+    background:linear-gradient(135deg,#8b5cf6,#4fd6ff);box-shadow:0 10px 28px rgba(139,92,246,.3)}
+  .ffd-login-kicker{margin-top:6px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:900;color:#6d28d9}
+  .ffd-login-card h2{margin:0;font-size:26px;line-height:1.15;color:#111827;font-weight:900}
+  .ffd-login-card p{margin:0 0 8px;color:#6b7280;font-size:14px;line-height:1.45}
+  .ffd-login-card label{margin-top:8px;font-size:13px;font-weight:800;color:#374151}
+  .ffd-login-card input{height:46px;border-radius:12px;border:1px solid #d1d5db;padding:0 13px;font:inherit;font-size:15px;outline:none;background:#fff;color:#111827}
+  .ffd-login-card input:focus{border-color:#8b5cf6;box-shadow:0 0 0 4px rgba(139,92,246,.14)}
+  .ffd-login-btn{margin-top:12px;height:46px;border:0;border-radius:999px;background:#1a73e8;color:#fff;font:inherit;font-weight:900;cursor:pointer;box-shadow:0 8px 24px rgba(26,115,232,.28)}
+  .ffd-login-btn:hover{background:#1765cc}
+  .ffd-login-note{margin-top:4px;font-size:12px;color:#6b7280;line-height:1.45;background:#f3f4f6;border-radius:12px;padding:10px}
+
   .ffd-bar{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:9000;
     display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:999px;
     background:rgba(18,18,28,.92);border:1px solid rgba(139,92,246,.55);

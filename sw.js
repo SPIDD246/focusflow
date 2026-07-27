@@ -1,6 +1,6 @@
 // FocusFlow service worker — network-first (always fresh when online, offline fallback)
-const CACHE = "focusflow-v53";
-const ASSETS = ["./", "./index.html", "./styles.css?v=53", "./app.js?v=53", "./demo.js?v=53", "./firebase-sync.js?v=53", "./icon.svg", "./manifest.json"];
+const CACHE = "focusflow-v54";
+const ASSETS = ["./", "./index.html", "./styles.css?v=54", "./app.js?v=54", "./demo.js?v=54", "./firebase-sync.js?v=54", "./icon.svg", "./manifest.json"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));
