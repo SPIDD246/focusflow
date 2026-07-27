@@ -1,8 +1,8 @@
 // ---------- FocusFlow ----------
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const COLORS = ["#6fae7c", "#3f9d7f", "#e6b25f", "#6aa7c4", "#b490d4", "#ef7d5d"];
-const WEEKLY_GOAL_H = 14;   // ~2h/ngày theo roadmap ôn thi
-const DAILY_GOAL_MIN = 120; // mục tiêu 120 phút học mỗi ngày
+const WEEKLY_GOAL_H = 14;   // ~2h/day study goal
+const DAILY_GOAL_MIN = 120; // 120 min daily study goal
 // Demo mode (?demo) chạy trên một key riêng → không bao giờ đọc/ghi dữ liệu thật. Xem demo.js.
 const STORE_KEY = window.FF_DEMO ? (window.FF_DEMO_KEY || "focusflow.demo") : "focusflow.v1";
 
@@ -102,13 +102,13 @@ function renderStats() {
   const focusH = weekFocus / 60;
   document.getElementById("goalFill").style.width = Math.min(100, (focusH / WEEKLY_GOAL_H) * 100) + "%";
   document.getElementById("goalText").textContent = `${focusH.toFixed(1)} / ${WEEKLY_GOAL_H}h`;
-  // Mục tiêu phút/ngày
+  // Mục tiêu min/ngày
   const todayMin = state.focusByDay[isoDay(new Date())] || 0;
   const dFill = document.getElementById("dailyFill");
   const dText = document.getElementById("dailyText");
   if (dFill && dText) {
     dFill.style.width = Math.min(100, (todayMin / DAILY_GOAL_MIN) * 100) + "%";
-    dText.textContent = `${Math.round(todayMin)} / ${DAILY_GOAL_MIN} phút` + (todayMin >= DAILY_GOAL_MIN ? " ✅" : "");
+    dText.textContent = `${Math.round(todayMin)} / ${DAILY_GOAL_MIN} min` + (todayMin >= DAILY_GOAL_MIN ? " ✅" : "");
   }
 }
 
@@ -220,7 +220,7 @@ function celebrateLevels(gained) {
   setTimeout(() => {
     burst(window.innerWidth / 2, window.innerHeight / 3);
     flashLevelUp(lv, tier);
-    systemPanel("LEVEL UP", [`Bạn đã đạt <b>Level ${lv}</b>`, `Danh hiệu mới: <b>${tier.title}</b>`], "SYSTEM ⚡ LEVEL UP");
+    systemPanel("LEVEL UP", [`You reached <b>Level ${lv}</b>`, `New title: <b>${tier.title}</b>`], "SYSTEM ⚡ LEVEL UP");
   }, 700);
   notify("⬆️ Level Up!", `You just hit Level ${lv} · ${tier.title}!`);
 }
@@ -394,14 +394,14 @@ function renderNextUnlock(info) {
     .forEach((b) => { if (lv < b.lv) cands.push(b); });
   if (!cands.length) {
     el.hidden = false;
-    el.innerHTML = `<span class="nu-ico">⚡</span><span class="nu-txt">Đã mở khoá tất cả — bạn ở <b>đỉnh System</b></span>`;
+    el.innerHTML = `<span class="nu-ico">⚡</span><span class="nu-txt">All unlocks complete — you are at the <b>top of the System</b></span>`;
     return;
   }
   cands.sort((a, b) => a.lv - b.lv);
   const next = cands[0];
   const xpLeft = xpToReachLevel(next.lv);
   el.hidden = false;
-  el.innerHTML = `<span class="nu-ico">${next.icon}</span><span class="nu-txt">còn <b>${xpLeft} XP</b> → mở khoá <b>${escapeHtml(next.name)}</b> <i>Lv ${next.lv}</i></span>`;
+  el.innerHTML = `<span class="nu-ico">${next.icon}</span><span class="nu-txt"><b>${xpLeft} XP</b> left → unlock <b>${escapeHtml(next.name)}</b> <i>Lv ${next.lv}</i></span>`;
 }
 // 4-axis radar (INT top, DIS right, FOC bottom, STR left) showing each stat's level.
 // The shape is relative · the strongest stat reaches the edge so you see your build at a glance.
@@ -494,7 +494,7 @@ function renderPerks() {
   box.innerHTML = PERKS.map((p) => {
     const on = lv >= p.lv;
     const isNext = !on && nextPerk && p.key === nextPerk.key;
-    const lock = isNext ? `<span class="perk-lock next">còn ${p.lv - lv} LV</span>` : (on ? "" : `<span class="perk-lock">Lv ${p.lv}</span>`);
+    const lock = isNext ? `<span class="perk-lock next">${p.lv - lv} LV left</span>` : (on ? "" : `<span class="perk-lock">Lv ${p.lv}</span>`);
     return `<div class="perk ${on ? "on" : "off"}${isNext ? " next" : ""}" data-perk="${p.key}">
       <div class="perk-node">${on ? p.icon : (isNext ? p.icon : "🔒")}</div>
       <div class="perk-info">
@@ -567,7 +567,7 @@ function renderQuests() {
   if (allClaimed) {
     box.innerHTML = `<div class="quest-cleared"><div class="qc-mark">⚔️</div>
       <div class="qc-title">ALL QUESTS CLEARED</div>
-      <div class="qc-sub">Boss đang chờ · quay lại ngày mai cho nhiệm vụ mới</div></div>`;
+      <div class="qc-sub">Boss is waiting · come back tomorrow for new quests</div></div>`;
     const cnt0 = document.getElementById("questCount");
     if (cnt0) cnt0.textContent = `${quests.length}/${quests.length}`;
     return;
@@ -602,7 +602,7 @@ function claimQuest(key) {
   const levels = grantXp(q.reward, trained);
   save(); render();
   burst(window.innerWidth / 2, window.innerHeight / 2);
-  systemPanel("QUEST CLEAR", [`${q.icon} ${q.label}`, `Phần thưởng: <b>+${q.reward} XP</b>`], "SYSTEM 🗡️ QUEST");
+  systemPanel("QUEST CLEAR", [`${q.icon} ${q.label}`, `Reward: <b>+${q.reward} XP</b>`], "SYSTEM 🗡️ QUEST");
   celebrateLevels(levels);
 }
 
@@ -610,11 +610,11 @@ function claimQuest(key) {
 // A boss appears each week with HP measured in focus-minutes. Your weekly focus time is the
 // "damage"; hit HP and the boss is defeated (once per week) for a big XP reward.
 const BOSSES = [
-  { name: "The Procrasti-Sloth",  emoji: "🦥", hp: 120, reward: 60,  tier: "COMMON",    title: "Kẻ Trì Hoãn" },
-  { name: "Doomscroll Hydra",     emoji: "📱", hp: 180, reward: 90,  tier: "RARE",      title: "Mãng Xà Lướt Vô Tận" },
-  { name: "The Distraction Void", emoji: "🕳️", hp: 210, reward: 110, tier: "EPIC",      title: "Hư Không Phân Tâm" },
-  { name: "Brain Fog Wraith",     emoji: "🌫️", hp: 240, reward: 120, tier: "EPIC",      title: "Bóng Ma Sương Mù" },
-  { name: "Deadline Dragon",      emoji: "🐉", hp: 300, reward: 150, tier: "LEGENDARY", title: "Ác Long Hạn Chót" },
+  { name: "The Procrasti-Sloth",  emoji: "🦥", hp: 120, reward: 60,  tier: "COMMON",    title: "The Procrastinator" },
+  { name: "Doomscroll Hydra",     emoji: "📱", hp: 180, reward: 90,  tier: "RARE",      title: "Endless Scroll Hydra" },
+  { name: "The Distraction Void", emoji: "🕳️", hp: 210, reward: 110, tier: "EPIC",      title: "Distraction Void" },
+  { name: "Brain Fog Wraith",     emoji: "🌫️", hp: 240, reward: 120, tier: "EPIC",      title: "Brain Fog Wraith" },
+  { name: "Deadline Dragon",      emoji: "🐉", hp: 300, reward: 150, tier: "LEGENDARY", title: "Deadline Dragon" },
 ];
 // Deterministic boss-of-the-week from the Monday date string (no randomness → stable across reloads).
 function bossFor(wk) { let h = 0; for (let i = 0; i < wk.length; i++) h = (h * 31 + wk.charCodeAt(i)) | 0; return BOSSES[Math.abs(h) % BOSSES.length]; }
@@ -637,7 +637,7 @@ function renderBoss() {
     const levels = grantXp(boss.reward, "str");
     save(); renderHero();
     burst(window.innerWidth / 2, window.innerHeight / 2);
-    systemPanel("BOSS DEFEATED", [`Bạn đã hạ <b>${boss.name}</b>`, `Phần thưởng: <b>+${boss.reward} XP</b>`], "SYSTEM 👹 BOSS");
+    systemPanel("BOSS DEFEATED", [`You defeated <b>${boss.name}</b>`, `Reward: <b>+${boss.reward} XP</b>`], "SYSTEM 👹 BOSS");
     notify("🏆 Boss defeated!", `You defeated ${boss.name} and earned ${boss.reward} XP!`);
     celebrateLevels(levels);
     const card = document.querySelector(".boss-card");
@@ -658,14 +658,14 @@ function renderBoss() {
         ${dead ? `<span class="tcard-slain">SLAIN</span>` : ""}
       </div>
       <div class="tcard-name">${escapeHtml(boss.name)}</div>
-      <div class="tcard-title">「${escapeHtml(boss.title || "Boss tuần")}」</div>
+      <div class="tcard-title">「${escapeHtml(boss.title || "Weekly Boss")}」</div>
       <div class="tcard-hpwrap">
         <div class="tcard-hplabel"><span>HP</span><span>${dead ? "0" : remaining} / ${boss.hp}</span></div>
         <div class="tcard-hpbar"><span style="width:${hpPct}%"></span></div>
       </div>
       <div class="tcard-foot">${dead
-        ? `🏆 Đã hạ gục · +${boss.reward} XP · boss mới xuất hiện tuần sau`
-        : `⚔️ Focus <b>${remaining} phút</b> nữa để hạ · thưởng <b>+${boss.reward} XP</b>`}</div>
+        ? `🏆 Defeated · +${boss.reward} XP · a new boss appears next week`
+        : `⚔️ Focus <b>${remaining} min</b> more to defeat it · reward <b>+${boss.reward} XP</b>`}</div>
     </div>`;
 }
 
@@ -735,7 +735,7 @@ function renderBadges() {
     <div class="badge locked mystery" data-tier="secret">
       <div class="badge-ico">❔</div>
       <div class="badge-num">???</div>
-      <div class="badge-sub">bí ẩn</div>
+      <div class="badge-sub">hidden</div>
     </div>`;
   document.getElementById("badges").innerHTML = list.map((b) => `
     <div class="badge ${b.earned ? "earned" : "locked"}" data-tier="${b.tier}">
@@ -785,7 +785,7 @@ form.addEventListener("submit", (e) => {
   const subject = form.subject.value.trim();
   if (!subject) return;
   const dur = diffMinutes(form.start.value, form.end.value);
-  if (dur <= 0) { toast("Giờ kết thúc phải sau giờ bắt đầu"); return; }
+  if (dur <= 0) { toast("End time must be after start time"); return; }
   const data = { subject, day: form.day.value, start: form.start.value, duration: dur, color: pickedColor };
   if (editingId) { Object.assign(state.sessions.find((x) => x.id === editingId), data); toast("Quest updated"); }
   else { state.sessions.push({ id: uid(), ...data }); toast("Quest added"); }
@@ -846,7 +846,7 @@ function finishTimer() {
   secAccrued = 0; minsThisSession = 0;
   remaining = totalSec; sessionPaused = false; paintTimer();
   burst(window.innerWidth / 2, window.innerHeight / 2);
-  toast(`⏱️ Hoàn thành ${mins} phút · phiên ghi nhận 🎉`);
+  toast(`⏱️ Completed ${mins} min · session recorded 🎉`);
   notify("⏱️ Focus complete!", `You trained for ${mins} minutes. Keep it up!`);
 }
 toggleBtn.addEventListener("click", () => { if (running) { sessionPaused = true; pauseTimer(); } else startTimer(); });
@@ -1176,22 +1176,22 @@ function tickDday() {
   const now = new Date(); now.setHours(0, 0, 0, 0);
   const days = Math.ceil((EXAM_DATE - now) / 86400000);
   const lbl = document.querySelector(".dday-lbl");
-  if (days > 0) { el.textContent = days; if (lbl) lbl.textContent = "ngày tới kỳ thi"; }
-  else if (days === 0) { el.textContent = "🔥"; if (lbl) lbl.textContent = "Hôm nay thi, cố lên!"; }
-  else { el.textContent = "✓"; if (lbl) lbl.textContent = "Kỳ thi đã qua"; }
+  if (days > 0) { el.textContent = days; if (lbl) lbl.textContent = "days to exam"; }
+  else if (days === 0) { el.textContent = "🔥"; if (lbl) lbl.textContent = "Exam day — you got this!"; }
+  else { el.textContent = "✓"; if (lbl) lbl.textContent = "Exam passed"; }
 }
 tickDday(); setInterval(tickDday, 3600000);
 
 // ---------- Helpers ----------
 function fmtDur(min) { if (min < 60) return `${min}m`; const h = Math.floor(min / 60), m = min % 60; return m ? `${h}h ${m}m` : `${h}h`; }
-// Số phút giữa 2 mốc "HH:MM" (nếu end <= start thì coi như qua nửa đêm, +24h)
+// Số min giữa 2 mốc "HH:MM" (nếu end <= start thì coi như qua nửa đêm, +24h)
 function diffMinutes(start, end) {
   const [sh, sm] = start.split(":").map(Number), [eh, em] = end.split(":").map(Number);
   let d = (eh * 60 + em) - (sh * 60 + sm);
   if (d <= 0) d += 24 * 60;
   return d;
 }
-// Cộng phút vào "HH:MM" → trả lại "HH:MM" (wrap 24h)
+// Cộng min vào "HH:MM" → trả lại "HH:MM" (wrap 24h)
 function addMinutes(start, min) {
   const [sh, sm] = start.split(":").map(Number);
   let t = (sh * 60 + sm + min) % (24 * 60);
@@ -1286,21 +1286,20 @@ function openInfo(title, html) {
   const btn = document.getElementById("aboutBtn");
   if (!btn) return;
   const html = `<div style="max-height:56vh;overflow-y:auto;padding-right:4px;line-height:1.6">
-    <p><b>FocusFlow</b> biến việc học thành một cuộc phiêu lưu nhập vai. Lên lịch tuần, chạy phiên tập trung —
-      <b>mỗi phút học là XP</b> để lên cấp nhân vật, mở kỹ năng, dọn nhiệm vụ và hạ boss tuần.
-      Học đều đặn mà vui như chơi game.</p>
-    <p style="margin:.8em 0 .3em"><b>Tính năng chính</b></p>
+    <p><b>FocusFlow</b> turns studying into an RPG adventure. Plan your week, run focus sessions, and
+      <b>every minute becomes XP</b> to level up, unlock skills, clear quests, and defeat the weekly boss.</p>
+    <p style="margin:.8em 0 .3em"><b>Main features</b></p>
     <ul style="margin:0;padding-left:1.15em">
-      <li>🗓️ <b>Lịch tuần</b> (Quest Board) + ⏱️ <b>Đồng hồ tập trung</b> (Training) — mỗi phút học = XP</li>
-      <li>🧙 <b>Nhân vật &amp; cấp độ</b>, 🧠 4 chỉ số INT/DIS/FOC/STR, 🌳 <b>cây kỹ năng</b></li>
-      <li>🗡️ <b>Nhiệm vụ hằng ngày</b>, 👹 <b>boss tuần</b>, 🏆 thành tựu</li>
-      <li>📊 <b>Nhật ký tuần</b> + streak 🔥, 📈 biểu đồ tập trung</li>
-      <li>🔔 Nhắc học · 📅 xuất lịch (.ics) · 🎵 nhạc tập trung · 🎨 sáng/tối</li>
-      <li>📲 <b>Cài như app</b> (PWA, chạy offline) · ☁️ <b>đồng bộ</b> khi đăng nhập Google</li>
+      <li>🗓️ <b>Weekly schedule</b> (Quest Board) + ⏱️ <b>Focus timer</b> (Training) — every minute = XP</li>
+      <li>🧙 <b>Character &amp; levels</b>, 🧠 4 stats INT/DIS/FOC/STR, 🌳 <b>skill tree</b></li>
+      <li>🗡️ <b>daily quests</b>, 👹 <b>weekly boss</b>, 🏆 achievements</li>
+      <li>📊 <b>weekly journal</b> + streak 🔥, 📈 focus chart</li>
+      <li>🔔 study reminders · 📅 calendar export (.ics) · 🎵 focus music · 🎨 light/dark</li>
+      <li>📲 <b>Install as app</b> (PWA, works offline) · ☁️ <b>sync</b> with Google login</li>
     </ul>
     <p style="margin:.9em 0 0;font-size:13px;opacity:.85">🔗
-      <a href="https://spidd246.github.io/focusflow/demo.html" target="_blank" rel="noopener">Bản demo</a> &nbsp;·&nbsp;
-      <a href="https://github.com/SPIDD246/focusflow" target="_blank" rel="noopener">Mã nguồn GitHub</a></p>
+      <a href="https://spidd246.github.io/focusflow/demo.html" target="_blank" rel="noopener">Demo</a> &nbsp;·&nbsp;
+      <a href="https://github.com/SPIDD246/focusflow" target="_blank" rel="noopener">GitHub source</a></p>
   </div>`;
   btn.addEventListener("click", () => openInfo("✦ FocusFlow — Your Learning Adventure", html));
 })();
@@ -1345,57 +1344,57 @@ window.FF = {
     if (!label || !btn) return;
     btn.dataset.state = kind || "";
     if (kind === "signed-in") {
-      label.textContent = "Đã đăng nhập"; btn.title = text + " · bấm để đăng xuất";
+      label.textContent = "Signed in"; btn.title = text + " · click to log out";
       localStorage.setItem("ff_signed_in_once", "1"); btn.classList.remove("pulse-hint");
     }
     else if (kind === "signed-out") {
-      label.textContent = "Đăng nhập"; btn.title = "Đăng nhập để lưu & tự tải tiến trình ở mọi máy";
+      label.textContent = "Login"; btn.title = "Login to save and auto-load progress on any device";
       // Lần đầu (chưa từng đăng nhập trên trình duyệt này) → nhắc nhẹ + làm nút nổi bật.
       if (!localStorage.getItem("ff_signed_in_once")) {
         btn.classList.add("pulse-hint");
-        setTimeout(() => toast("💡 Đăng nhập ☁️ để tiến trình tự hiện ở mọi máy"), 900);
+        setTimeout(() => toast("💡 Login ☁️ to auto-load progress on any device"), 900);
       }
     }
-    else if (kind === "syncing") { label.textContent = "Đang đồng bộ…"; }
+    else if (kind === "syncing") { label.textContent = "Syncing…"; }
     else if (kind === "link") {
-      // Chế độ link riêng: dữ liệu theo mã trong URL, ẩn nút login cho gọn.
-      label.textContent = "Link riêng"; btn.classList.remove("pulse-hint"); btn.title = "Đang xem qua link riêng (mã trong URL)";
-      btn.hidden = true;                       // không cần login khi đã có link
-      const lb = document.getElementById("linkBtn"); if (lb) { lb.dataset.state = "on"; lb.title = "Đang ở chế độ link riêng"; }
+      // Private link mode: dữ liệu theo mã trong URL, ẩn nút login cho gọn.
+      label.textContent = "Private link"; btn.classList.remove("pulse-hint"); btn.title = "Viewing through a private link (code in URL)";
+      btn.hidden = true;                       // no login needed when a link is active
+      const lb = document.getElementById("linkBtn"); if (lb) { lb.dataset.state = "on"; lb.title = "Private link mode active"; }
     }
-    else if (kind === "ok") { label.textContent = "Đã đồng bộ ✓"; setTimeout(() => { if (window.FFSync && (window.FFSync.user || window.FFSync.linkMode)) label.textContent = window.FFSync.linkMode ? "Link riêng" : "Đã đăng nhập"; }, 2000); }
-    else if (kind === "error") { label.textContent = "Lỗi đồng bộ"; btn.title = text; }
+    else if (kind === "ok") { label.textContent = "Synced ✓"; setTimeout(() => { if (window.FFSync && (window.FFSync.user || window.FFSync.linkMode)) label.textContent = window.FFSync.linkMode ? "Private link" : "Signed in"; }, 2000); }
+    else if (kind === "error") { label.textContent = "Sync error"; btn.title = text; }
   },
 };
 // Nút sync: chưa đăng nhập → login; đã đăng nhập → hỏi đăng xuất
 document.getElementById("syncBtn").addEventListener("click", () => {
-  if (!window.FFSync) { toast("Đang tải Firebase…"); return; }
+  if (!window.FFSync) { toast("Loading Firebase…"); return; }
   if (window.FFSync.user) {
-    if (confirm("Đăng xuất khỏi cloud sync? (tiến trình vẫn lưu trên máy)")) window.FFSync.logout();
+    if (confirm("Log out of cloud sync? (progress stays on this device)")) window.FFSync.logout();
   } else {
     window.FFSync.login();
   }
 });
-// Nút "Link riêng": tạo link chứa mã bí mật → mở ở máy nào cũng tự hiện tiến trình + lịch (không cần login).
+// Nút "Private link": tạo link chứa mã bí mật → mở ở máy nào cũng tự hiện tiến trình + lịch (không cần login).
 document.getElementById("linkBtn").addEventListener("click", async () => {
-  if (!window.FFSync) { toast("Đang tải Firebase…"); return; }
+  if (!window.FFSync) { toast("Loading Firebase…"); return; }
   if (window.FFSync.linkMode) {
     // Đang ở chế độ link → hiện lại link hiện tại để copy
     const url = location.href;
-    try { await navigator.clipboard.writeText(url); toast("🔗 Đã copy link riêng"); } catch (_) { prompt("Link riêng của bạn:", url); }
+    try { await navigator.clipboard.writeText(url); toast("🔗 Private link copied"); } catch (_) { prompt("Your private link:", url); }
     return;
   }
-  if (!confirm("Tạo LINK RIÊNG?\n\nAi có ĐÚNG link này (gồm mã bí mật) đều xem & sửa được tiến trình của bạn — nên đừng chia sẻ. Tiếp tục?")) return;
+  if (!confirm("Create PRIVATE LINK?\n\nAnyone with the exact link (including the secret code) can view and edit your progress — do not share it. Continue?")) return;
   try {
-    toast("Đang tạo link riêng…");
+    toast("Creating private link…");
     const url = await window.FFSync.createPrivateLink();
     try { await navigator.clipboard.writeText(url); } catch (_) {}
     if (typeof openInfo === "function") {
-      openInfo("🔗 Link riêng của bạn", `Mở link này ở bất kỳ máy nào là tự hiện tiến trình + lịch (không cần đăng nhập).<br><br><b>Đã copy vào clipboard.</b><br><br><code style="word-break:break-all;font-size:11px">${url}</code><br><br>⚠️ Giữ kín — ai có link đều xem & sửa được.`);
+      openInfo("🔗 Your private link", `Open this link on any device to load progress + schedule automatically (no login needed).<br><br><b>Copied to clipboard.</b><br><br><code style="word-break:break-all;font-size:11px">${url}</code><br><br>⚠️ Keep it private — anyone with the link can view and edit.`);
     } else {
-      prompt("Link riêng (đã copy):", url);
+      prompt("Private link (copied):", url);
     }
-  } catch (e) { toast("Tạo link thất bại — kiểm tra kết nối/Firebase rules"); }
+  } catch (e) { toast("Could not create link — check connection/Firebase rules"); }
 });
 
 paintTimer();
@@ -1403,31 +1402,31 @@ syncReminderUI();
 render();
 
 /* ================================================================
-   DAILY SYSTEM MESSAGE v43 — panel 【SYSTEM】 chào 1 lần/ngày
+   DAILY SYSTEM MESSAGE v43 — 【SYSTEM】 panel shown once per day
    ================================================================ */
 function dailySystemMessage() {
   ensureRpg();
   const today = isoDay(new Date());
-  if (state.rpg.sysMsgDay === today) return;      // đã chào hôm nay
+  if (state.rpg.sysMsgDay === today) return;      // already shown today
   state.rpg.sysMsgDay = today; save();
   const info = levelInfo(state.rpg.xp);
   const st = (typeof streak === "function") ? streak() : 0;
   const quests = todayQuests();
   const claimed = quests.filter((q) => state.quests.claimed[q.key]).length;
   const hour = new Date().getHours();
-  const greet = hour < 5 ? "Khuya rồi, Thợ Săn" : hour < 11 ? "Chào buổi sáng, Thợ Săn" : hour < 18 ? "Chào buổi chiều, Thợ Săn" : "Chào buổi tối, Thợ Săn";
+  const greet = hour < 5 ? "Late night, Hunter" : hour < 11 ? "Good morning, Hunter" : hour < 18 ? "Good afternoon, Hunter" : "Good evening, Hunter";
   const lines = [
-    `${greet}. Bạn đang ở <b>Lv ${info.level}</b>${st > 0 ? ` · chuỗi <b>${st} ngày</b> 🔥` : ""}.`,
-    claimed >= quests.length && quests.length ? `Mọi nhiệm vụ hôm qua đã dọn sạch — <b>${quests.length} nhiệm vụ mới</b> đang chờ.` : `Hôm nay có <b>${quests.length} nhiệm vụ</b>. Bắt đầu một phiên Train để lên cấp.`,
+    `${greet}. You are at <b>Lv ${info.level}</b>${st > 0 ? ` · <b>${st}-day</b> streak 🔥` : ""}.`,
+    claimed >= quests.length && quests.length ? `Yesterday's quests are cleared — <b>${quests.length} new quests</b> are waiting.` : `Today has <b>${quests.length} quests</b>. Start a training session to level up.`,
   ];
   // Trì hoãn nhẹ để không đè lên system panel khác lúc khởi động
-  setTimeout(() => systemPanel("NHIỆM VỤ TRONG NGÀY", lines, "【 SYSTEM 】"), 700);
+  setTimeout(() => systemPanel("DAILY MISSIONS", lines, "【 SYSTEM 】"), 700);
 }
 dailySystemMessage();
 
 /* ================================================================
    SYSTEM HUD v39 — inject khung/glow + scanline overlay + cursor glow
-   Thêm lớp hình ảnh, không đụng logic. Tôn trọng reduced-motion.
+   Adds visual layers without changing logic. Respects reduced-motion.
    ================================================================ */
 (function systemHud() {
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -1445,8 +1444,8 @@ dailySystemMessage();
     if (card.querySelector(":scope > .hud-frame")) return;
     const glow = document.createElement("div"); glow.className = "hud-glow"; glow.setAttribute("aria-hidden", "true");
     const frame = document.createElement("div"); frame.className = "hud-frame"; frame.setAttribute("aria-hidden", "true");
-    card.prepend(glow);            // dưới nội dung
-    card.appendChild(frame);       // viền trên cùng
+    card.prepend(glow);            // under content
+    card.appendChild(frame);       // top border overlay
   }
   function decorateAll() { document.querySelectorAll(".card").forEach(decorate); }
   decorateAll();

@@ -40,12 +40,12 @@ function status(text, state) {
 // ---- Đăng nhập / Đăng xuất ----
 async function login() {
   try {
-    status("Đang đăng nhập…", "syncing");
+    status("Signing in…", "syncing");
     await persistenceReady;
     await signInWithPopup(auth, provider);
   } catch (e) {
     console.warn("login error", e);
-    status(e.code === "auth/popup-blocked" ? "Popup bị chặn — cho phép popup rồi thử lại" : "Đăng nhập thất bại", "error");
+    status(e.code === "auth/popup-blocked" ? "Popup blocked — allow popups and try again" : "Login failed", "error");
   }
 }
 async function logout() {
@@ -100,15 +100,15 @@ async function syncOnLogin(user) {
     const cloudHasData = dSnap.exists() && dSnap.data().state;
     const cloudUpdatedAt = cloudHasData ? (dSnap.data().updatedAt || 0) : 0;
     if (cloudHasData && (cloudUpdatedAt > localUpdatedAt || isLocalEmpty(st))) {
-      FF().setState && FF().setState(JSON.parse(dSnap.data().state));   // cloud mới hơn / local trống → nạp cloud
-      status("Đã tải tiến trình từ cloud", "ok");
+      FF().setState && FF().setState(JSON.parse(dSnap.data().state));   // cloud newer / local empty → load cloud
+      status("Loaded progress from cloud", "ok");
     } else {
-      await pushToCloud(user);                                          // local mới hơn / cloud trống → đẩy lên
-      status(cloudHasData ? "Đã đồng bộ lên cloud" : "Đã tạo tài khoản + sao lưu", "ok");
+      await pushToCloud(user);                                          // local newer / cloud empty → push up
+      status(cloudHasData ? "Synced to cloud" : "Created account + backup", "ok");
     }
   } catch (e) {
     console.warn("sync error", e);
-    status("Lỗi đồng bộ (kiểm tra rules)", "error");
+    status("Sync error (check rules)", "error");
   }
 }
 
@@ -120,15 +120,15 @@ async function pushToCloud(user) {
     const snap = await getDoc(dataRef(user.uid));
     if (snap.exists() && snap.data().state) {
       const cloud = JSON.parse(snap.data().state);
-      if (isLocalEmpty(st) && stateWeight(cloud) > 0) { console.warn("push chặn: local trống, cloud có data"); return; }
+      if (isLocalEmpty(st) && stateWeight(cloud) > 0) { console.warn("push blocked: local empty, cloud has data"); return; }
     }
   } catch (_) {}
-  await setDoc(dataRef(user.uid), {                        // DỮ LIỆU → data/{uid}
+  await setDoc(dataRef(user.uid), {                        // DATA → data/{uid}
     state: JSON.stringify(st),
     updatedAt: st.updatedAt || Date.now(),
     syncedAt: Date.now(),
   });
-  await setDoc(userRef(user.uid), {                        // cập nhật tóm tắt trong HỒ SƠ
+  await setDoc(userRef(user.uid), {                        // update summary in PROFILE
     progress: progressSummary(st),
     lastSyncAt: Date.now(),
   }, { merge: true });
@@ -141,8 +141,8 @@ function scheduleSync() {
   if (!currentUser) return;
   clearTimeout(saveTimer);
   saveTimer = setTimeout(async () => {
-    try { await pushToCloud(currentUser); status("Đã lưu lên cloud", "ok"); }
-    catch (e) { console.warn(e); status("Lỗi lưu cloud", "error"); }
+    try { await pushToCloud(currentUser); status("Saved to cloud", "ok"); }
+    catch (e) { console.warn(e); status("Cloud save error", "error"); }
   }, 2000);
 }
 
@@ -152,12 +152,12 @@ function scheduleSync() {
 // mỗi người có kho riêng users/{uid} + data/{uid}. Link riêng (#k=) chỉ dùng khi chủ động tạo để chia sẻ.
 // (Khôi phục kho chia sẻ cũ: mở URL kèm #k=cekak3W-TgwjLrT3KBrCcP1zVARK6Hpa.)
 let linkKey = readLinkKey();
-let pullDone = false;   // chặn mọi push lên cloud cho tới khi pull lần đầu hoàn tất (tránh state rỗng đè data)
+let pullDone = false;   // block cloud pushes until the first pull completes (prevents empty state overwrite)
 
 function readLinkKey() {
   try {
     const m = (location.hash || "").match(/[#&]k=([A-Za-z0-9_-]{24,})/);
-    return m ? m[1] : null;   // không có mã trong URL → null → dùng chế độ tài khoản (đăng nhập)
+    return m ? m[1] : null;   // no code in URL → null → use account mode (login)
   } catch (_) { return null; }
 }
 
@@ -180,7 +180,7 @@ function stateWeight(st) {
 async function pushToKey(key) {
   const st = FF().getState ? FF().getState() : null;
   if (!st) return;
-  if (!pullDone) return;                 // an toàn: chưa pull xong thì không ghi
+  if (!pullDone) return;                 // safety: do not write before pull is complete
   const ref = doc(db, "links", key);
   // CHỐNG MẤT DATA: đọc cloud trước; nếu bản đang ghi trống/nghèo hơn HẲN bản cloud → KHÔNG ghi đè.
   try {
@@ -189,11 +189,11 @@ async function pushToKey(key) {
       const cloud = JSON.parse(snap.data().state);
       const wNew = stateWeight(st), wCloud = stateWeight(cloud);
       // Bản mới trống nhưng cloud có data → chặn hẳn (đây chính là lỗi đã gây mất data).
-      if (isLocalEmpty(st) && wCloud > 0) { console.warn("push bị chặn: local trống, cloud có data"); return; }
+      if (isLocalEmpty(st) && wCloud > 0) { console.warn("push blocked: local empty, cloud has data"); return; }
       // Bản mới nghèo hơn cloud >30% và cloud không cũ hơn → nghi ngờ, giữ backup rồi mới ghi.
       if (wNew < wCloud * 0.7) {
         await setDoc(doc(db, "links", key + "__bak"), { state: snap.data().state, updatedAt: snap.data().updatedAt || Date.now(), syncedAt: Date.now() }).catch(() => {});
-        console.warn("push nghi ngờ (nghèo hơn cloud) — đã giữ backup cloud cũ vào __bak");
+        console.warn("suspicious push (weaker than cloud) — saved old cloud backup to __bak");
       }
     }
   } catch (_) {}
@@ -221,25 +221,25 @@ async function pullFromKey(key) {
     if (cloud.state && ((cloud.updatedAt || 0) > localUpdatedAt || isLocalEmpty(st))) {
       FF().setState && FF().setState(JSON.parse(cloud.state));
       pullDone = true;
-      status("Đã tải tiến trình từ link riêng", "ok");
+      status("Loaded progress from private link", "ok");
     } else {
       pullDone = true;
       await pushToKey(key);
-      status("Đã đồng bộ link riêng", "ok");
+      status("Synced private link", "ok");
     }
   } else {
     pullDone = true;
     await pushToKey(key);
-    status("Đã tạo link riêng", "ok");
+    status("Created private link", "ok");
   }
 }
 
 function scheduleKeyPush() {
-  if (!pullDone) return;   // chưa pull xong → không ghi đè cloud
+  if (!pullDone) return;   // pull not complete → do not overwrite cloud
   clearTimeout(saveTimer);
   saveTimer = setTimeout(async () => {
-    try { await pushToKey(linkKey); status("Đã lưu lên link riêng", "ok"); }
-    catch (e) { console.warn(e); status("Lỗi lưu link riêng", "error"); }
+    try { await pushToKey(linkKey); status("Saved to private link", "ok"); }
+    catch (e) { console.warn(e); status("Private link save error", "error"); }
   }, 2000);
 }
 
@@ -251,7 +251,7 @@ async function createPrivateLink() {
     pullDone = true;
     await pushToKey(key);
     const url = location.origin + location.pathname + "#k=" + key;
-    status("Đã bật link riêng", "ok");
+    status("Private link enabled", "ok");
     startKeyPolling();
     return url;
   } catch (e) {
@@ -282,22 +282,22 @@ function startKeyPolling() {
 
 // Nếu mở link đã có #k= → vào thẳng chế độ link riêng (bỏ qua login).
 if (linkKey) {
-  status("🔗 Chế độ link riêng", "link");
+  status("🔗 Private link mode", "link");
   pullFromKey(linkKey).then(startKeyPolling).catch((e) => {
     console.warn("pullFromKey", e);
-    status("Lỗi tải link riêng (kiểm tra rules)", "error");
+    status("Private link load error (check rules)", "error");
   });
 }
 
 // ---- Theo dõi trạng thái đăng nhập (bỏ qua khi đang ở chế độ link riêng) ----
 onAuthStateChanged(auth, async (user) => {
-  if (linkKey) return; // chế độ link riêng không dùng auth
+  if (linkKey) return; // private link mode does not use auth
   currentUser = user;
   if (user) {
     status(`✓ ${user.displayName || user.email}`, "signed-in");
     await syncOnLogin(user);
   } else {
-    status("Chưa đăng nhập", "signed-out");
+    status("Not signed in", "signed-out");
   }
 });
 

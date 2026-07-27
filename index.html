@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>FocusFlow · Learning & Schedule Manager</title>
-  <meta name="description" content="FocusFlow — biến việc học thành game nhập vai: lên lịch tuần, tập trung kiếm XP, lên cấp, làm nhiệm vụ hằng ngày và hạ boss tuần." />
+  <meta name="description" content="FocusFlow turns studying into an RPG: plan your week, focus to earn XP, level up, complete daily quests, and defeat the weekly boss." />
   <meta name="theme-color" content="#eef4e8" id="themeColorMeta" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Orbitron:wght@400;500;600;700;800;900&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=56" />
+  <link rel="stylesheet" href="styles.css?v=57" />
 </head>
 <body>
   <div class="aurora"></div>
@@ -42,14 +42,14 @@
       </div>
     </div>
     <div class="top-actions">
-      <button class="btn ghost sync-btn" id="syncBtn" title="Đăng nhập để lưu tiến trình lên cloud">☁️ <span id="syncLabel">Đăng nhập</span></button>
-      <button class="btn ghost sync-btn" id="linkBtn" title="Tạo link riêng: mở ở máy nào cũng tự hiện tiến trình">🔗 <span>Link riêng</span></button>
-      <button class="icon-btn" id="aboutBtn" title="Giới thiệu FocusFlow">ℹ️</button>
+      <button class="btn ghost sync-btn" id="syncBtn" title="Sign in to save progress to the cloud">☁️ <span id="syncLabel">Login</span></button>
+      <button class="btn ghost sync-btn" id="linkBtn" title="Create a private link: open it on any device to load progress">🔗 <span>Private link</span></button>
+      <button class="icon-btn" id="aboutBtn" title="About FocusFlow">ℹ️</button>
       <button class="icon-btn" id="themeToggle" title="Toggle light / dark">🌙</button>
       <button class="btn install" id="installBtn" hidden>⬇️ Install</button>
-      <div class="dday" id="dday" title="Đếm ngược tới kỳ thi vào 10 chuyên Lý LHP">
+      <div class="dday" id="dday" title="Countdown to the entrance exam">
         <span class="dday-num" id="ddayNum">—</span>
-        <span class="dday-lbl">ngày tới kỳ thi</span>
+        <span class="dday-lbl">days to exam</span>
       </div>
       <div class="clock" id="clock">—</div>
     </div>
@@ -193,19 +193,19 @@
     <!-- RIGHT: Stats & Settings -->
     <aside class="col side-right">
       <section class="card glow">
-        <h2 class="card-title">Nhật ký tuần</h2>
+        <h2 class="card-title">Weekly Journal</h2>
         <div class="stat-grid">
-          <div class="stat"><span class="stat-num" id="statSessions">0</span><span class="stat-label">Nhiệm vụ</span></div>
-          <div class="stat"><span class="stat-num" id="statDone">0</span><span class="stat-label">Hoàn thành</span></div>
-          <div class="stat"><span class="stat-num" id="statFocus">0h</span><span class="stat-label">Đã học</span></div>
+          <div class="stat"><span class="stat-num" id="statSessions">0</span><span class="stat-label">Quests</span></div>
+          <div class="stat"><span class="stat-num" id="statDone">0</span><span class="stat-label">Completed</span></div>
+          <div class="stat"><span class="stat-num" id="statFocus">0h</span><span class="stat-label">Studied</span></div>
           <div class="stat"><span class="stat-num" id="statStreak">0</span><span class="stat-label">🔥 Streak</span></div>
         </div>
         <div class="progress-wrap">
-          <div class="progress-head"><span>🎯 Mục tiêu hôm nay</span><span id="dailyText">0 / 120 phút</span></div>
+          <div class="progress-head"><span>🎯 Today's goal</span><span id="dailyText">0 / 120 min</span></div>
           <div class="progress-track"><div class="progress-fill" id="dailyFill"></div></div>
         </div>
         <div class="progress-wrap">
-          <div class="progress-head"><span>◈ Mục tiêu tuần</span><span id="goalText">0 / 14h</span></div>
+          <div class="progress-head"><span>◈ Weekly goal</span><span id="goalText">0 / 14h</span></div>
           <div class="progress-track"><div class="progress-fill" id="goalFill"></div></div>
         </div>
       </section>
@@ -251,10 +251,10 @@
               <option>Thu</option><option>Fri</option><option>Sat</option><option>Sun</option>
             </select>
           </label>
-          <label>Từ (giờ bắt đầu)<input name="start" type="time" value="18:00" required /></label>
+          <label>From (start time)<input name="start" type="time" value="18:00" required /></label>
         </div>
         <div class="row">
-          <label>Đến (giờ kết thúc)<input name="end" type="time" value="19:00" required /></label>
+          <label>To (end time)<input name="end" type="time" value="19:00" required /></label>
           <label>Color<div class="swatches" id="swatches"></div></label>
         </div>
         <div class="modal-actions">
@@ -267,14 +267,14 @@
 
   <div class="toast" id="toast" hidden></div>
 
-  <!-- demo.js phải chạy TRƯỚC app.js: nó bật cờ FF_DEMO để app.js chọn key lưu trữ riêng. -->
-  <script src="demo.js?v=56"></script>
-  <script src="app.js?v=56"></script>
-  <!-- Ở chế độ demo KHÔNG nạp Firebase: không đăng nhập, không đọc/ghi cloud. -->
+  <!-- demo.js must run BEFORE app.js: it sets FF_DEMO so app.js uses a separate storage key. -->
+  <script src="demo.js?v=57"></script>
+  <script src="app.js?v=57"></script>
+  <!-- In demo mode, do NOT load Firebase: no login, no cloud reads/writes. -->
   <script>
     if (!window.FF_DEMO) {
       const s = document.createElement("script");
-      s.type = "module"; s.src = "firebase-sync.js?v=56";
+      s.type = "module"; s.src = "firebase-sync.js?v=57";
       document.body.appendChild(s);
     }
   </script>

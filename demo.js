@@ -74,7 +74,7 @@
     const WEEK_MIN = [110, 85, 130, 65, 125, 95, 105];   // Mon..Sun
     const focusByDay = {};
     const focusLog = [];
-    for (let i = 0; i < ti; i++) {                        // các ngày đã trọn vẹn
+    for (let i = 0; i < ti; i++) {                        // completed days
       const date = daysAgo(ti - i);
       focusByDay[date] = WEEK_MIN[i];
       focusLog.push(date);
@@ -91,7 +91,7 @@
     // (boss chỉ tính các ngày trong tuần hiện tại).
     const prev = [95, 130, 70, 145, 110, 60, 125];
     for (let i = 0; i < prev.length; i++) {
-      const date = daysAgo(ti + 1 + i);   // lùi tiếp từ ngày trước Thứ 2 của tuần này
+      const date = daysAgo(ti + 1 + i);   // continue backward from the day before this week's Monday
       focusByDay[date] = prev[i];
       focusLog.push(date);
     }
@@ -105,26 +105,26 @@
       completions: { [wk]: done },
       focusByDay,
       focusLog,
-      focusMinutes: XP,                 // 1 XP = 1 phút học (đúng quy ước app.js)
+      focusMinutes: XP,                 // 1 XP = 1 study minute (same convention as app.js)
       theme: "dark",
       reminders: { enabled: true, lead: 10, summary: false },
       rpg: {
         xp: XP,
         stats: { int: 2100, dis: 1450, foc: XP, str: 620 },
-        seeded: true,                   // đừng backfill lại XP từ focusMinutes
+        seeded: true,                   // do not backfill XP from focusMinutes again
         train: "int",
         totalSessions: 63,
         questsClaimed: 41,
         bossesDefeated: 3,
         // perksSeen/achSeen bỏ trống → app.js tự backfill IM LẶNG (không spam popup mở khoá).
-        sysMsgDay: isoDay(new Date()),  // bỏ qua panel 【SYSTEM】 để tour không bị đè
+        sysMsgDay: isoDay(new Date()),  // skip the 【SYSTEM】 panel so it does not cover the tour
       },
-      quests: { day: isoDay(new Date()), sessions: 2, claimed: {} }, // picks tự sinh; s2 claim được ngay
+      quests: { day: isoDay(new Date()), sessions: 2, claimed: {} }, // picks auto-generate; s2 is claimable immediately
       // Sát thương boss = tổng phút học TRONG TUẦN. Tự tính xem boss đã chết chưa rồi ghi đúng cờ:
       // đầu tuần boss còn sống (hiện thanh máu), cuối tuần boss đã bị hạ (hiện thẻ SLAIN + phần thưởng).
       // Ghi sẵn cờ `defeated` để app.js KHÔNG bắn lại popup "BOSS DEFEATED" mỗi lần mở demo.
       boss: { week: wk, defeated: weekDamage >= bossHp(wk) },
-      demoDay: today,                   // mốc để làm mới demo mỗi ngày
+      demoDay: today,                   // marker used to refresh demo daily
       updatedAt: Date.now(),
     };
   }
@@ -217,7 +217,7 @@
       ensureLoginScreen();
       const el = document.getElementById("ffdLogin");
       if (el) el.classList.remove("hide");
-      say("Chưa đăng nhập", "signed-out");
+      say("Not signed in", "signed-out");
     }
 
     window.FFSync = {
@@ -227,7 +227,7 @@
         this.user = null;
         sessionStorage.removeItem(AUTH_KEY);
         sessionStorage.removeItem(USER_KEY);
-        say("Chưa đăng nhập", "signed-out");
+        say("Not signed in", "signed-out");
         if (window.toast) window.toast("Logged out of demo");
       },
       scheduleSync() {},
@@ -237,18 +237,18 @@
 
     ensureLogoutButton();
     if (window.FFSync.user) say(`✓ ${window.FFSync.user.displayName}`, "signed-in", window.FFSync.user);
-    else say("Chưa đăng nhập", "signed-out");
+    else say("Not signed in", "signed-out");
   }
 
   // Tour chỉ đi qua các panel CÒN HIỆN trong demo gọn (khớp với hidePanels ở trên).
   const TOUR = [
-    { sel: ".hero-card",     title: "Nhân vật của bạn",   body: "Mỗi phút học = 1 XP. XP lên level, mở danh hiệu và chỉ số INT / DIS / FOC / STR trên radar." },
-    { sel: "#week",          title: "Bảng nhiệm vụ tuần", body: "Thời khoá biểu cả tuần. Bấm “+ New Quest” để thêm buổi học, bấm vào buổi để đánh dấu hoàn thành." },
-    { sel: ".timer-card",    title: "Đồng hồ Train",      body: "Hẹn giờ tập trung (25/45/15 phút). Chạy tới đâu cộng XP tới đó — chọn chỉ số muốn luyện ở hàng TRAIN." },
-    { sel: "#questList",     title: "Nhiệm vụ hằng ngày", body: "Mỗi ngày bốc 4 nhiệm vụ mới. Xong thì bấm CLAIM để nhận XP thưởng — thử ngay, có cái claim được đấy!" },
-    { sel: ".card.glow",     title: "Nhật ký tuần",       body: "Nhiệm vụ, số buổi hoàn thành, giờ đã học, và chuỗi ngày liên tiếp 🔥." },
-    { sel: "#barChart",      title: "Biểu đồ tập trung",  body: "Số phút học từng ngày trong tuần." },
-    { sel: "#syncBtn",       title: "Tài khoản demo",  body: "Bấm để mở màn hình đăng nhập demo. Đây chỉ là mô phỏng an toàn, không cần tài khoản thật và không lưu mật khẩu." },
+    { sel: ".hero-card",     title: "Your character",   body: "Every study minute = 1 XP. XP levels you up and grows INT / DIS / FOC / STR on the radar." },
+    { sel: "#week",          title: "Weekly quest board", body: "Your weekly schedule. Click “+ New Quest” to add a study session, or click a session to mark it done." },
+    { sel: ".timer-card",    title: "Training timer",      body: "Focus timer (25/45/15 min). XP grows while it runs — choose the stat to train in the TRAIN row." },
+    { sel: "#questList",     title: "Daily quests", body: "Each day gives 4 new quests. Finish them and press CLAIM for bonus XP — try it now." },
+    { sel: ".card.glow",     title: "Weekly journal",       body: "Quests, completed sessions, studied time, and your streak 🔥." },
+    { sel: "#barChart",      title: "Focus chart",  body: "Study minutes for each day of the week." },
+    { sel: "#syncBtn",       title: "Demo account",  body: "Click to open the demo login screen. This is a safe simulation, no real account needed and no password is saved." },
   ];
 
   const css = `
@@ -343,15 +343,15 @@
     step = i;
     const s = TOUR[step];
     const el = document.querySelector(s.sel);
-    if (!el || el.offsetParent === null) { go(i + 1); return; }   // không có / đang ẩn → bỏ qua bước
+    if (!el || el.offsetParent === null) { go(i + 1); return; }   // missing / hidden → skip step
 
     tip.innerHTML = `
-      <div class="ffd-step">BƯỚC ${step + 1} / ${TOUR.length}</div>
+      <div class="ffd-step">STEP ${step + 1} / ${TOUR.length}</div>
       <h3></h3><p></p>
       <div class="ffd-nav">
-        <button class="ffd-skip">Bỏ qua</button>
-        ${step > 0 ? '<button class="ffd-prev">← Trước</button>' : ""}
-        <button class="pri ffd-next">${step === TOUR.length - 1 ? "Xong ✓" : "Tiếp →"}</button>
+        <button class="ffd-skip">Skip</button>
+        ${step > 0 ? '<button class="ffd-prev">← Back</button>' : ""}
+        <button class="pri ffd-next">${step === TOUR.length - 1 ? "Done ✓" : "Next →"}</button>
       </div>`;
     tip.querySelector("h3").textContent = s.title;
     tip.querySelector("p").textContent = s.body;
@@ -361,7 +361,7 @@
     if (prev) prev.onclick = () => go(step - 1);
 
     el.scrollIntoView({ block: "center", behavior: "smooth" });
-    setTimeout(place, 380);   // đợi scroll xong mới đo toạ độ
+    setTimeout(place, 380);   // wait for scroll before measuring position
   }
 
   function startTour() {
@@ -387,7 +387,7 @@
     setupFakeLogin();
 
     // Demo GỌN: ẩn các panel phụ để người xem chỉ tập trung vào tính năng cốt lõi.
-    // Giữ lại: Nhân vật/XP · Lịch tuần · Đồng hồ Train · Nhiệm vụ ngày · Nhật ký tuần · Biểu đồ.
+    // Giữ lại: Nhân vật/XP · Lịch tuần · Training timer · Nhiệm vụ ngày · Weekly journal · Biểu đồ.
     // Ẩn đi:   Cây kỹ năng · Boss tuần · Nhạc tập trung · Nhắc học & dữ liệu.
     hidePanels();
 
@@ -395,10 +395,10 @@
     bar.className = "ffd-bar";
     bar.innerHTML = `
       <span class="ffd-tag">DEMO</span>
-      <span class="ffd-txt">Dữ liệu mẫu · không lưu vào tài khoản nào</span>
-      <button class="pri ffd-tour">▶ Xem hướng dẫn</button>
-      <button class="ffd-reset">↺ Đặt lại</button>
-      <button class="ffd-exit">Thoát</button>`;
+      <span class="ffd-txt">Sample data · not saved to any account</span>
+      <button class="pri ffd-tour">▶ Start tour</button>
+      <button class="ffd-reset">↺ Reset</button>
+      <button class="ffd-exit">Exit</button>`;
     document.body.appendChild(bar);
     bar.querySelector(".ffd-tour").onclick = startTour;
     bar.querySelector(".ffd-reset").onclick = () => window.FF_DEMO_RESET();
