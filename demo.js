@@ -171,15 +171,12 @@
       wrap.innerHTML = `
         <form class="ffd-login-card" id="ffdLoginForm" autocomplete="off">
           <div class="ffd-login-mark">⚔️</div>
-          <div class="ffd-login-kicker">FocusFlow Demo</div>
           <h2>Sign in to continue</h2>
-          <p>This is a demo login only. Do not enter any real password.</p>
           <label>Email or username</label>
           <input id="ffdLoginEmail" type="text" placeholder="demo@focusflow.app" autocomplete="username" required />
           <label>Password</label>
           <input id="ffdLoginPass" type="password" placeholder="Any demo password" autocomplete="new-password" required />
           <button class="ffd-login-btn" type="submit">Log in</button>
-          <div class="ffd-login-note">Password is never saved or sent. Any non-empty password works.</div>
         </form>`;
       document.body.appendChild(wrap);
       wrap.querySelector("#ffdLoginForm").addEventListener("submit", (e) => {
@@ -212,8 +209,8 @@
         this.user = null;
         sessionStorage.removeItem(AUTH_KEY);
         sessionStorage.removeItem(USER_KEY);
+        say("Chưa đăng nhập", "signed-out");
         if (window.toast) window.toast("Logged out of demo");
-        showLoginScreen();
       },
       scheduleSync() {},
       createPrivateLink() { return Promise.reject(new Error("demo")); },
@@ -221,7 +218,7 @@
     };
 
     if (window.FFSync.user) say(`✓ ${window.FFSync.user.displayName}`, "signed-in", window.FFSync.user);
-    else setTimeout(showLoginScreen, 250);
+    else say("Chưa đăng nhập", "signed-out");
   }
 
   // Tour chỉ đi qua các panel CÒN HIỆN trong demo gọn (khớp với hidePanels ở trên).
@@ -245,15 +242,12 @@
     border:1px solid rgba(148,163,184,.35);box-shadow:0 24px 90px rgba(0,0,0,.45);display:flex;flex-direction:column;gap:10px}
   .ffd-login-mark{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;font-size:24px;
     background:linear-gradient(135deg,#8b5cf6,#4fd6ff);box-shadow:0 10px 28px rgba(139,92,246,.3)}
-  .ffd-login-kicker{margin-top:6px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:900;color:#6d28d9}
   .ffd-login-card h2{margin:0;font-size:26px;line-height:1.15;color:#111827;font-weight:900}
-  .ffd-login-card p{margin:0 0 8px;color:#6b7280;font-size:14px;line-height:1.45}
   .ffd-login-card label{margin-top:8px;font-size:13px;font-weight:800;color:#374151}
   .ffd-login-card input{height:46px;border-radius:12px;border:1px solid #d1d5db;padding:0 13px;font:inherit;font-size:15px;outline:none;background:#fff;color:#111827}
   .ffd-login-card input:focus{border-color:#8b5cf6;box-shadow:0 0 0 4px rgba(139,92,246,.14)}
   .ffd-login-btn{margin-top:12px;height:46px;border:0;border-radius:999px;background:#1a73e8;color:#fff;font:inherit;font-weight:900;cursor:pointer;box-shadow:0 8px 24px rgba(26,115,232,.28)}
   .ffd-login-btn:hover{background:#1765cc}
-  .ffd-login-note{margin-top:4px;font-size:12px;color:#6b7280;line-height:1.45;background:#f3f4f6;border-radius:12px;padding:10px}
 
   .ffd-bar{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:9000;
     display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:999px;
