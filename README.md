@@ -52,86 +52,33 @@ focusflow/
 
 ## 2. Setup, Installation, and Use Guide
 
-### Run the project locally
-
-Clone the repository:
+To run FocusFlow on your computer, clone the repository and start a simple local web server:
 
 ```bash
 git clone https://github.com/SPIDD246/focusflow.git
 cd focusflow
-```
-
-Start a local web server:
-
-```bash
 python3 -m http.server 8000
 ```
 
-Open the app in your browser:
+Then open the app in your browser:
 
 ```text
 http://localhost:8000/
 ```
 
-Open demo mode locally:
+For demo mode, open:
 
 ```text
 http://localhost:8000/?demo=1
 ```
 
-> The project is a static web app, so there is no build step required.
+FocusFlow is a static web app, so there is no build step required. It can also be installed as a PWA. On desktop Chrome or Edge, open the website and use the install icon in the address bar or the browser menu. On Android, open the website in Chrome, tap the three-dot menu, and choose **Add to Home screen** or **Install app**. After installation, FocusFlow can be opened like a normal app.
+
+The app supports cloud sync with Firebase. Depending on the setup, data can be saved in browser local storage, Firebase Firestore, or through Google account sync. This helps your schedule and progress appear again when you open the app on another device.
+
+Because FocusFlow uses a service worker, the browser may sometimes keep an old cached version. If the app looks outdated, close all FocusFlow tabs, reopen the page, and hard refresh with **Ctrl + Shift + R**. If needed, clear site data from browser settings.
 
 ---
-
-### Install as an app
-
-FocusFlow can be installed as a PWA.
-
-On desktop Chrome / Edge:
-
-1. Open the FocusFlow website.
-2. Click the install icon in the address bar, or open the browser menu.
-3. Choose **Install FocusFlow**.
-
-On Android:
-
-1. Open the website in Chrome.
-2. Tap the three-dot menu.
-3. Choose **Add to Home screen** or **Install app**.
-
-After installation, FocusFlow can be opened like a normal app.
-
----
-
----
-
-### Cloud sync
-
-FocusFlow supports cloud sync with Firebase.
-
-Depending on the setup, data can be saved in:
-
-- Browser local storage
-- Firebase Firestore
-- Google account sync
-
-Cloud sync helps your schedule and progress appear again when you open the app on another device.
-
----
-
-### If the app shows old data
-
-Because FocusFlow uses a service worker, the browser may sometimes keep an old cached version.
-
-If the app looks outdated:
-
-1. Close all FocusFlow tabs.
-2. Reopen the page.
-3. Hard refresh with **Ctrl + Shift + R**.
-4. If needed, clear site data from browser settings.
-
----
-
 ## 3. Demo and Image
 
 ### Demo mode
