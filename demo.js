@@ -156,12 +156,30 @@
   function setupFakeLogin() {
     const AUTH_KEY = "ff_demo_auth";
     const USER_KEY = "ff_demo_user";
-    const say = (text, kind, user) => { if (window.FF && window.FF.onSyncStatus) window.FF.onSyncStatus(text, kind, user); };
+    const say = (text, kind, user) => {
+      if (window.FF && window.FF.onSyncStatus) window.FF.onSyncStatus(text, kind, user);
+      const out = document.getElementById("demoLogoutBtn");
+      if (out) out.hidden = kind !== "signed-in";
+    };
     const isAuthed = () => sessionStorage.getItem(AUTH_KEY) === "1";
     const savedUser = () => {
       try { return JSON.parse(sessionStorage.getItem(USER_KEY) || "null"); }
       catch (_) { return null; }
     };
+
+    function ensureLogoutButton() {
+      if (document.getElementById("demoLogoutBtn")) return;
+      const syncBtn = document.getElementById("syncBtn");
+      if (!syncBtn || !syncBtn.parentNode) return;
+      const btn = document.createElement("button");
+      btn.id = "demoLogoutBtn";
+      btn.className = "btn ghost sync-btn";
+      btn.hidden = !window.FFSync || !window.FFSync.user;
+      btn.textContent = "Log Out";
+      btn.title = "Log out of demo account";
+      btn.addEventListener("click", () => window.FFSync && window.FFSync.logout());
+      syncBtn.insertAdjacentElement("afterend", btn);
+    }
 
     function ensureLoginScreen() {
       if (document.getElementById("ffdLogin")) return;
@@ -217,6 +235,7 @@
       get linkMode() { return false; },
     };
 
+    ensureLogoutButton();
     if (window.FFSync.user) say(`✓ ${window.FFSync.user.displayName}`, "signed-in", window.FFSync.user);
     else say("Chưa đăng nhập", "signed-out");
   }
