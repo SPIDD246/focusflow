@@ -69,31 +69,65 @@ focusflow/
 
 ## 2. Setup, Installation, and Use Guide
 
-To run FocusFlow locally, clone the project and start a simple web server:
+### Clone the project
 
 ```bash
 git clone https://github.com/SPIDD246/focusflow.git
 cd focusflow
+```
+
+### Run locally
+
+```bash
 python3 -m http.server 8000
 ```
 
-Open the app:
+Open:
 
 ```text
 http://localhost:8000/
 ```
 
-Open demo mode:
+### Open demo mode
 
 ```text
 http://localhost:8000/?demo=1
 ```
 
-FocusFlow is a static web app, so there is **no build step** and no framework setup. It can also be installed as a PWA: on desktop Chrome or Edge, use the install icon in the address bar or browser menu; on Android, open the website in Chrome, tap the three-dot menu, and choose **Add to Home screen** or **Install app**.
+### Install as an app
 
-The app can save data in the browser and sync progress with Firebase, depending on the current setup. This helps study schedules and progress appear again when the app is opened on another device.
+Desktop Chrome / Edge:
 
-> **Cache note:** FocusFlow uses a service worker. If the app ever looks outdated, close all FocusFlow tabs and hard refresh with **Ctrl + Shift + R**. If needed, clear site data from browser settings.
+```text
+Address bar → Install icon → Install FocusFlow
+```
+
+Android Chrome:
+
+```text
+Menu ⋮ → Add to Home screen / Install app
+```
+
+### Sync data
+
+```text
+Open the same app link on another device.
+Progress can sync through Firebase / browser storage.
+```
+
+### Fix old cached version
+
+```text
+Close all FocusFlow tabs.
+Open the app again.
+Press Ctrl + Shift + R.
+```
+
+If it still looks old:
+
+```text
+Browser settings → Site data → Clear FocusFlow data
+```
 
 ---
 
