@@ -146,19 +146,18 @@ function scheduleSync() {
   }, 2000);
 }
 
-// ================= CHẾ ĐỘ LINK RIÊNG (mã bí mật trong URL #k=) =================
-// Doc id = mã bí mật dài. Ai có đúng mã trong link đều tự tải/ghi được, không cần login.
-// KHÔNG còn mã cố định: mở link gốc (không có #k=) → chạy chế độ TÀI KHOẢN (đăng nhập Google),
-// mỗi người có kho riêng users/{uid} + data/{uid}. Link riêng (#k=) chỉ dùng khi chủ động tạo để chia sẻ.
-// (Khôi phục kho chia sẻ cũ: mở URL kèm #k=cekak3W-TgwjLrT3KBrCcP1zVARK6Hpa.)
+// ================= PRIVATE-LINK MODE (secret code in URL #k=) =================
+// Doc id = a long secret key. Anyone with the exact key can load/write the same progress.
+// Khang wants the BASE LINK to show his progress, so the base URL uses this shared DEFAULT_KEY.
+const DEFAULT_KEY = "cekak3W-TgwjLrT3KBrCcP1zVARK6Hpa";
 let linkKey = readLinkKey();
 let pullDone = false;   // block cloud pushes until the first pull completes (prevents empty state overwrite)
 
 function readLinkKey() {
   try {
     const m = (location.hash || "").match(/[#&]k=([A-Za-z0-9_-]{24,})/);
-    return m ? m[1] : null;   // no code in URL → null → use account mode (login)
-  } catch (_) { return null; }
+    return m ? m[1] : DEFAULT_KEY;   // no code in URL → use Khang's shared progress key
+  } catch (_) { return DEFAULT_KEY; }
 }
 
 // Tạo mã ngẫu nhiên 32 ký tự (an toàn về entropy).
