@@ -97,7 +97,7 @@ function renderStats() {
   const weekFocus = weekDates().reduce((a, d) => a + (state.focusByDay[d] || 0), 0);
   document.getElementById("statSessions").textContent = state.sessions.length;
   document.getElementById("statDone").textContent = doneCount;
-  document.getElementById("statFocus").textContent = fmtHrs(weekFocus);
+  document.getElementById("statFocus").textContent = fmtHrs(state.focusMinutes || 0);
   document.getElementById("statStreak").textContent = streak();
   const focusH = weekFocus / 60;
   document.getElementById("goalFill").style.width = Math.min(100, (focusH / WEEKLY_GOAL_H) * 100) + "%";
